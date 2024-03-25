@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	
+	<!-- default -->
+	<meta charset="utf-8">
+
+	<title>A* algorithm</title>
+	<meta name="description" content="A* algorithm">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<link rel="icon" href="../images/favicon.png">
+	<meta property="og:image" content="../images/preview.jpg">
+
+	<link rel="stylesheet" href="../libs/bootstrap/new css/bootstrap.min.css">
+
+	<link rel="stylesheet" href="../css/main.css">
+	<link rel="stylesheet" href="../css/media.css">
+
+	<script src="../libs/jquery/jquery-3.6.0.min.js" defer></script>
+	<script src="../js/common.js" defer></script>
+
+	<!-- default -->
+
+	<script src="../libs/bootstrap/js/bootstrap.bundle.min.js" defer></script>
+	<link rel="stylesheet" href="../css/Astar/Astart.css">
+	<script src="../js/Astar.js" defer></script>
+	
+</head>
+
+<body>
+
+	<!-- header -->
+	<header class="p-2 text-bg-dark">
+		<div class="container">
+			<div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+				<a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
+					<svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"/></svg>
+				</a>
+	
+				<ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+				<li><a href="../index.html" class="nav-link px-2 text-secondary">Home</a></li>
+				<li><a href="#" class="nav-link px-2 text-white-50">Clusterization</a></li>
+				<li><a href="#" class="nav-link px-2 text-white-50">Genetic tree</a></li>
+				<li><a href="#" class="nav-link px-2 text-white-50">Neural network</a></li>
+				<li><a href="#" class="nav-link px-2 text-white-50">Decision tree</a></li>
+				<li><a href="#" class="nav-link px-2 text-white-50">Ant colony</a></li>
+			</ul>
+			</div>
+		</div>
+	</header>
+
+	<!-- main -->
+	<div class = "container"><br>
+		<div class="row row-cols-auto">
+			<!-- grid -->
+			<div class="col-xl">
+				<div id="AstarGrid">
+					<!-- window size range form -->
+				<label for="windowSizeRange" class="form-label">Size of the window: <output id="windowValue"></output> </label>
+				<input type="range" class="form-range" min="0" max="1300" step="10" id="windowSizeRange" value = "660">
+				</div>
+			</div>
+			<!-- settings -->
+			<div class = 'col-xs'>
+				<!-- grid size range form --><br><br>
+				<label for="gridSizeRange" class="form-label">Size of the grid: <output id="gridValue"></output> </label>
+				<input type="range" class="form-range" min="0" max="100" step="1" id="gridSizeRange" value="10">
+				
+				<!-- cell type radio form --><br><br>
+				<div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+				<input type="radio" class="btn-check" name="btnradio" id="BLANKbtn" autocomplete="off" checked>
+				<label class="btn btn-outline-light" for="BLANKbtn">ERASER</label>
+
+				<input type="radio" class="btn-check" name="btnradio" id="WALLbtn" autocomplete="off">
+				<label class="btn btn-outline-light" for="WALLbtn">WALL</label>
+
+				<input type="radio" class="btn-check" name="btnradio" id="STARTbtn" autocomplete="off">
+				<label class="btn btn-outline-light" for="STARTbtn">START</label>
+
+				<input type="radio" class="btn-check" name="btnradio" id="ENDbtn" autocomplete="off">
+				<label class="btn btn-outline-light" for="ENDbtn">END</label>
+
+				<input type="radio" class="btn-check" name="btnradio" id="SLOWbtn" autocomplete="off">
+				<label class="btn btn-outline-light" for="SLOWbtn">SLOW</label>
+
+				<input type="radio" class="btn-check" name="btnradio" id="BOOSTbtn" autocomplete="off">
+				<label class="btn btn-outline-light" for="BOOSTbtn">BOOST</label>
+				</div>
+
+				<!-- brush size range form --><br><br>
+				<label for="BrushSizeRange" class="form-label">Size of the brush: <output id="brushValue"></output> </label>
+				<input type="range" class="form-range" min="1" max="9" step="2" id="BrushSizeRange" value="1">
+
+				<!-- delay range form --><br><br>
+				<label for="IterationsDelayRange" class="form-label">Iterations delay, ms: <output id="delayValue"></output> </label>
+				<input type="range" class="form-range" min="0" max="1000" step="1" id="IterationsDelayRange" value="0">
+
+				<!-- generate labyrinth button --><br><br>
+				<button type="button" class="btn btn-outline-light" id = "CreateLabyrinth">Generate labyrinth</button>
+
+				<!-- restart button -->
+				<button type="button" class="btn btn-outline-light" id = "RestartBtn">Restart</button>
+
+				<!-- run button -->
+				<button type="button" class="btn btn-outline-light" id = "RunBtn">Run Algorithm</button><br><br>
+
+				<!-- alert -->
+				<div id="liveAlertPlaceholder"></div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

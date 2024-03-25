@@ -1,0 +1,72 @@
+/* USER VARIABLES SECTION */
+
+:root{
+	--accent: rgb(154, 130, 84);
+	--color-header: #f4efec;
+	--color-text: rgb(205, 198, 195);
+	--regular-text: 16px;
+	--lineheight: 1.65;
+	--userfont: outfit-c;
+}
+
+/* BOOTSTRAP SETTINGS SECTION */
+
+/* gutter 20px (10px + 10px). Comment this code for default gutter start at 1.5rem (24px) wide.
+.container, .container-fluid, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl { --bs-gutter-x: .625rem; }
+.row, .row > * { --bs-gutter-x: 0rem; }*/
+
+/* FONTS LOAD SECTION */
+
+@font-face {
+	font-family: raleway-c;
+	src: url(../fonts/raleway-regular.woff2);
+}
+@font-face {
+	font-family: outfit-c;
+	src: url(../fonts/outfit-regular.woff2);
+}
+/* GENERAL CSS SETTINGS */
+
+::placeholder { color: var(--color-text); }
+::selection { background-color: var(--accent); color: var(--color-text); }
+input, textarea { outline: none; }
+input:focus:required:invalid, textarea:focus:required:invalid { border-color: red; }
+input:required:valid, textarea:required:valid { border-color: green; }
+
+body {
+	font-family: var(--userfont);
+	font-size: var(--regular-text);
+	line-height: var(--lineheight);
+	color: var(--color-text);
+	min-width: 320px;
+	position: relative;
+	overflow-x: hidden;
+	background-image: url(../images/background.jpg);
+	background-size: 50px;
+	overflow-x: hidden;
+
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+/* USER STYLES */
+
+.image {
+	max-width: 100%;
+	margin-bottom: var(--bs-gutter-x);
+	border-radius: 4px;
+}
+
+.gridCellImage {
+	max-width: 100%;
+	padding: 0;
+	border-radius: 4px;
+}
+
+.accent {
+	color: var(--accent);
+	font-weight: bold;
+}
