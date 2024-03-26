@@ -54,7 +54,7 @@
 
 	<!-- main -->
 	<div class = "container"><br>
-		<div class = "col-xs">
+		<div>
 			<label for="windowSizeRange" class="form-label">Size of the window: <output id="windowValue"></output> </label>
 			<input type="range" class="form-range" min="0" max="1300" step="10" id="windowSizeRange" value = "660">
 		</div>
@@ -66,9 +66,10 @@
 			</div>
 			<!-- settings -->
 			<div class = 'col-xs'>
-				<!-- grid size range form --><br><br>
-				<label for="gridSizeRange" class="form-label">Size of the grid: <output id="gridValue"></output> </label>
-				<input type="range" class="form-range" min="0" max="100" step="1" id="gridSizeRange" value="10">
+
+				<!-- brush size range form --><br><br>
+				<label for="BrushSizeRange" class="form-label">Size of the brush: <output id="brushValue"></output> </label>
+				<input type="range" class="form-range" min="1" max="9" step="2" id="BrushSizeRange" value="1">
 				
 				<!-- cell type radio form --><br><br>
 				<div class="btn-group" role="group" aria-label="Basic radio toggle button group">
@@ -84,6 +85,7 @@
 				<input type="radio" class="btn-check" name="btnradio" id="ENDbtn" autocomplete="off">
 				<label class="btn btn-outline-light" for="ENDbtn">END</label>
 
+				<!--gdgdg-->
 				<input type="radio" class="btn-check" name="btnradio" id="SLOWbtn" autocomplete="off">
 				<label class="btn btn-outline-light" for="SLOWbtn">SLOW</label>
 
@@ -91,13 +93,13 @@
 				<label class="btn btn-outline-light" for="BOOSTbtn">BOOST</label>
 				</div>
 
-				<!-- brush size range form --><br><br>
-				<label for="BrushSizeRange" class="form-label">Size of the brush: <output id="brushValue"></output> </label>
-				<input type="range" class="form-range" min="1" max="9" step="2" id="BrushSizeRange" value="1">
-
 				<!-- delay range form --><br><br>
 				<label for="IterationsDelayRange" class="form-label">Iterations delay, ms: <output id="delayValue"></output> </label>
 				<input type="range" class="form-range" min="0" max="1000" step="1" id="IterationsDelayRange" value="0">
+
+				<!-- grid size range form --><br><br>
+				<label for="gridSizeRange" class="form-label">Size of the grid: <output id="gridValue"></output> </label>
+				<input type="range" class="form-range" min="3" max="100" step="1" id="gridSizeRange" value="10">
 
 				<!-- generate labyrinth button --><br><br>
 				<button type="button" class="btn btn-outline-light" id = "CreateLabyrinth">Generate labyrinth</button>

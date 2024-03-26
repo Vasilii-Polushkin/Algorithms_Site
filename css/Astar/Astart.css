@@ -31,21 +31,25 @@
 }
 
 .open-list{
-    border: 4px solid rgba(226, 147, 3, 0.9);
+    border: 4px solid rgba(226, 147, 3, 0.9) !important;
 }
 
 .closed-list{
-    background-color: rgba(226, 147, 3, 0.9);
+    background-color: rgba(226, 147, 3, 0.9) !important;
 }
 
 .final-path{
     box-shadow: 0 0 0.3em rgb(255, 255, 255);
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, 0.9) !important;
 }
 
 .final-path-advanced{
     box-shadow: 0 0 0.5em rgb(255, 255, 255);
     background-color: rgba(255, 255, 255, 0.9);
+}
+
+.slow{
+    background-color: rgb(61, 146, 76);
 }
 
 .end-found{
