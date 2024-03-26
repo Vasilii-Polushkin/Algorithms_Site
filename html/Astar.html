@@ -54,13 +54,14 @@
 
 	<!-- main -->
 	<div class = "container"><br>
+		<div class = "col-xs">
+			<label for="windowSizeRange" class="form-label">Size of the window: <output id="windowValue"></output> </label>
+			<input type="range" class="form-range" min="0" max="1300" step="10" id="windowSizeRange" value = "660">
+		</div>
 		<div class="row row-cols-auto">
 			<!-- grid -->
 			<div class="col-xl">
 				<div id="AstarGrid">
-					<!-- window size range form -->
-				<label for="windowSizeRange" class="form-label">Size of the window: <output id="windowValue"></output> </label>
-				<input type="range" class="form-range" min="0" max="1300" step="10" id="windowSizeRange" value = "660">
 				</div>
 			</div>
 			<!-- settings -->
