@@ -1,5 +1,3 @@
-//import {PriorityQueue} from "./PriorityQueue.mjs";
-
 //global variables, shoud be editable only using functions
 
 let windowHeight = 660;
@@ -7,8 +5,6 @@ let windowWidth = 660;
 
 let cellsWidth = 10;
 let cellsHeight = 10;
-
-let isRunning = 0;
 
 // new width & height
 const outputGridSizeValue = document.getElementById("gridValue");
@@ -25,7 +21,6 @@ const outputIterationsDelayValue = document.getElementById("delayValue");
 const cellsTypes = { BLANK: 0, WALL: 1, START: 2, END: 3, SLOW: 4, BOOST: 5};
 const cellsTypesColours = { BLANK_COLOUR: '', WALL_COLOUR: `rgb(20, 18, 17)`, START_COLOUR: `rgb(245, 238, 235)`, END_COLOUR: `rgb(226, 147, 3)`, SLOW_COLOUR: `brown`, BOOST_COLOUR: `green`};
 let selectedCellType = cellsTypes.BLANK;
-
 //start & end cells
 
 let startCell = null;
@@ -40,10 +35,12 @@ grid.classList.add('grid');
 AstarGrid.appendChild(grid);
 
 //---------------------appending visual grid with cells----------------------//
-function makeVisualGrid()
+function remakeVisualGrid()
 {
-    isRunning = 0;
     grid.innerHTML = '';
+
+    clearLabyrinthStack();
+    clearAstarStack();
 
     startCell = null;
     endCell = null;
@@ -108,6 +105,7 @@ function updateWindowWidthHeight()
 {
   windowHeight = windowWidth = parseInt(outputWindowSizeValue.value);
 }
+
 function updateGridWidthHeight()
 {
   cellsHeight = cellsWidth = parseInt(outputGridSizeValue.value);
@@ -124,7 +122,7 @@ function updateWindowSize()
     grid.style.gridTemplateRows = `repeat(${cellsHeight}, ${cellHeightPixels}px)`; // наоборот
 }
 
-window.onload = () => {makeVisualGrid(cellsHeight, cellsWidth)};
+window.onload = () => {remakeVisualGrid(cellsHeight, cellsWidth)};
 //---------------------appending vilual cells to grid----------------------//
 
 function getValidCells(cellIndex)
@@ -279,13 +277,15 @@ document.getElementById("BOOSTbtn").addEventListener("click", function (){
 // restart btn
 document.getElementById("RestartBtn").addEventListener("click", function (){
   updateGridWidthHeight();
-  makeVisualGrid();
+  remakeVisualGrid();
 })
 
 
 //labyrinth btn
 document.getElementById("CreateLabyrinth").addEventListener("click", function (){
-  createLabyrinth();
+  updateGridWidthHeight();
+  remakeVisualGrid();
+  generateLabyrinth();
 })
 
 // grid size range
@@ -324,7 +324,7 @@ brushSizeInput.addEventListener("input", (event) => {
 });
 
 // run algorithm btn
-document.getElementById("RunBtn").addEventListener("click", runAlgorithm);
+document.getElementById("RunBtn").addEventListener("click", runAstar);
 
 // alert
 const alertPlaceholder = document.getElementById('liveAlertPlaceholder')
@@ -412,12 +412,6 @@ class PriorityQueue {
 
 // cell: [weight, position(i * height + j)]
 
-let weights = [];
-let path = [];
-let ancestors = [];
-const closedList = new Set();
-let openList = new PriorityQueue((a, b) => a[0] < b[0]);
-
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -444,7 +438,7 @@ function getAdjustCells(cellId)
   const res = [];
 
   if (cellId - cellsWidth >= 0) res.push(cellId - cellsWidth);
-  if (cellId + cellsWidth <= cellsWidth * cellsHeight) res.push(cellId + cellsWidth);
+  if (cellId + cellsWidth < cellsWidth * cellsHeight) res.push(cellId + cellsWidth);
   if (cellId % cellsWidth != 0) res.push(cellId - 1);
   if (cellId % cellsWidth != cellsWidth - 1) res.push(cellId + 1);
 
@@ -461,10 +455,29 @@ function getRandomKey(collection) {
   }
 }
 
-async function createLabyrinth()
+//----------------------------------------------------- Labyrinth ----------------------------------------------//
+let labyrinthStack = [];
+
+function clearLabyrinthStack()
 {
-  updateGridWidthHeight();
-  makeVisualGrid();
+  while (labyrinthStack.length != 0)
+    labyrinthStack.pop().isGenerating = false;
+}
+
+function generateLabyrinth()
+{
+  clearLabyrinthStack();
+  labyrinthStack.push(new labyrinth());
+  labyrinthStack[0].createLabyrinth();
+}
+class labyrinth
+{
+isGenerating = true;
+//constructor(){};
+async createLabyrinth()
+{
+  //updateGridWidthHeight();
+  //remakeVisualGrid();
 
   for (let i = 0; i < cellsHeight * cellsWidth; ++i)
     document.getElementById(i).style.backgroundColor = cellsTypesColours.WALL_COLOUR;
@@ -481,6 +494,7 @@ async function createLabyrinth()
   const wallList = new Set();
 
   await sleep(iterationsDelay);
+  if (this.isGenerating == false) return;
   getAdjustCells(randomCellId).forEach(id => {
     wallList.add(id);
     //visited[id] = true;
@@ -500,15 +514,17 @@ async function createLabyrinth()
     let top = getTopAdjustCell(randomWallId);
     let left = getLeftAdjustCell(randomWallId);
     let right = getRightAdjustCell(randomWallId);
-    
+
     if (bottom != null && top != null)
     {
       if (visited[bottom] && !visited[top])
       {
         visited[top] = true;
         if (iterationsDelay) await sleep(iterationsDelay);
+        if (this.isGenerating == false) return;
         document.getElementById(randomWallId).style.backgroundColor = cellsTypesColours.BLANK_COLOUR;
         if (iterationsDelay) await sleep(iterationsDelay);
+        if (this.isGenerating == false) return;
         document.getElementById(top).style.backgroundColor = cellsTypesColours.BLANK_COLOUR;
         getAdjustCells(top).forEach(id => {
           if (!visited[id])
@@ -522,8 +538,10 @@ async function createLabyrinth()
       {
         visited[bottom] = true;
         if (iterationsDelay) await sleep(iterationsDelay);
+        if (this.isGenerating == false) return;
         document.getElementById(randomWallId).style.backgroundColor = cellsTypesColours.BLANK_COLOUR;
         if (iterationsDelay) await sleep(iterationsDelay);
+        if (this.isGenerating == false) return;
         document.getElementById(bottom).style.backgroundColor = cellsTypesColours.BLANK_COLOUR;
         getAdjustCells(bottom).forEach(id => {
           if (!visited[id])
@@ -539,8 +557,10 @@ async function createLabyrinth()
       if (visited[left] && !visited[right])
       {
         if (iterationsDelay) await sleep(iterationsDelay);
+        if (this.isGenerating == false) return;
         document.getElementById(randomWallId).style.backgroundColor = cellsTypesColours.BLANK_COLOUR;
         if (iterationsDelay) await sleep(iterationsDelay);
+        if (this.isGenerating == false) return;
         document.getElementById(right).style.backgroundColor = cellsTypesColours.BLANK_COLOUR;
         visited[right] = true;
         getAdjustCells(right).forEach(id => {
@@ -554,8 +574,10 @@ async function createLabyrinth()
       if (!visited[left] && visited[right])
       {
         if (iterationsDelay) await sleep(iterationsDelay);
+        if (this.isGenerating == false) return;
         document.getElementById(randomWallId).style.backgroundColor = cellsTypesColours.BLANK_COLOUR;
         if (iterationsDelay) await sleep(iterationsDelay);
+        if (this.isGenerating == false) return;
         document.getElementById(left).style.backgroundColor = cellsTypesColours.BLANK_COLOUR;
         visited[left] = true;
         getAdjustCells(left).forEach(id => {
@@ -570,6 +592,7 @@ async function createLabyrinth()
   }
   for (let i = 0; i < cellsHeight * cellsWidth; ++i)
   {
+
     let cell = document.getElementById(i);
     if (cell.style.backgroundColor == cellsTypesColours.BLANK_COLOUR)
     {
@@ -599,82 +622,114 @@ async function createLabyrinth()
     }
   }
 }
-
-function clearGarbage()
-{
-  closedList.forEach((elem) => {
-    if (elem < cellsHeight * cellsWidth)
-    {
-      cell = document.getElementById(elem);
-      cell.textContent = "";
-      cell.classList.remove("closed-list");
-      cell.classList.remove("open-list");
-    }
-  })
-  closedList.clear();
-
-  while(!openList.isEmpty())
-  {
-    if (openList.peek()[1] < cellsHeight * cellsWidth)
-    {
-      const cell = document.getElementById(openList.pop()[1]);
-      cell.classList.remove("open-list");
-      cell.textContent = "";
-    }
-    else openList.pop();
-  }
-
-  path.forEach((elem) => {
-    if (elem < cellsHeight * cellsWidth)
-    {
-      cell = document.getElementById(elem);
-      cell.textContent = "";
-      cell.classList.remove("final-path");
-    }
-  });
-  path.length = 0;
-  weights.length = 0;
 }
 
-
-function runAlgorithm()
+function colorChannelMixer(colorChannelA, colorChannelB, amountToMix)
 {
-  isRunning = 0;
-  clearGarbage();
+  var channelA = colorChannelA*amountToMix;
+  var channelB = colorChannelB*(1-amountToMix);
+  return parseInt(channelA+channelB);
+}
+function colorMixer(rgbA, rgbB, amountToMix)
+{
+  var r = colorChannelMixer(rgbA[0],rgbB[0],amountToMix);
+  var g = colorChannelMixer(rgbA[1],rgbB[1],amountToMix);
+  var b = colorChannelMixer(rgbA[2],rgbB[2],amountToMix);
+  return "rgb("+r+","+g+","+b+")";
+}
+//---------------------------------------------------------Astar------------------------------------------------//
+let AstarStack = [];
 
-  if (!startCell || !endCell)
+function clearAstarStack()
+{
+  while (AstarStack.length != 0)
   {
-    appendAlert('Set the starting and ending cell!', 'success');
-    return;
+    AstarStack[AstarStack.length - 1].clearGarbage();
+    AstarStack.pop().isRunning = false;
+  }
+}
+
+function runAstar()
+{
+  clearAstarStack();
+  AstarStack.push(new AstarAlgorithm());
+  AstarStack[0].runAlgorithm();
+}
+class AstarAlgorithm
+{
+  weights = [];
+  path = [];
+  ancestors = [];
+  closedList = new Set();
+  openList = new PriorityQueue((a, b) => a[0] < b[0]);
+
+  startJ = startCell % cellsWidth;
+  startI = Math.floor(startCell / cellsWidth);
+  
+  endJ = endCell % cellsWidth;
+  endI = Math.floor(endCell / cellsWidth);
+
+  endCell = endCell;
+  startCell = startCell;
+
+  isRunning = true;
+
+  clearGarbage()
+  {
+    this.closedList.forEach((elem) => {
+    if (elem < cellsHeight * cellsWidth)
+    {
+      const cell = document.getElementById(elem);
+      if (cell != null)
+      {
+        cell.textContent = "";
+        cell.classList.remove("closed-list");
+        cell.classList.remove("open-list");
+      }
+    }
+    })
+    this.closedList.clear();
+
+    while(!this.openList.isEmpty())
+  {
+    if (this.openList.peek()[1] < cellsHeight * cellsWidth)
+    {
+      const cell = document.getElementById(this.openList.pop()[1]);
+      if (cell != null)
+      {
+        cell.classList.remove("open-list");
+        cell.textContent = "";
+      }
+    }
+    else this.openList.pop();
+    }
+
+    this.path.forEach((elem) => {
+    if (elem < cellsHeight * cellsWidth)
+    {
+      const cell = document.getElementById(elem);
+      if (cell != null)
+      {
+        cell.textContent = "";
+        cell.classList.remove("final-path");
+      }
+    }
+    });
+    this.path.length = 0;
+    this.weights.length = 0;
   }
 
-  ancestors.length = cellsWidth * cellsHeight;
-  weights.length = cellsWidth * cellsHeight;
-  weights.fill(cellsWidth * cellsHeight * 2);
-
-  const startJ = startCell % cellsWidth;
-  const startI = Math.floor(startCell / cellsWidth);
-
-  const endJ = endCell % cellsWidth;
-  const endI = Math.floor(endCell / cellsWidth);
-
-  // позиция
-  closedList.add(parseInt(startCell));
-
-  // вес - позиция
-  openList.push([distanceToEnd(startI, startJ), parseInt(startCell)]);
-
-  function distanceToEnd(i, j)
+  distanceToEnd(i, j)
   {
-  const distY = Math.abs(i - endI);
-  const distX = Math.abs(j - endJ);
+    const distY = Math.abs(i - this.endI);
+    const distX = Math.abs(j - this.endJ);
 
-  //return Math.abs(distY - distX) + Math.min(distY, distX) * Math.sqrt(2);
-  return distX + distY;
-  //return Math.max(distX, distY);
+    //return Math.abs(distY - distX) + Math.min(distY, distX) * Math.sqrt(2);
+    return distX + distY;
+    //return Math.max(distX, distY);
   }
 
-  function getCells(cell)
+  getCells(cell)
   {
     const startJ = cell[1] % cellsWidth;
     const startI = Math.floor(cell[1] / cellsWidth);
@@ -690,56 +745,59 @@ function runAlgorithm()
 
         if (newI >= cellsHeight || newI < 0 ||
           newJ >= cellsWidth || newJ < 0 ||
-          closedList.has(newI * cellsWidth + newJ) ||
-          document.getElementById(newI * cellsWidth + newJ).style.backgroundColor == cellsTypesColours.WALL_COLOUR||
-          Math.abs(i) == Math.abs(j) && 
+          this.closedList.has(newI * cellsWidth + newJ) ||
+          document.getElementById(newI * cellsWidth + newJ).style.backgroundColor == cellsTypesColours.WALL_COLOUR||            Math.abs(i) == Math.abs(j) && 
           document.getElementById(newI * cellsWidth + startJ).style.backgroundColor == cellsTypesColours.WALL_COLOUR &&
           document.getElementById(startI * cellsWidth + newJ).style.backgroundColor == cellsTypesColours.WALL_COLOUR)
           continue;
 
-        let weight = distanceToEnd(newI, newJ) + cell[0] - distanceToEnd(startI, startJ);
+        let weight = this.distanceToEnd(newI, newJ) + cell[0] - this.distanceToEnd(startI, startJ);
         weight += (Math.abs(i) == Math.abs(j)) ? Math.sqrt(2): 1;
         result.push([weight, newI * cellsWidth + newJ]);
       }
     }
     return result;
   }
-  isRunning = 1;
-  findPath();
 
-  //colorChannelA and colorChannelB are ints ranging from 0 to 255
-  function colorChannelMixer(colorChannelA, colorChannelB, amountToMix)
+  runAlgorithm()
   {
-    var channelA = colorChannelA*amountToMix;
-    var channelB = colorChannelB*(1-amountToMix);
-    return parseInt(channelA+channelB);
-  }
-  //rgbA and rgbB are arrays, amountToMix ranges from 0.0 to 1.0
-  //example (red): rgbA = [255,0,0]
-  function colorMixer(rgbA, rgbB, amountToMix)
-  {
-    var r = colorChannelMixer(rgbA[0],rgbB[0],amountToMix);
-    var g = colorChannelMixer(rgbA[1],rgbB[1],amountToMix);
-    var b = colorChannelMixer(rgbA[2],rgbB[2],amountToMix);
-    return "rgb("+r+","+g+","+b+")";
+    //this.clearGarbage();
+
+    this.ancestors.length = cellsWidth * cellsHeight;
+    this.weights.length = cellsWidth * cellsHeight;
+    this.weights.fill(cellsWidth * cellsHeight * 2);
+
+    if (this.startCell == null || this.endCell == null)
+    {
+      appendAlert('Set the starting and ending cell!', 'success');
+      return;
+    }
+
+    // позиция
+    this.closedList.add(parseInt(this.startCell));
+
+    // вес - позиция
+    this.openList.push([this.distanceToEnd(this.startI, this.startJ), parseInt(this.startCell)]);
+
+    this.findPath();
   }
 
-  async function findPath()
+  async findPath()
   {
   do
   {
-    let currCell = openList.pop();
+    await sleep(iterationsDelay);
+    if (!this.isRunning) return;
+
+    let currCell = this.openList.pop();
 
     RemoveFromOpenListVisual(currCell[1]);
     AddToClosedListVisual(currCell[1]);
 
-    closedList.add(currCell[1]);
+    this.closedList.add(currCell[1]);
 
-    //console.log(openList.peek());
-    //getCells(openList.peek());
-
-    getCells(currCell).forEach(cell => {
-      if (weights[cell[1]] > cell[0])
+    this.getCells(currCell).forEach(cell => {
+      if (this.weights[cell[1]] > cell[0])
       {
         //------------------visuals-------------------//
         if (Math.min(cellsWidth, cellsHeight) <= 10)
@@ -751,48 +809,45 @@ function runAlgorithm()
         AddToOpenListVisual(cell[1]);
         //------------------visuals-------------------//
 
-        ancestors[cell[1]] = currCell[1];
-        weights[cell[1]] = cell[0];
-        openList.push(cell);
+        this.ancestors[cell[1]] = currCell[1];
+        this.weights[cell[1]] = cell[0];
+        this.openList.push(cell);
       }
     });
-    await sleep(iterationsDelay);
-    if (!isRunning) return;
-  } while (!openList.isEmpty() && openList.peek()[1] != endCell);
+  } while (!this.openList.isEmpty() && this.openList.peek()[1] != this.endCell);
 
-  if (openList.isEmpty())
+  if (this.openList.isEmpty())
   {
     appendAlert('No path found!', 'success')
   }
   else
   {
-    let index = endCell;
-    while (index != startCell)
+    let index = this.endCell;
+    while (index != this.startCell)
     {
-      index = ancestors[index];
-      path.push(index);
+      index = this.ancestors[index];
+      this.path.push(index);
     }
+    this.path.push(this.endCell);
+    this.path.reverse();
 
-    path.reverse();
-
-    for (let i = 0; i < path.length; ++i)
+    for (let i = 0; i < this.path.length; ++i)
     {
-      document.getElementById(path[i]).classList.add("final-path");
+      document.getElementById(this.path[i]).classList.add("final-path");
       await sleep(Math.min(100, iterationsDelay));
-      if (!isRunning) return;
+      if (!this.isRunning) return;
     }
-    document.getElementById(endCell).classList.add("final-path");
 
-    /*
-    for (let i = 0; i < path.length; ++i)
-    {
-      let cell = document.getElementById(path[i]);
-      resetCellClasses(cell);
-      cell.style.backgroundColor = colorMixer([240, 157, 2],[255, 255, 255], i / path.length);
-      //await sleep(Math.min(100, iterationsDelay));
-    }
-    */
+  /*
+  for (let i = 0; i < path.length; ++i)
+  {
+    let cell = document.getElementById(path[i]);
+    resetCellClasses(cell);
+    cell.style.backgroundColor = colorMixer([240, 157, 2],[255, 255, 255], i / path.length);
+    //await sleep(Math.min(100, iterationsDelay));
+    if (!this.isRunning) return;
   }
-  isRunning = 0;
-}
+  */
+    }
+  }
 }
