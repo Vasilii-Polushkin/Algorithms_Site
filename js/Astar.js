@@ -1,3 +1,5 @@
+import PriorityQueue from "./PriorityQueue.js";
+
 //global variables, shoud be editable only using functions
 
 let windowHeight = 660;
@@ -341,75 +343,6 @@ const alertPlaceholder = document.getElementById('liveAlertPlaceholder')
     }
 //---------------------------------------- REALIZATION ----------------------------------------------//
 
-// ---------------------------------------  queue  --------------------------------------------------//
-const parent = i => ((i + 1) >>> 1) - 1;
-const left = i => (i << 1) + 1;
-const right = i => (i + 1) << 1;
-
-class PriorityQueue {
-  constructor(comparator = (a, b) => a > b) {
-    this._heap = [];
-    this._comparator = comparator;
-  }
-  size() {
-    return this._heap.length;
-  }
-  isEmpty() {
-    return this.size() == 0;
-  }
-  peek() {
-    return this._heap[0];
-  }
-  push(...values) {
-    values.forEach(value => {
-      this._heap.push(value);
-      this._siftUp();
-    });
-    return this.size();
-  }
-  pop() {
-    const poppedValue = this.peek();
-    const bottom = this.size() - 1;
-    if (bottom > 0) {
-      this._swap(0, bottom);
-    }
-    this._heap.pop();
-    this._siftDown();
-    return poppedValue;
-  }
-  replace(value) {
-    const replacedValue = this.peek();
-    this._heap[0] = value;
-    this._siftDown();
-    return replacedValue;
-  }
-  _greater(i, j) {
-    return this._comparator(this._heap[i], this._heap[j]);
-  }
-  _swap(i, j) {
-    [this._heap[i], this._heap[j]] = [this._heap[j], this._heap[i]];
-  }
-  _siftUp() {
-    let node = this.size() - 1;
-    while (node > 0 && this._greater(node, parent(node))) {
-      this._swap(node, parent(node));
-      node = parent(node);
-    }
-  }
-  _siftDown() {
-    let node = 0;
-    while (
-      (left(node) < this.size() && this._greater(left(node), node)) ||
-      (right(node) < this.size() && this._greater(right(node), node))
-    ) {
-      let maxChild = (right(node) < this.size() && this._greater(right(node), left(node))) ? right(node) : left(node);
-      this._swap(node, maxChild);
-      node = maxChild;
-    }
-  }
-}
-// ---------------------------------------  queue  --------------------------------------------------//
-
 // cell: [weight, position(i * height + j)]
 
 function sleep(ms) {
@@ -468,17 +401,16 @@ function generateLabyrinth()
 {
   clearLabyrinthStack();
   labyrinthStack.push(new labyrinth());
-  labyrinthStack[0].createLabyrinth();
 }
 class labyrinth
 {
 isGenerating = true;
-//constructor(){};
+constructor(){
+  this.createLabyrinth();
+};
+
 async createLabyrinth()
 {
-  //updateGridWidthHeight();
-  //remakeVisualGrid();
-
   for (let i = 0; i < cellsHeight * cellsWidth; ++i)
     document.getElementById(i).style.backgroundColor = cellsTypesColours.WALL_COLOUR;
 
@@ -653,10 +585,12 @@ function runAstar()
 {
   clearAstarStack();
   AstarStack.push(new AstarAlgorithm());
-  AstarStack[0].runAlgorithm();
 }
 class AstarAlgorithm
 {
+  constructor(){
+    this.runAlgorithm();
+  }
   weights = [];
   path = [];
   ancestors = [];
@@ -743,16 +677,28 @@ class AstarAlgorithm
         let newI = startI + i;
         let newJ = startJ + j;
 
+        let newCell = document.getElementById(newI * cellsWidth + newJ);
+
         if (newI >= cellsHeight || newI < 0 ||
           newJ >= cellsWidth || newJ < 0 ||
           this.closedList.has(newI * cellsWidth + newJ) ||
-          document.getElementById(newI * cellsWidth + newJ).style.backgroundColor == cellsTypesColours.WALL_COLOUR||            Math.abs(i) == Math.abs(j) && 
+          newCell.style.backgroundColor == cellsTypesColours.WALL_COLOUR||
+          Math.abs(i) == Math.abs(j) && 
           document.getElementById(newI * cellsWidth + startJ).style.backgroundColor == cellsTypesColours.WALL_COLOUR &&
           document.getElementById(startI * cellsWidth + newJ).style.backgroundColor == cellsTypesColours.WALL_COLOUR)
           continue;
 
         let weight = this.distanceToEnd(newI, newJ) + cell[0] - this.distanceToEnd(startI, startJ);
-        weight += (Math.abs(i) == Math.abs(j)) ? Math.sqrt(2): 1;
+
+        if (newCell.style.backgroundColor == cellsTypesColours.BLANK_COLOUR)
+          weight += (Math.abs(i) == Math.abs(j)) ? Math.sqrt(2): 1;
+
+        else if (newCell.style.backgroundColor == cellsTypesColours.BOOST_COLOUR)
+          weight += (Math.abs(i) == Math.abs(j)) ? Math.sqrt(2) / 2: 1 / 2;
+
+        else //if (newCell.style.backgroundColor == cellsTypesColours.SLOW_COLOUR)
+          weight += (Math.abs(i) == Math.abs(j)) ? Math.sqrt(2) * 2: 1 * 2;
+
         result.push([weight, newI * cellsWidth + newJ]);
       }
     }
@@ -761,8 +707,6 @@ class AstarAlgorithm
 
   runAlgorithm()
   {
-    //this.clearGarbage();
-
     this.ancestors.length = cellsWidth * cellsHeight;
     this.weights.length = cellsWidth * cellsHeight;
     this.weights.fill(cellsWidth * cellsHeight * 2);
