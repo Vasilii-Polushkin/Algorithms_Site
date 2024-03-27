@@ -1,9 +1,9 @@
-
 const parent = i => ((i + 1) >>> 1) - 1;
 const left = i => (i << 1) + 1;
 const right = i => (i + 1) << 1;
 
-export class PriorityQueue {
+export default class PriorityQueue {
+  
   constructor(comparator = (a, b) => a > b) {
     this._heap = [];
     this._comparator = comparator;

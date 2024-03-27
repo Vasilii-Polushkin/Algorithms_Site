@@ -19,7 +19,7 @@ const outputIterationsDelayValue = document.getElementById("delayValue");
 
 // selected cell types
 const cellsTypes = { BLANK: 0, WALL: 1, START: 2, END: 3, SLOW: 4, BOOST: 5};
-const cellsTypesColours = { BLANK_COLOUR: '', WALL_COLOUR: `rgb(20, 18, 17)`, START_COLOUR: `rgb(245, 238, 235)`, END_COLOUR: `rgb(226, 147, 3)`, SLOW_COLOUR: `rgb(178, 68, 68)`, BOOST_COLOUR: `rgb(61, 146, 76)`};
+const cellsTypesColours = { BLANK_COLOUR: '', WALL_COLOUR: `rgb(20, 18, 17)`, START_COLOUR: `rgb(245, 238, 235)`, END_COLOUR: `rgb(226, 147, 3)`, SLOW_COLOUR: `brown`, BOOST_COLOUR: `green`};
 let selectedCellType = cellsTypes.BLANK;
 //start & end cells
 
@@ -45,8 +45,8 @@ function remakeVisualGrid()
     startCell = null;
     endCell = null;
 
-    const cellWidthPixels = windowWidth / cellsWidth ;
-    const cellHeightPixels = windowHeight / cellsHeight ;
+    let cellWidthPixels = windowWidth / cellsWidth ;
+    let cellHeightPixels = windowHeight / cellsHeight ;
 
     grid.style.gridTemplateColumns = `repeat(${cellsWidth}, ${cellWidthPixels}px)`;
     grid.style.gridTemplateRows = `repeat(${cellsHeight}, ${cellHeightPixels}px)`; // наоборот
@@ -127,10 +127,10 @@ window.onload = () => {remakeVisualGrid(cellsHeight, cellsWidth)};
 
 function getValidCells(cellIndex)
 {
-  const diametr = parseInt(outputBrushSizeValue.textContent);
+  let diametr = parseInt(outputBrushSizeValue.textContent);
 
-  cellJ = cellIndex % cellsWidth;
-  cellI = Math.floor(cellIndex / cellsWidth);
+  let cellJ = cellIndex % cellsWidth;
+  let cellI = Math.floor(cellIndex / cellsWidth);
 
   let result = [];
 
@@ -168,14 +168,14 @@ function updateCellVisuals(event)
     {
       case cellsTypes.BLANK:
         getValidCells(event.target.id).forEach((cell)=>{
-          cellElement = document.getElementById(cell);
+          let cellElement = document.getElementById(cell);
           resetCellClasses(cellElement);
           cellElement.style.backgroundColor = cellsTypesColours.BLANK_COLOUR;
         });
         break;
       case cellsTypes.WALL:
         getValidCells(event.target.id).forEach((cell)=>{
-          cellElement = document.getElementById(cell);
+          let cellElement = document.getElementById(cell);
           resetCellClasses(cellElement);
           cellElement.style.backgroundColor = cellsTypesColours.WALL_COLOUR;
         }); 
@@ -201,14 +201,14 @@ function updateCellVisuals(event)
         break;
       case cellsTypes.SLOW:
         getValidCells(event.target.id).forEach((cell)=>{
-          cellElement = document.getElementById(cell);
+          let cellElement = document.getElementById(cell);
           resetCellClasses(cellElement);
           cellElement.style.backgroundColor = cellsTypesColours.SLOW_COLOUR;
         }); 
         break;
       case cellsTypes.BOOST:
         getValidCells(event.target.id).forEach((cell)=>{
-          cellElement = document.getElementById(cell);
+          let cellElement = document.getElementById(cell);
           resetCellClasses(cellElement);
           cellElement.style.backgroundColor = cellsTypesColours.BOOST_COLOUR;
         }); 
@@ -468,15 +468,12 @@ function generateLabyrinth()
 {
   clearLabyrinthStack();
   labyrinthStack.push(new labyrinth());
+  labyrinthStack[0].createLabyrinth();
 }
 class labyrinth
 {
-constructor(){
-  this.createLabyrinth();
-};
-
 isGenerating = true;
-
+//constructor(){};
 async createLabyrinth()
 {
   //updateGridWidthHeight();
@@ -656,12 +653,10 @@ function runAstar()
 {
   clearAstarStack();
   AstarStack.push(new AstarAlgorithm());
+  AstarStack[0].runAlgorithm();
 }
 class AstarAlgorithm
 {
-  constructor(){
-    this.runAlgorithm();
-  }
   weights = [];
   path = [];
   ancestors = [];
@@ -745,31 +740,19 @@ class AstarAlgorithm
     {
       for (let j = -1; j <= 1; ++j)
       {
-        const newI = startI + i;
-        const newJ = startJ + j;
-
-        const newCell = document.getElementById(newI * cellsWidth + newJ);
+        let newI = startI + i;
+        let newJ = startJ + j;
 
         if (newI >= cellsHeight || newI < 0 ||
           newJ >= cellsWidth || newJ < 0 ||
           this.closedList.has(newI * cellsWidth + newJ) ||
-          newCell.style.backgroundColor == cellsTypesColours.WALL_COLOUR||
-          Math.abs(i) == Math.abs(j) && 
+          document.getElementById(newI * cellsWidth + newJ).style.backgroundColor == cellsTypesColours.WALL_COLOUR||            Math.abs(i) == Math.abs(j) && 
           document.getElementById(newI * cellsWidth + startJ).style.backgroundColor == cellsTypesColours.WALL_COLOUR &&
-          document.getElementById(newJ * cellsWidth + startI).style.backgroundColor == cellsTypesColours.WALL_COLOUR)
+          document.getElementById(startI * cellsWidth + newJ).style.backgroundColor == cellsTypesColours.WALL_COLOUR)
           continue;
 
         let weight = this.distanceToEnd(newI, newJ) + cell[0] - this.distanceToEnd(startI, startJ);
-
-        if (newCell.style.backgroundColor == cellsTypesColours.BLANK_COLOUR)
-          weight += (Math.abs(i) == Math.abs(j)) ? Math.sqrt(2): 1;
-
-        else if (newCell.style.backgroundColor == cellsTypesColours.BOOST_COLOUR)
-          weight += (Math.abs(i) == Math.abs(j)) ? Math.sqrt(2) / 2: 1 / 2;
-        
-        else// if (newCell.style.backgroundColor == cellsTypesColours.SLOW_COLOUR)
-          weight += (Math.abs(i) == Math.abs(j)) ? Math.sqrt(2) * 2: 1 * 2;
-
+        weight += (Math.abs(i) == Math.abs(j)) ? Math.sqrt(2): 1;
         result.push([weight, newI * cellsWidth + newJ]);
       }
     }
