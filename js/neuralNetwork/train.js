@@ -13,7 +13,7 @@ for(let i = 0; i < trainingData.length; i++){
     trainingData[i] = new Pair(inputs, desired_outputs);
 }
 
-let network = stochasticGradientDescent(trainingData, 1, 10, 0.1);
+let network = stochasticGradientDescent(trainingData, 30, 10, 0.1);
 
 import fs from 'fs';
 fs.writeFileSync('trainedNetwork.json', JSON.stringify(network));

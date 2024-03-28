@@ -1,5 +1,5 @@
 import {Matrix, feedForward, Network} from "./nn.js";
-import network from "../../json/trainedNetwork.json" assert {type: "json"}
+import network from "./trainedNetwork.json" assert {type: "json"}
 
 window.addEventListener('load', () => {
     resize();
