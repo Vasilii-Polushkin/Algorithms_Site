@@ -18,11 +18,15 @@ let h = ctx.canvas.height;
 
 let input = new Array(squareHeight).fill(0).map(() => new Array(squareWidth).fill(0));
 
+const imageOutput = document.querySelector('.image-output');
+let img = document.createElement('img');
+
 const clearButton = document.getElementById('clear');
 clearButton.addEventListener('click', function () {
     let canvas = document.getElementById('canvas'),
         ctx = canvas.getContext("2d");
     input = new Array(squareHeight).fill(0).map(() => new Array(squareWidth).fill(0))
+    imageOutput.removeChild(img);
 });
 
 const answerButton = document.getElementById('answer');
@@ -53,13 +57,12 @@ answerButton.addEventListener('click', function () {
         }
     }
 
-    let url = "../../images/favicon.png";
+    img.src = '../images/' + answer.toString() + '.png';
+    imageOutput.append(img);
 
-    const imagePlaceholder = document.getElementById("image");
-    const image = document.createElement('img');
-    imagePlaceholder.appendChild(grid);
-
-    console.log(answer);
+    /*let imageCanvas = document.getElementById('imageAnswer'),
+        imgCtx = canvas.getContext("2d", { willReadFrequently: true });
+    imgCtx.drawImage(img, 0, 0);*/
 });
 
 function loop() {
@@ -88,7 +91,7 @@ let paint = false;
 
 function getPosition(event) {
     coord.x = event.clientX - canvas.offsetLeft;
-    coord.y = event.clientY - canvas.offsetTop;
+    coord.y = event.clientY - canvas.offsetTop - 150;
 
     let dx = w / squareWidth;
     let dy = h / squareHeight;

@@ -1,0 +1,20 @@
+section {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.box {
+    position: relative;
+    top: 100px;
+}
+
+canvas {
+    border-radius: 6px;
+}
+
+.image-output {
+    margin: 15px;
+    width: 300px;
+    height: 400px;
+}
