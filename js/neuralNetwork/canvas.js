@@ -53,6 +53,12 @@ answerButton.addEventListener('click', function () {
         }
     }
 
+    let url = "../../images/favicon.png";
+
+    const imagePlaceholder = document.getElementById("image");
+    const image = document.createElement('img');
+    imagePlaceholder.appendChild(grid);
+
     console.log(answer);
 });
 
