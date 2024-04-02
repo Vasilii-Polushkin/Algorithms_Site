@@ -18,15 +18,15 @@ let h = ctx.canvas.height;
 
 let input = new Array(squareHeight).fill(0).map(() => new Array(squareWidth).fill(0));
 
-const imageOutput = document.querySelector('.image-output');
-let img = document.createElement('img');
+const answerDigit = document.getElementById('answerDigit');
+answerDigit.innerHTML = '?';
 
 const clearButton = document.getElementById('clear');
 clearButton.addEventListener('click', function () {
     let canvas = document.getElementById('canvas'),
         ctx = canvas.getContext("2d");
-    input = new Array(squareHeight).fill(0).map(() => new Array(squareWidth).fill(0))
-    imageOutput.removeChild(img);
+    input = new Array(squareHeight).fill(0).map(() => new Array(squareWidth).fill(0));
+    answerDigit.innerHTML = '?';
 });
 
 const answerButton = document.getElementById('answer');
@@ -48,8 +48,8 @@ answerButton.addEventListener('click', function () {
 
     activations = feedForward(network, activations);
 
-    let mx = 0;
     let answer = 0;
+    let mx = 0;
     for(let i = 0; i < 10; i++){
         if(activations[2].data[i][0] > mx){
             mx = activations[2].data[i][0];
@@ -57,12 +57,7 @@ answerButton.addEventListener('click', function () {
         }
     }
 
-    img.src = '../images/' + answer.toString() + '.png';
-    imageOutput.append(img);
-
-    /*let imageCanvas = document.getElementById('imageAnswer'),
-        imgCtx = canvas.getContext("2d", { willReadFrequently: true });
-    imgCtx.drawImage(img, 0, 0);*/
+    answerDigit.innerHTML = answer;
 });
 
 function loop() {

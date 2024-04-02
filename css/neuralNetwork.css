@@ -1,7 +1,7 @@
 section {
     display: flex;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: center;
 }
 
 .box {
@@ -13,8 +13,14 @@ canvas {
     border-radius: 6px;
 }
 
-.image-output {
-    margin: 15px;
-    width: 300px;
-    height: 400px;
+#answerDigit {
+    display: inline-block;
+}
+
+h5 {
+    display: inline-block;
+}
+
+#menu {
+    margin: 8%;
 }
