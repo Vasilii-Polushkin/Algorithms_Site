@@ -1,0 +1,26 @@
+section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.box {
+    position: relative;
+    top: 100px;
+}
+
+canvas {
+    border-radius: 6px;
+}
+
+#answerDigit {
+    display: inline-block;
+}
+
+h5 {
+    display: inline-block;
+}
+
+#menu {
+    margin: 8%;
+}
