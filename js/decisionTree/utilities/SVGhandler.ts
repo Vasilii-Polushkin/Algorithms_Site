@@ -1,5 +1,3 @@
-//import * as Global from '../globalVariables';
-
 export async function loadCSV(url)
 {
     function parseCSV(text) {
@@ -18,7 +16,7 @@ export async function loadCSV(url)
         return result;
     }
 
-    let table = [];
+    let table: string[][] = [];
     await fetch(url)
         .then(response => response.text())
         .then(text => {
@@ -28,12 +26,3 @@ export async function loadCSV(url)
 
     return table;
 }
-
-//обрабатываем каждый столбец(атрибут) поочередно
-//сначала определяем тип атрибута
-//потом преобразуем столб в сет и находим всевозможные условия, которые могут быть в узлах дерева
-export function getAllPossibleConditions(){
-
-}
-
-export function 
