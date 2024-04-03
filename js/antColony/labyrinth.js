@@ -93,10 +93,10 @@ export function generateLabyrinth() {
             handleSquare(setField, x, y, '1');
 
     // выбираем случайным образом чётные координаты на карте с лабиринтом
-    //const startX = getRandomFrom(Array(squareCols).fill(0).map((item, index) => index).filter(x => isEven(x)));
-    //const startY = getRandomFrom(Array(squareRows).fill(0).map((item, index) => index).filter(y => isEven(y)));
-    const startX = 0;
-    const startY = 0;
+    const startX = getRandomFrom(Array(squareCols).fill(0).map((item, index) => index).filter(x => isEven(x)));
+    const startY = getRandomFrom(Array(squareRows).fill(0).map((item, index) => index).filter(y => isEven(y)));
+    //const startX = 0;
+    //const startY = 0;
 
     let tractor = {};
     tractor.x = startX;

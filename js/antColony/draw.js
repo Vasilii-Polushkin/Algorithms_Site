@@ -1,8 +1,11 @@
 import {generateLabyrinth, getField} from "./labyrinth.js";
+import {initAnts, initColony, initPheromones, getNearPheromones} from "./main.js";
+import {View} from "./view.js";
+import {Control} from "./control.js";
 
-export let rows = 100;
-export let cols = 160;
-export let squareSide = 4;
+export let rows = 700;
+export let cols = 700;
+export let squareSide = 7;
 export let squareRows = rows / squareSide;
 export let squareCols = cols / squareSide;
 
@@ -20,7 +23,7 @@ for (let i = 0; i < map.length; i++) {
 
 map = generateLabyrinth();
 
-function init () {
+function init() {
     canvas.width = cols * squareSide;
     canvas.height = rows * squareSide;
 
@@ -34,7 +37,7 @@ function init () {
     context.fill();
 }
 
-function drawMap () {
+function drawMap() {
     for (let x = 0; x < cols; x++)
         for (let y = 0; y < rows; y++)
             if (getField(Math.floor(x / squareSide), Math.floor(y / squareSide)) === '1') {
@@ -45,6 +48,17 @@ function drawMap () {
             }
 }
 
-init();
-drawMap();
+//init();
+//drawMap();
 
+let colony = initColony(350, 350);
+export let ants = initAnts(colony);
+export let pheromones = initPheromones();
+
+export var view;
+var control;
+
+window.onload = () => {
+    view = new View();
+    control = new Control();
+}
