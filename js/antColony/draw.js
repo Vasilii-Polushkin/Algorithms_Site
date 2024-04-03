@@ -1,8 +1,8 @@
 import {generateLabyrinth, getField} from "./labyrinth.js";
 
-export let rows = 200;
-export let cols = 300;
-export let squareSide = 2;
+export let rows = 100;
+export let cols = 160;
+export let squareSide = 4;
 export let squareRows = rows / squareSide;
 export let squareCols = cols / squareSide;
 
