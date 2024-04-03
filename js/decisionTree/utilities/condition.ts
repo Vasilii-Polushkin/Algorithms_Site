@@ -5,7 +5,7 @@ export enum attributeTypes
 }
 export class attribute
 {
-    constructor(attributeID, valuesI, usedI)
+    constructor(attributeID: number, valuesI: number[], usedI: boolean | boolean[])
     {
         this.id = attributeID;
         this.values = valuesI;

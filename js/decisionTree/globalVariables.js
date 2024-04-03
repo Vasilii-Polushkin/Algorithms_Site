@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAttributesLists = exports.categoricalAttributesList = exports.intervalAttributesList = exports.dataTable = void 0;
 var condition_1 = require("./utilities/condition");
 // таблица, где первая строка с названиями колонок
@@ -48,14 +48,14 @@ function getAttributesLists() {
             }
         }
         if (attribuleType == condition_1.attributeTypes.CATEGORICAL) {
-            newCategoricalAttributesList.push(new condition_1.attribute(exports.dataTable[0][columID], colum, false));
+            newCategoricalAttributesList.push(new condition_1.attribute(parseFloat(exports.dataTable[0][columID]), colum, false));
         }
         else {
             adjustMedians(colum);
             var usedArr = [];
             usedArr.length = colum.length;
             usedArr.fill(false);
-            newIntervalAttributesList.push(new condition_1.attribute(exports.dataTable[0][columID], colum, usedArr));
+            newIntervalAttributesList.push(new condition_1.attribute(parseFloat(exports.dataTable[0][columID]), colum, usedArr));
         }
     }
     return [newIntervalAttributesList, exports.categoricalAttributesList];

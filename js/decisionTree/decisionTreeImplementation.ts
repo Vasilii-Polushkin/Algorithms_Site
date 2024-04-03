@@ -52,7 +52,7 @@ export class TreeNode
         Global.intervalAttributesList.forEach((attribute) => {
             for (let i = 0; i < attribute.values.length; ++i)
             {
-                if (attribute.used[i])
+                if (attribute.used[i] == true)
                     continue;
 
                 const breakpoint = attribute.values[i];

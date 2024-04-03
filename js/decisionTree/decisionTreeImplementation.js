@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.DecisionTree = exports.TreeNode = exports.calcEnthrophy = exports.xLog2x = void 0;
 var condition_1 = require("./utilities/condition");
 var Global = require("./globalVariables");
@@ -37,7 +37,7 @@ var TreeNode = /** @class */ (function () {
         var rightIDs = [];
         Global.intervalAttributesList.forEach(function (attribute) {
             var _loop_1 = function (i) {
-                if (attribute.used[i])
+                if (attribute.used[i] == true)
                     return "continue";
                 var breakpoint = attribute.values[i];
                 var leftSamplesClasses = new Map;

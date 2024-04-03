@@ -5,6 +5,6 @@ import { attributeTypes, attribute } from "./utilities/condition";
 import { CSVurls } from "./utilities/CSVurls";
 // первая строка - названия столбцов
 // последний столб - название класса
-//let dataTable = await loadCSV(CSVurls.iris);
+let dataTable = loadCSV(CSVurls.iris);
 //console.log(dataTable);
 console.log(123123);

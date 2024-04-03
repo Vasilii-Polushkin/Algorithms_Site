@@ -7,7 +7,7 @@ export let dataTable: string[][] = [];
 export let intervalAttributesList: attribute[];
 export let categoricalAttributesList: attribute[];
 
-function sortUnique(arr) {
+function sortUnique(arr: any) {
     if (arr.length === 0) return arr;
     arr = arr.sort();
     var ret = [arr[0]];
@@ -18,7 +18,7 @@ function sortUnique(arr) {
     return ret;
   }
 
-function adjustMedians(arr){
+function adjustMedians(arr: any){
     let res:any[] = [];
     for (let i = 0; i < arr.length - 1; ++i)
         res.push((arr[i] + arr[i + 1]) / 2);
@@ -67,7 +67,7 @@ export function getAttributesLists()
         if (attribuleType == attributeTypes.CATEGORICAL)
         {
             newCategoricalAttributesList.push(new attribute
-                (dataTable[0][columID], colum, false)
+                (parseFloat(dataTable[0][columID]), colum, false)
             );
         }
         else
@@ -78,7 +78,7 @@ export function getAttributesLists()
             usedArr.fill(false);
 
             newIntervalAttributesList.push(new attribute
-                (dataTable[0][columID], colum, usedArr)
+                (parseFloat(dataTable[0][columID]), colum, usedArr)
             );
         }
     }
