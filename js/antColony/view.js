@@ -1,8 +1,8 @@
-import {ants} from "./draw.js"
+import {ants, colony, rows, cols} from "./main.js"
 
 export class View {
     constructor() {
-       this.canvas = document.getElementById('canvas');
+        this.canvas = document.getElementById('canvas');
         this.onResize();
         window.addEventListener('resize', this.onResize);
     }
@@ -11,29 +11,21 @@ export class View {
         this.ctx.fillStyle = '#047344';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        /*for (let label of model.listLabel)
-            label.draw(this.ctx);*/
-
-        /*for (let block of model.listBlock)
-            block.draw(this.ctx);*/
-
-        /*for (let rock of model.listRock)
-            rock.draw(this.ctx);
+        /*for (let wall of walls)
+            wall.draw(this.ctx);
 
         for (let food of model.listFood)
             food.draw(this.ctx);*/
 
-        //for (let colony of model.listColony)
-            for (let ant of ants)
-                ant.draw(this.ctx, this.fw);
+        for (let ant of ants)
+            ant.draw(this.ctx, this.fw);
 
-        /*for (let colony of model.listColony)
-            colony.draw(this.ctx);*/
+        colony.draw(this.ctx);
     }
 
     onResize() {
-        this.canvas.width = 700;
-        this.canvas.height = 700;
+        this.canvas.height = rows;
+        this.canvas.width = cols;
         this.ctx = this.canvas.getContext('2d');
         this.ctx.shadowColor = 'Black';
         this.ctx.textBaseline = "middle";
