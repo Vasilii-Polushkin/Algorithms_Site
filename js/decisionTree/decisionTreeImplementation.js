@@ -1,49 +1,43 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.DecisionTree = exports.TreeNode = exports.calcEnthrophy = exports.xLog2x = void 0;
-var condition_1 = require("./utilities/condition");
-var Global = require("./globalVariables");
-function xLog2x(x) {
-    return x <= 0 ? 0 : x * Math.log2(x);
-}
-exports.xLog2x = xLog2x;
-function calcEnthrophy(probabilities) {
-    var entropy = 0;
-    for (var i = 0; i < probabilities.length; ++i)
-        entropy -= xLog2x(probabilities[i]);
-    return entropy;
-}
-exports.calcEnthrophy = calcEnthrophy;
-var TreeNode = /** @class */ (function () {
-    function TreeNode() {
-        this.attributeType = null;
-        this.attributeID = null;
+import { attributeTypes, attribute } from "./utilities/attribute.js";
+import { sortUnique, calcEnthrophy, adjustMedians } from "./utilities/math.js";
+//обрабатываем каждый столбец(атрибут) поочередно
+//сначала определяем тип атрибута
+//потом преобразуем столб в сет и находим всевозможные условия, которые могут быть в узлах дерева
+export class TreeNode {
+    children = [];
+    attributeType = null;
+    attributeID = null;
+    entropy = 0;
+    samplesAmount = 0;
+    samplesIDs = [];
+    constructor() {
     }
     ;
-    TreeNode.prototype.isLeaf = function () {
+    isLeaf() {
         return (this.attributeID == null);
-    };
+    }
     // для каждого неиспользовавшегося условия из списка считаем энтропию для текущего списка семплов
     // выбираем лучшее условие (с наименьшей энтропией) и добавляем ноду
-    TreeNode.prototype.addConditionAndChildren = function (minKnowledge) {
-        var _this = this;
+    addConditionAndChildren(minKnowledge, intervalAttributesList, categoricalAttributesList, dataTable) {
+        if (this.entropy == 0)
+            return;
         // interval
-        var bestIntervalAttributeID = 0;
-        var bestIntervalValueID = 0;
-        var currMinIntervalEntrophy = 2;
-        var leftTotal = 0;
-        var rightTotal = 0;
-        var leftIDs = [];
-        var rightIDs = [];
-        Global.intervalAttributesList.forEach(function (attribute) {
-            var _loop_1 = function (i) {
+        let bestIntervalAttributeID = 0;
+        let bestIntervalValueID = 0;
+        let currMinIntervalEntrophy = 2;
+        let leftTotal = 0;
+        let rightTotal = 0;
+        let leftIDs = [];
+        let rightIDs = [];
+        intervalAttributesList.forEach((attribute) => {
+            for (let i = 0; i < attribute.values.length; ++i) {
                 if (attribute.used[i] == true)
-                    return "continue";
-                var breakpoint = attribute.values[i];
-                var leftSamplesClasses = new Map;
-                var rightSamplesClasses = new Map;
-                _this.samplesIDs.forEach(function (id) {
-                    var currClass = parseFloat(Global.dataTable[id][Global.dataTable[0].length - 1]);
+                    continue;
+                const breakpoint = attribute.values[i];
+                const leftSamplesClasses = new Map;
+                const rightSamplesClasses = new Map;
+                this.samplesIDs.forEach((id) => {
+                    const currClass = parseFloat(dataTable[id][dataTable[0].length - 1]);
                     if (currClass <= breakpoint) {
                         leftIDs.push(id);
                         leftSamplesClasses[currClass]++;
@@ -55,50 +49,43 @@ var TreeNode = /** @class */ (function () {
                         rightTotal++;
                     }
                 });
-                var leftSamplesClassesProbabilities = [];
-                for (var _i = 0, leftSamplesClasses_1 = leftSamplesClasses; _i < leftSamplesClasses_1.length; _i++) {
-                    var _a = leftSamplesClasses_1[_i], key = _a[0], value = _a[1];
+                let leftSamplesClassesProbabilities = [];
+                for (const [key, value] of leftSamplesClasses)
                     leftSamplesClassesProbabilities.push(value) / leftTotal;
-                }
-                var rightSamplesClassesProbabilities = [];
-                for (var _b = 0, rightSamplesClasses_1 = rightSamplesClasses; _b < rightSamplesClasses_1.length; _b++) {
-                    var _c = rightSamplesClasses_1[_b], key = _c[0], value = _c[1];
+                let rightSamplesClassesProbabilities = [];
+                for (const [key, value] of rightSamplesClasses)
                     rightSamplesClassesProbabilities.push(value) / rightTotal;
-                }
-                var leftEnthrophy = calcEnthrophy(leftSamplesClassesProbabilities);
-                var rightEnthrophy = calcEnthrophy(rightSamplesClassesProbabilities);
-                var newEntrophy = (leftTotal / (leftTotal + rightTotal)) * leftEnthrophy +
+                const leftEnthrophy = calcEnthrophy(leftSamplesClassesProbabilities);
+                const rightEnthrophy = calcEnthrophy(rightSamplesClassesProbabilities);
+                const newEntrophy = (leftTotal / (leftTotal + rightTotal)) * leftEnthrophy +
                     (rightTotal / (leftTotal + rightTotal)) * rightEnthrophy;
                 if (newEntrophy < currMinIntervalEntrophy) {
                     currMinIntervalEntrophy = newEntrophy;
                     bestIntervalAttributeID = attribute.id;
                     bestIntervalValueID = i;
                 }
-            };
-            for (var i = 0; i < attribute.values.length; ++i) {
-                _loop_1(i);
             }
         });
         // categorical
-        var bestCategoricalAttributeID = 0;
-        var bestCategoricalValueID = 0;
-        var currMinCategoricalEntrophy = 2;
-        Global.categoricalAttributesList.forEach(function (attribute) {
+        let bestCategoricalAttributeID = 0;
+        let bestCategoricalValueID = 0;
+        let currMinCategoricalEntrophy = 2;
+        categoricalAttributesList.forEach((attribute) => {
         });
         if (minKnowledge && Math.min(currMinIntervalEntrophy, currMinCategoricalEntrophy) < minKnowledge)
             return;
         if (currMinIntervalEntrophy < currMinCategoricalEntrophy) {
-            Global.intervalAttributesList[bestIntervalAttributeID].used[bestIntervalValueID] = true;
-            this.attributeType = condition_1.attributeTypes.INTERVAL;
+            intervalAttributesList[bestIntervalAttributeID].used[bestIntervalValueID] = true;
+            this.attributeType = attributeTypes.INTERVAL;
             this.attributeID = bestIntervalAttributeID;
             // left child
-            var leftChild = new TreeNode;
+            let leftChild = new TreeNode;
             leftChild.entropy = currMinIntervalEntrophy;
             leftChild.samplesAmount = leftTotal;
             leftChild.samplesIDs = leftIDs;
             this.children.push(leftChild);
             // right child
-            var rightChild = new TreeNode;
+            let rightChild = new TreeNode;
             rightChild.entropy = currMinIntervalEntrophy;
             rightChild.samplesAmount = rightTotal;
             rightChild.samplesIDs = rightIDs;
@@ -106,41 +93,83 @@ var TreeNode = /** @class */ (function () {
         }
         else {
         }
-    };
-    return TreeNode;
-}());
-exports.TreeNode = TreeNode;
-var DecisionTree = /** @class */ (function () {
-    function DecisionTree(maxDepth, minKnowledge) {
+    }
+}
+export class DecisionTree {
+    // таблица, где первая строка с названиями колонок
+    dataTable;
+    // все возможные условия в нодах
+    intervalAttributesList = [];
+    categoricalAttributesList = [];
+    maxDepth;
+    minKnowledge;
+    rootNode = null;
+    buildTreeDFS(currNode, currDepth) {
+        currNode.addConditionAndChildren(this.minKnowledge, this.intervalAttributesList, this.categoricalAttributesList, this.dataTable);
+        if (this.maxDepth != undefined && currDepth == this.maxDepth)
+            return;
+        currNode.children.forEach((childNode) => {
+            this.buildTreeDFS(childNode, currDepth + 1);
+        });
+    }
+    fillAttributesLists() {
+        const columLength = this.dataTable.length;
+        const rowLength = this.dataTable[0].length;
+        for (let columID = 0; columID < rowLength - 1; ++columID) {
+            let attribuleType = attributeTypes.INTERVAL;
+            let colum = [];
+            for (let rowID = 1; rowID < columLength; ++rowID)
+                colum.push(this.dataTable[rowID][columID]);
+            colum = sortUnique(colum);
+            //deducing colum(attribute) type
+            if (colum.length <= 10)
+                attribuleType = attributeTypes.CATEGORICAL;
+            for (let rowID = 0; rowID < colum.length; ++rowID) {
+                let floatNum = parseFloat(colum[rowID]);
+                if (isNaN(floatNum)) {
+                    attribuleType = attributeTypes.CATEGORICAL;
+                    break;
+                }
+                // для категоральных не очень мб
+                else {
+                    colum[rowID] = floatNum;
+                }
+            }
+            // решаем куда идет атрибут
+            if (attribuleType == attributeTypes.CATEGORICAL) {
+                this.categoricalAttributesList.push(new attribute(columID, colum, false));
+            }
+            else {
+                colum = adjustMedians(colum);
+                let usedArr = [];
+                usedArr.length = colum.length;
+                usedArr.fill(false);
+                this.intervalAttributesList.push(new attribute(columID, colum, usedArr));
+            }
+        }
+    }
+    constructor(newDataTable, maxDepth, minKnowledge) {
+        this.dataTable = newDataTable;
+        this.fillAttributesLists();
         this.maxDepth = maxDepth;
         this.minKnowledge = minKnowledge;
         this.rootNode = new TreeNode();
-        this.rootNode.samplesAmount = Global.dataTable.length - 1;
-        for (var i = 0; i < this.rootNode.samplesAmount; ++i)
+        this.rootNode.samplesAmount = this.dataTable.length - 1;
+        for (let i = 1; i <= this.rootNode.samplesAmount; ++i)
             this.rootNode.samplesIDs.push(i);
-        {
-            var samplesClasses_2 = new Map;
-            this.rootNode.samplesIDs.forEach(function (id) {
-                samplesClasses_2[Global.dataTable[id][Global.dataTable[0].length - 1]]++;
-            });
-            var samplesClassesProbabilities = [];
-            for (var _i = 0, samplesClasses_1 = samplesClasses_2; _i < samplesClasses_1.length; _i++) {
-                var _a = samplesClasses_1[_i], key = _a[0], value = _a[1];
-                samplesClassesProbabilities.push(value) / (Global.dataTable.length - 1);
-            }
-            this.rootNode.entropy = calcEnthrophy(samplesClassesProbabilities);
+        const samplesClasses = new Map;
+        this.rootNode.samplesIDs.forEach((id) => {
+            if (samplesClasses[this.dataTable[id][this.dataTable[0].length - 1]] == undefined)
+                samplesClasses[this.dataTable[id][this.dataTable[0].length - 1]] = 0;
+            samplesClasses[this.dataTable[id][this.dataTable[0].length - 1]]++;
+        });
+        let samplesClassesProbabilities = [];
+        for (const [key, value] of samplesClasses) {
+            console.log(1212);
+            samplesClassesProbabilities.push(value) / (this.dataTable.length - 1);
         }
+        this.rootNode.entropy = calcEnthrophy(samplesClassesProbabilities);
         this.buildTreeDFS(this.rootNode, 0);
     }
-    DecisionTree.prototype.buildTreeDFS = function (currNode, currDepth) {
-        var _this = this;
-        currNode.addConditionAndChildren(this.minKnowledge);
-        if (this.maxDepth && currDepth == this.maxDepth)
-            return;
-        currNode.children.forEach(function (childNode) {
-            _this.buildTreeDFS(childNode, currDepth + 1);
-        });
-    };
-    return DecisionTree;
-}());
-exports.DecisionTree = DecisionTree;
+}
+//# sourceMappingURL=decisionTreeImplementation.js.map

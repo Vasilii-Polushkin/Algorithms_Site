@@ -11,7 +11,6 @@ export class attribute
         this.values = valuesI;
         this.used = usedI;
     }
-    //attributeType: attributeTypes;
     id: number;
     values: number[];
     //either bool for categorical or bool[] for interval

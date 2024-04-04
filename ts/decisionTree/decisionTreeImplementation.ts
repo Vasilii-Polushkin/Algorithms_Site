@@ -1,36 +1,23 @@
-import { attributeTypes } from "./utilities/condition";
-import * as Global from './globalVariables';
+import { attributeTypes, attribute} from "./utilities/attribute.js";
+import { sortUnique, calcEnthrophy, xLog2x, adjustMedians} from "./utilities/math.js";
 
-export function xLog2x(x: number):number
-{
-    return x <= 0? 0 : x * Math.log2(x);
-}
-
-export function calcEnthrophy(probabilities: number[]): number
-{
-    let entropy = 0;
-
-    for (let i = 0; i < probabilities.length; ++i)
-        entropy -= xLog2x(probabilities[i]);
-
-    return entropy;
-}
+//обрабатываем каждый столбец(атрибут) поочередно
+//сначала определяем тип атрибута
+//потом преобразуем столб в сет и находим всевозможные условия, которые могут быть в узлах дерева
 
 export class TreeNode
 {
-    children: TreeNode[];
+    children: TreeNode[] = [];
 
-    attributeType: attributeTypes | null;
-    attributeID: number | null;
+    attributeType: attributeTypes | null = null;
+    attributeID: number | null = null;
 
-    entropy: number;
-    samplesAmount: number;
-    samplesIDs: number[];
+    entropy: number = 0;
+    samplesAmount: number = 0;
+    samplesIDs: number[] = [];
 
     constructor()
     {
-        this.attributeType = null;
-        this.attributeID = null;
     };
 
     isLeaf():boolean
@@ -39,8 +26,15 @@ export class TreeNode
     }
     // для каждого неиспользовавшегося условия из списка считаем энтропию для текущего списка семплов
     // выбираем лучшее условие (с наименьшей энтропией) и добавляем ноду
-    addConditionAndChildren(minKnowledge: number | undefined | null): void
+    addConditionAndChildren(minKnowledge: number | null,
+        intervalAttributesList: attribute[],
+        categoricalAttributesList: attribute[],
+        dataTable: string[][]): void
+        
     {
+        if (this.entropy == 0)
+            return;
+        
         // interval
         let bestIntervalAttributeID = 0;
         let bestIntervalValueID = 0;
@@ -49,7 +43,7 @@ export class TreeNode
         let rightTotal = 0;
         let leftIDs: number[] = [];
         let rightIDs: number[] = [];
-        Global.intervalAttributesList.forEach((attribute) => {
+        intervalAttributesList.forEach((attribute) => {
             for (let i = 0; i < attribute.values.length; ++i)
             {
                 if (attribute.used[i] == true)
@@ -61,7 +55,7 @@ export class TreeNode
                 const rightSamplesClasses = new Map<any, number>;
 
                 this.samplesIDs.forEach((id) => {
-                    const currClass = parseFloat(Global.dataTable[id][Global.dataTable[0].length - 1]);
+                    const currClass = parseFloat(dataTable[id][dataTable[0].length - 1]);
                     if (currClass <= breakpoint)
                     {
                         leftIDs.push(id);
@@ -104,7 +98,7 @@ export class TreeNode
         let bestCategoricalAttributeID = 0;
         let bestCategoricalValueID = 0;
         let currMinCategoricalEntrophy = 2;
-        Global.categoricalAttributesList.forEach((attribute) => {
+        categoricalAttributesList.forEach((attribute) => {
 
         });
 
@@ -113,7 +107,7 @@ export class TreeNode
 
         if (currMinIntervalEntrophy < currMinCategoricalEntrophy)
         {
-            Global.intervalAttributesList[bestIntervalAttributeID].used[bestIntervalValueID] = true;
+            intervalAttributesList[bestIntervalAttributeID].used[bestIntervalValueID] = true;
             this.attributeType = attributeTypes.INTERVAL;
             this.attributeID = bestIntervalAttributeID;
 
@@ -139,16 +133,24 @@ export class TreeNode
 }
 export class DecisionTree
 {
-    maxDepth: number | undefined | null;
-    minKnowledge: number | undefined | null;
+    // таблица, где первая строка с названиями колонок
+    dataTable: string[][];
 
-    rootNode: TreeNode
+    // все возможные условия в нодах
+    intervalAttributesList: attribute[] = [];
+    categoricalAttributesList: attribute[] = [];
+
+    maxDepth: number | undefined;
+    minKnowledge: number | undefined;
+
+    rootNode: TreeNode | null = null;
     
     buildTreeDFS(currNode: TreeNode, currDepth: number): void
     {
-        currNode.addConditionAndChildren(this.minKnowledge);
+        currNode.addConditionAndChildren(this.minKnowledge,
+            this.intervalAttributesList, this.categoricalAttributesList, this.dataTable);
 
-        if (this.maxDepth && currDepth == this.maxDepth)
+        if (this.maxDepth != undefined && currDepth == this.maxDepth)
             return;
 
         currNode.children.forEach((childNode: TreeNode) => {
@@ -156,25 +158,92 @@ export class DecisionTree
         });
     }
 
-    constructor(maxDepth?: number, minKnowledge?: number)
+    fillAttributesLists(): void
     {
+        const columLength = this.dataTable.length;
+        const rowLength = this.dataTable[0].length;
+
+        for (let columID = 0; columID < rowLength - 1; ++columID)
+        {
+            let attribuleType = attributeTypes.INTERVAL;
+            let colum:any[] = [];
+
+            for (let rowID = 1; rowID < columLength; ++rowID)
+                colum.push(this.dataTable[rowID][columID]);
+
+            colum = sortUnique(colum);
+
+             //deducing colum(attribute) type
+             if (colum.length <= 10)
+                attribuleType = attributeTypes.CATEGORICAL;
+            
+                for (let rowID = 0; rowID < colum.length; ++rowID)
+                {
+                    let floatNum = parseFloat(colum[rowID]);
+                    if (isNaN(floatNum))
+                    {
+                        attribuleType = attributeTypes.CATEGORICAL;
+                        break;
+                    }
+                    // для категоральных не очень мб
+                    else
+                    {
+                        colum[rowID] = floatNum;
+                    }
+                }
+
+            // решаем куда идет атрибут
+            if (attribuleType == attributeTypes.CATEGORICAL)
+            {
+                this.categoricalAttributesList.push(new attribute
+                    (columID, colum, false)
+                );
+            }
+            else
+            {
+                colum = adjustMedians(colum);
+                let usedArr:boolean[] = [];
+                usedArr.length = colum.length;
+                usedArr.fill(false);
+
+                this.intervalAttributesList.push(new attribute
+                    (columID, colum, usedArr)
+                );
+            }
+        }
+    }
+
+    constructor(newDataTable: string[][], maxDepth?: number, minKnowledge?: number)
+    {
+        this.dataTable = newDataTable;
+        this.fillAttributesLists();
+
         this.maxDepth = maxDepth;
         this.minKnowledge = minKnowledge;
+
         this.rootNode = new TreeNode();
-        this.rootNode.samplesAmount = Global.dataTable.length - 1;
-        for (let i = 0; i < this.rootNode.samplesAmount; ++i)
+        this.rootNode.samplesAmount = this.dataTable.length - 1;
+        for (let i = 1; i <= this.rootNode.samplesAmount; ++i)
             this.rootNode.samplesIDs.push(i);
-        {
+        
             const samplesClasses = new Map<any, number>;
+            
             this.rootNode.samplesIDs.forEach((id) => {
-                samplesClasses[Global.dataTable[id][Global.dataTable[0].length - 1]]++;
+                if (samplesClasses[this.dataTable[id][this.dataTable[0].length - 1]] == undefined)
+                    samplesClasses[this.dataTable[id][this.dataTable[0].length - 1]] = 0;
+                samplesClasses[this.dataTable[id][this.dataTable[0].length - 1]] ++;
             });
+
             let samplesClassesProbabilities: number[] = [];
-                for (const[key, value] of samplesClasses)
-                    samplesClassesProbabilities.push(value) / (Global.dataTable.length - 1);
+
+            for (const[key, value] of samplesClasses)
+            {
+                console.log(1212);
+                samplesClassesProbabilities.push(value) / (this.dataTable.length - 1);
+            }
 
             this.rootNode.entropy = calcEnthrophy(samplesClassesProbabilities);
-        }
+        
         this.buildTreeDFS(this.rootNode, 0);
     }
 }

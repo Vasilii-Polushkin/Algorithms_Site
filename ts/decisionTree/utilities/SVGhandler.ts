@@ -1,6 +1,6 @@
-export async function loadCSV(url)
+export async function loadCSV(url: string)
 {
-    function parseCSV(text) {
+    function parseCSV(text: string) {
         let prevSymbol = '', currString = [''], result = [currString], index = 0, stringIndex = 0, insideQuotes = true, symbol;
         for (symbol of text) {
           if (symbol === '"') {

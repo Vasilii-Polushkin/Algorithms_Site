@@ -9,10 +9,9 @@ export class attribute {
         this.values = valuesI;
         this.used = usedI;
     }
-    //attributeType: attributeTypes;
     id;
     values;
     //either bool for categorical or bool[] for interval
     used;
 }
-//# sourceMappingURL=condition.js.map
+//# sourceMappingURL=attribute.js.map
