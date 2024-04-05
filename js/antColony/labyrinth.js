@@ -4,7 +4,7 @@ let squareSide = 4;
 let squareRows = rows / squareSide;
 let squareCols = cols / squareSide;
 
-const canvas = document.getElementById('labyrinthCanvas');
+const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 
 export let map = new Array(squareRows);
@@ -161,5 +161,5 @@ function drawMap() {
             }
 }
 
-init();
-drawMap();
+//init();
+//drawMap();

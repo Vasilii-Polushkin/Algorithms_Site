@@ -1,0 +1,12 @@
+section {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+body, html {
+    height: 93%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}

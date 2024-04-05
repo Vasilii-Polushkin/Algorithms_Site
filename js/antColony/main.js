@@ -5,15 +5,16 @@ import {Control} from "./control.js";
 import {Ant, Cell, Colony} from "./objects.js";
 
 // read coordinates from control
-let colonyX = 350;
-let colonyY = 350;
+let colonyX = 500;
+let colonyY = 500;
 
 // read from control
-let antsCount = 50;
+let antsCount = 100;
 
 export let availableFields = 8;
 const alpha = 1;
-export let step = 5;
+export let step = 3;
+export let speed = 1;
 export let rows = 640;
 export let cols = 640;
 
@@ -36,6 +37,7 @@ export function getNearFields(ant, pheromones) {
     }
 
     let toFoodPheromone = new Array(availableFields);
+
     for (let j = 0; j < toFoodPheromone.length; j++) {
         let pheromoneX;
         let pheromoneY;
@@ -82,9 +84,8 @@ export function getNearFields(ant, pheromones) {
         }
         if(!b) {
             toFoodPheromone[j] = 0;
-            return toFoodPheromone;
         }
-        toFoodPheromone[j] = pheromones[pheromoneY][pheromoneX].toFood;
+        else toFoodPheromone[j] = pheromones[pheromoneY][pheromoneX].toFood;
     }
     return toFoodPheromone;
 }
@@ -101,7 +102,7 @@ export function initAnts(colony) {
         do {
             direction = Math.floor(Math.random() * 10);
         } while (direction > 7);
-        ants[i] = new Ant(direction, colony.x, colony.y);
+        ants[i] = new Ant(direction, colony);
     }
     return ants;
 }

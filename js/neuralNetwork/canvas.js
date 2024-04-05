@@ -86,7 +86,7 @@ let paint = false;
 
 function getPosition(event) {
     coord.x = event.clientX - canvas.offsetLeft;
-    coord.y = event.clientY - canvas.offsetTop - 150;
+    coord.y = event.clientY - canvas.offsetTop;
 
     let dx = w / squareWidth;
     let dy = h / squareHeight;

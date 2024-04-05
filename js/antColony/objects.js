@@ -1,5 +1,5 @@
 import {Flyweight} from "./view.js";
-import {availableFields, step} from "./main.js";
+import {availableFields, step, speed} from "./main.js";
 
 export class Ant {
     constructor(direction, colony) {
@@ -29,44 +29,80 @@ export class Ant {
          */
         this.target = false;
         this.vision = 10;
+        this.stepCount = 0;
+        this.prevStep = 0;
+        this.step = Math.floor(Math.random() * 10) + 10;
     }
 
     doStep(toFoodPheromone) {
-        if(this.target){
+        let answerField = 0;
+        if (this.target) {
             //go home
-        }
-        else {
+        } else {
             // find food
-            let desireToMove = new Array(availableFields);
-            let probabilities = new Array(availableFields);
-            for (let i = 0; i < desireToMove.length; i++)
-                if(toFoodPheromone[i] > 0) desireToMove[i] = Math.pow(toFoodPheromone[i], 1);
-
-            const sum = desireToMove.reduce((partialSum, a) => partialSum + a, 0);
-            probabilities[0] = desireToMove[0] / sum;
-            for (let i = 1; i < probabilities.length; i++) {
-                probabilities[i] = desireToMove[i] / sum + probabilities[i - 1];
-            }
-
-            let temp = Math.random();
-            let answerField = 0;
-            for (let i = 1; i < probabilities.length; i++) {
-                if (temp < probabilities[i] && temp > probabilities[i - 1]) {
-                    answerField = i;
-                    break;
+            if(this.stepCount === this.step || this.stepCount === 0 || toFoodPheromone[this.prevStep] === 0){
+                if(this.stepCount === this.step) {
+                    this.step = Math.floor(Math.random() * 10) + 10;
+                    this.stepCount = 0;
                 }
-            }
+                else this.stepCount++;
 
-            if(answerField === 0) return {x: -step, y: -step};
-            if(answerField === 1) return {x: 0, y: -step};
-            if(answerField === 2) return {x: step, y: -step};
-            if(answerField === 3) return {x: -step, y: 0};
-            if(answerField === 4) return {x: step, y: 0};
-            if(answerField === 5) return {x: -step, y: step};
-            if(answerField === 6) return {x: 0, y: step};
-            if(answerField === 7) return {x: step, y: step};
+                let desireToMove = new Array(availableFields);
+                let probabilities = new Array(availableFields);
+                for (let i = 0; i < desireToMove.length; i++) {
+                    //if (toFoodPheromone[i] > 0) {
+                        desireToMove[i] = Math.pow(toFoodPheromone[i], 1);
+                    //}
+                }
+
+                const sum = desireToMove.reduce((partialSum, a) => partialSum + a, 0);
+                probabilities[0] = desireToMove[0] / sum;
+                for (let i = 1; i < probabilities.length; i++) {
+                    probabilities[i] = desireToMove[i] / sum + probabilities[i - 1];
+                }
+
+                answerField = 0;
+                let temp = Math.random();
+                for (let i = 1; i < probabilities.length; i++) {
+                    if (temp < probabilities[i] && temp > probabilities[i - 1]) {
+                        answerField = i;
+                        break;
+                    }
+                }
+
+                this.prevStep = answerField;
+            }
+            else{
+                this.stepCount++;
+                answerField = this.prevStep;
+            }
         }
 
+        if (answerField === 0) {
+            this.angle = -45;
+            return {x: -step, y: -step};
+        } else if (answerField === 1) {
+            this.angle = 0;
+            return {x: 0, y: -step};
+        } else if (answerField === 2) {
+            this.angle = 45;
+            return {x: step, y: -step};
+        } else if (answerField === 3) {
+            this.angle = -90;
+            return {x: -step, y: 0};
+        } else if (answerField === 4) {
+            this.angle = 90;
+            return {x: step, y: 0};
+        } else if (answerField === 5) {
+            this.angle = -135;
+            return {x: -step, y: step};
+        } else if (answerField === 6) {
+            this.angle = 180;
+            return {x: 0, y: step};
+        } else if (answerField === 7) {
+            this.angle = 135;
+            return {x: step, y: step};
+        }
     }
 
     /*goStep() {
@@ -109,11 +145,16 @@ export class Ant {
 
     draw(ctx, fw) {
         let x = this.location.x, y = this.location.y, angle = this.angle;
-        let pose = this.pose;
+
+        /*this.location.x += speed * Math.cos(this.angle);
+        this.location.y += speed * Math.sin(this.angle);*/
+        this.roundCoordinates();
+
+        let pose = this.pose * 0.5;
         // Смена координат для поворота
         ctx.save();
         ctx.translate(x, y);
-        ctx.rotate(angle);
+        ctx.rotate(angle * Math.PI / 180);
         ctx.translate(-x, -y);
         // Корм
         /*if (this.load) {
@@ -122,7 +163,7 @@ export class Ant {
         }*/
         // Цвета и линии
         ctx.lineWidth = 1;
-        ctx.strokeStyle = 'Black';
+        ctx.strokeStyle = '#000';
         ctx.fillStyle = '#1a0505';
         // Лапки 1-4
         ctx.beginPath();
@@ -169,7 +210,12 @@ export class Ant {
         ctx.stroke();
         ctx.closePath();
         // Сброс координат
-        //ctx.restore();
+        ctx.restore();
+    }
+
+    roundCoordinates() {
+        this.location.x = Math.round(this.location.x);
+        this.location.y = Math.round(this.location.y);
     }
 }
 
@@ -179,9 +225,14 @@ export class Colony {
         this.y = y;
     }
 
+    update() {
+
+    }
+
     draw(ctx) {
         ctx.beginPath();
-        ctx.arc(this.x, this.y, 32, 0, Math.PI * 2);
+        ctx.arc(this.x, this.y, 16, 0, Math.PI * 2);
+        ctx.fillStyle = '#943b16';
         ctx.fill();
         ctx.closePath();
     }
@@ -197,7 +248,7 @@ class Food {
 export class Cell {
     constructor() {
         // color of food is????
-        this.food = new Food(0.0, );
+        this.food = new Food(0.0,);
         this.wall = false;
         this.toHome = 0.0;
         this.toFood = 0.2;
