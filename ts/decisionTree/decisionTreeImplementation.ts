@@ -142,7 +142,7 @@ export class TreeNode
         let currMinCategoricalEntrophy = 999;
 
         categoricalAttributesList.forEach((attribute) => {
-            if (categoricalAttributesList[attribute.id].used = true)
+            if (categoricalAttributesList[attribute.id].used == true)
                 return;
 
             let categoricalSamplesIds: number[][] = [];
@@ -160,9 +160,8 @@ export class TreeNode
                 {
                     if (attribute.values[i] == dataTable[id][attribute.id])
                     {
-                        //categoricalClassesAmounts[] = {dataTable[id][dataTable.length - 1]: ++};
-                        categoricalClassesAmounts[i][dataTable[id][dataTable.length - 1]] = 
-                            incrementedValue(categoricalClassesAmounts[i][dataTable[id][dataTable.length - 1]]);
+                        categoricalClassesAmounts[i][dataTable[id][dataTable[0].length - 1]] = 
+                            incrementedValue(categoricalClassesAmounts[i][dataTable[id][dataTable[0].length - 1]]);
                         categoricalSamplesIds[i].push(id);
                         break;
                     }
@@ -352,12 +351,12 @@ export class DecisionTree
     classifyFromThisCSV(precentageToClassify: number)
     {
         const amountToClasify = this.dataTable.length * precentageToClassify / 100;
-        for (let i = 1; i < amountToClasify; ++i)
+        for (let i = 1; i < amountToClasify - 1; ++i)
         {
             let res = this.classifySingle(this.dataTable[i]);
 
-            console.log(this.dataTable[i][this.dataTable[0].length - 1]);
-            console.log(res);
+            //console.log(this.dataTable[i][this.dataTable[0].length - 1]);
+            //console.log(res);
         }
     }
 
@@ -367,7 +366,6 @@ export class DecisionTree
         this.fillAttributesLists();
 
         this.maxDepth = maxDepth;
-        //this.minKnowledge = minKnowledge;
 
         this.rootNode = new TreeNode();
         this.rootNode.samplesAmount = this.dataTable.length - 1;
@@ -389,7 +387,8 @@ export class DecisionTree
 
         this.rootNode.entrophy = calcEnthrophy(samplesClassesProbabilities);
 
-        this.minKnowledge = this.rootNode.entrophy * minKnowledgePersentage / 100;
+        if (minKnowledgePersentage != undefined)
+            this.minKnowledge = this.rootNode.entrophy * minKnowledgePersentage / 100;
 
         this.buildTreeDFS(this.rootNode, 0);
     }
