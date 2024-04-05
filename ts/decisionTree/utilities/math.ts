@@ -30,3 +30,11 @@ export function adjustMedians(arr: any){
         res.push((arr[i] + arr[i + 1]) / 2);
     return res;
 }
+
+export function incrementedValue(x: undefined | number): number
+{
+    if (x == undefined)
+        x = 0;
+    x++;
+    return x;
+}

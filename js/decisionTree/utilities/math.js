@@ -24,4 +24,10 @@ export function adjustMedians(arr) {
         res.push((arr[i] + arr[i + 1]) / 2);
     return res;
 }
+export function incrementedValue(x) {
+    if (x == undefined)
+        x = 0;
+    x++;
+    return x;
+}
 //# sourceMappingURL=math.js.map

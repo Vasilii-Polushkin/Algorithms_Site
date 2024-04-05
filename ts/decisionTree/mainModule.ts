@@ -9,3 +9,5 @@ import { CSVurls } from "./utilities/CSVurls.js";
 
 let tree = new DecisionTree(await loadCSV(CSVurls.iris));
 console.log(tree);
+
+tree.classifyFromThisCSV(100);

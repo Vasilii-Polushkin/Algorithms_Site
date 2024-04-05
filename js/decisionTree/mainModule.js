@@ -7,4 +7,5 @@ import { CSVurls } from "./utilities/CSVurls.js";
 //console.table(Global.dataTable);
 let tree = new DecisionTree(await loadCSV(CSVurls.iris));
 console.log(tree);
+tree.classifyFromThisCSV(100);
 //# sourceMappingURL=mainModule.js.map
