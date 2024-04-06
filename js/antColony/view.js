@@ -1,35 +1,72 @@
-import {ants, colony, rows, cols} from "./main.js"
+import {rows, cols} from "./main.js"
+import {generateLabyrinth, init, drawMap, map} from "./labyrinth.js";
+import {control, model} from "./control.js";
+
+let copyMap = map;
 
 export class View {
     constructor() {
-        this.canvas = document.getElementById('canvas');
+        this.layer1 = document.getElementById('layer1');
+        this.layer2 = document.getElementById('layer2');
         this.onResize();
         window.addEventListener('resize', this.onResize);
     }
 
+    init(){
+        if (control.setLabyrinth) {
+            copyMap = generateLabyrinth();
+            init();
+            drawMap();
+        }
+        else {
+            this.ctx1.fillStyle = '#047344';
+            this.ctx1.fillRect(0, 0, this.layer1.width, this.layer1.height);
+        }
+    }
+
     draw() {
-        this.ctx.fillStyle = '#047344';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        /*for (let wall of walls)
-            wall.draw(this.ctx);
-
-        for (let food of model.listFood)
+        /*for (let food of model.listFood)
             food.draw(this.ctx);*/
 
-        for (let ant of ants)
-            ant.draw(this.ctx, this.fw);
+        if (control.initColony) {
+            model.colony.drawSilhouette(this.ctx1);
+        }
+        if (control.setColony) {
+            for (let ant of model.ants) {
+                ant.draw(this.ctx1, this.fw);
+            }
+            model.colony.draw(this.ctx1);
+        }
+        if(control.setWall) {
+            this.ctx2.height = rows;
+            this.ctx2.width = cols;
+            this.ctx2.beginPath();
 
-        colony.draw(this.ctx);
+            this.ctx2.lineWidth = 20;
+
+            this.ctx2.lineCap = 'square';
+            this.ctx2.strokeStyle = '#1f1f1f';
+
+            this.ctx2.moveTo(control.x, control.y);
+
+            this.ctx2.lineTo(control.x, control.y);
+            this.ctx2.stroke();
+            this.ctx2.closePath();
+
+        }
     }
 
     onResize() {
-        this.canvas.height = rows;
-        this.canvas.width = cols;
-        this.ctx = this.canvas.getContext('2d');
-        this.ctx.shadowColor = 'Black';
-        this.ctx.textBaseline = "middle";
-        this.ctx.textAlign = "center";
+        this.layer1.height = rows;
+        this.layer1.width = cols;
+        this.layer2.height = rows;
+        this.layer2.width = cols;
+        this.ctx1 = this.layer1.getContext('2d');
+        this.ctx2 = this.layer2.getContext('2d');
+        this.ctx1.shadowColor = 'Black';
+        this.ctx1.textBaseline = "middle";
+        this.ctx1.textAlign = "center";
         this.fw = new Flyweight();
     }
 }

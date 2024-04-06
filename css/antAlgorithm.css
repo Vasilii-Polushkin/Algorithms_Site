@@ -10,3 +10,7 @@ body, html {
     flex-direction: column;
     justify-content: space-between;
 }
+
+canvas {
+    border-radius: 6px;
+}

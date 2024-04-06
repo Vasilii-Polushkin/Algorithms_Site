@@ -62,12 +62,15 @@
 
 <div>
     <section>
-        <canvas id="canvas"></canvas>
-        <div class = 'col-xs'>
+        <canvas id="layer1" style="z-index: 0"></canvas>
+        <canvas id="layer2" style="position: absolute; z-index: 1"></canvas>
+        <div class='col-xs'>
 
-            <!-- brush size range form --><br><br>
-            <label for="BrushSizeRange" class="form-label">Size of the brush: <output id="brushValue"></output> </label>
-            <input type="range" class="form-range" min="1" max="9" step="2" id="BrushSizeRange" value="1">
+            <!-- brush size range form -->
+            <label for="BrushSizeRange" class="form-label">Size of the brush:
+                <output id="brushValue"></output>
+            </label>
+            <input type="range" class="form-range" min="20" max="100" step="20" id="BrushSizeRange" value="1">
 
             <!-- cell type radio form --><br><br>
             <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
@@ -82,24 +85,28 @@
 
                 <input type="radio" class="btn-check" name="btnradio" id="FOODbtn" autocomplete="off">
                 <label class="btn btn-outline-light" for="FOODbtn">FOOD</label>
-
-                <input type="radio" class="btn-check" name="btnradio" id="PAUSEbtn" autocomplete="off">
-                <label class="btn btn-outline-light" for="PAUSEbtn">PAUSE</label>
             </div>
 
             <!-- number of ants range form --><br><br>
-            <label for="antsNumber" class="form-label">Number of ants: <output id="antsNumber"></output> </label>
-            <input type="range" class="form-range" min="1" max="500" step="10" id="antsNumber" value="1">
+            <label for="antsNumber" class="form-label">Number of ants:
+                <output id="antsNumber"></output>
+            </label>
+            <input type="range" class="form-range" min="10" max="400" step="10" id="antsNumberRange" value="1">
 
             <!-- ants speed range form --><br><br>
-            <label for="antsSpeed" class="form-label">Ants speed: <output id="antsSpeed"></output> </label>
-            <input type="range" class="form-range" min="3" max="100" step="1" id="antsSpeed" value="10">
+            <label for="antsSpeed" class="form-label">Ants speed:
+                <output id="antsSpeed"></output>
+            </label>
+            <input type="range" class="form-range" min="1" max="20" step="1" id="antsSpeedRange" value="10">
 
             <!-- generate labyrinth button --><br><br>
-            <button type="button" class="btn btn-outline-light" id = "CreateLabyrinth">Generate labyrinth</button>
+            <button type="button" class="btn btn-outline-light" id="CreateLabyrinth">Generate labyrinth</button>
 
             <!-- restart button -->
-            <button type="button" class="btn btn-outline-light" id = "RestartBtn">Restart</button>
+            <button type="button" class="btn btn-outline-light" id="RestartBtn">Restart</button>
+
+            <!-- pause button -->
+            <button type="button" class="btn btn-outline-light" id="PauseBtn">Pause</button>
 
             <!-- alert -->
             <div id="liveAlertPlaceholder"></div>

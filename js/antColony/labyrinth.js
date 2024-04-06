@@ -4,7 +4,7 @@ let squareSide = 4;
 let squareRows = rows / squareSide;
 let squareCols = cols / squareSide;
 
-const canvas = document.getElementById('canvas');
+const canvas = document.getElementById('layer1');
 const context = canvas.getContext('2d');
 
 export let map = new Array(squareRows);
@@ -134,9 +134,7 @@ export function generateLabyrinth() {
     return true;*/
 }
 
-map = generateLabyrinth();
-
-function init() {
+export function init() {
     canvas.width = cols * squareSide;
     canvas.height = rows * squareSide;
 
@@ -150,7 +148,7 @@ function init() {
     context.fill();
 }
 
-function drawMap() {
+export function drawMap() {
     for (let x = 0; x < cols; x++)
         for (let y = 0; y < rows; y++)
             if (getField(Math.floor(x / squareSide), Math.floor(y / squareSide)) === '1') {

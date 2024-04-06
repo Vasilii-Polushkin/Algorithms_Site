@@ -1,5 +1,7 @@
 import {Flyweight} from "./view.js";
 import {availableFields, step, speed} from "./main.js";
+import {drawMap, init} from "./labyrinth.js";
+import {control} from "./control.js";
 
 export class Ant {
     constructor(direction, colony) {
@@ -105,32 +107,6 @@ export class Ant {
         }
     }
 
-    /*goStep() {
-        let pos=model.roundPos(this.pos);
-        model.map[pos.x][pos.y]=false;
-        let angle=this.angle-Math.PI/2;
-        this.pos.x+=this.speed*Math.cos(angle);
-        this.pos.y+=this.speed*Math.sin(angle);
-        pos=model.roundPos(this.pos);
-        model.map[pos.x][pos.y]=this;
-        if (this.step<=0) {
-            this.pose=!this.pose;
-            this.step=1/this.speed*5;
-            this.score++;
-            if (this.pose)
-                model.newLabel(this.color, pos);
-            else if (this.load instanceof Food)
-                model.newLabel(Food.color, pos);
-        } else
-            this.step--;
-    }*/
-
-    /*leavePheromoneTrail(cell) {
-        // what's wrong with path length?
-        cell.toFood += alpha / this.path.length;
-        //this.path[this.path.length - 1]
-    }*/
-
     update(toFoodPheromone) {
         //this.timer--;
         //this.life -= 0.01;
@@ -146,8 +122,6 @@ export class Ant {
     draw(ctx, fw) {
         let x = this.location.x, y = this.location.y, angle = this.angle;
 
-        /*this.location.x += speed * Math.cos(this.angle);
-        this.location.y += speed * Math.sin(this.angle);*/
         this.roundCoordinates();
 
         let pose = this.pose * 0.5;
@@ -233,6 +207,22 @@ export class Colony {
         ctx.beginPath();
         ctx.arc(this.x, this.y, 16, 0, Math.PI * 2);
         ctx.fillStyle = '#943b16';
+        ctx.fill();
+        ctx.closePath();
+    }
+
+    drawSilhouette(ctx) {
+        if(control.setLabyrinth){
+            init();
+            drawMap();
+        }
+        else{
+            ctx.fillStyle = '#047344';
+            ctx.fillRect(0, 0, 640, 640);
+        }
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 16, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(65,61,61,0.5)";
         ctx.fill();
         ctx.closePath();
     }
