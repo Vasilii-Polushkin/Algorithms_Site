@@ -1,3 +1,4 @@
+export const maxEnthropy = 9999;
 export function xLog2x(x) {
     return x <= 0 ? 0 : x * Math.log2(x);
 }
