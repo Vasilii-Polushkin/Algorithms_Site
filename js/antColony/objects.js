@@ -1,7 +1,6 @@
 import {Flyweight} from "./view.js";
-import {availableFields, step, speed} from "./main.js";
-import {drawMap, init} from "./labyrinth.js";
-import {control} from "./control.js";
+import {availableFields} from "./control.js";
+import {step} from "./model.js";
 
 export class Ant {
     constructor(direction, colony) {
@@ -108,14 +107,6 @@ export class Ant {
     }
 
     update(toFoodPheromone) {
-        //this.timer--;
-        //this.life -= 0.01;
-        // Смена режима
-        /*if (this.timer <= 0) {
-            this.listTarget = this.vision();
-            this.action = this.ai.select(this);
-            this.action(this);
-        }*/
         return this.doStep(toFoodPheromone);
     }
 
@@ -130,11 +121,6 @@ export class Ant {
         ctx.translate(x, y);
         ctx.rotate(angle * Math.PI / 180);
         ctx.translate(-x, -y);
-        // Корм
-        /*if (this.load) {
-            this.load.pos = {x: x, y: y - fw.size4};
-            this.load.draw(ctx);
-        }*/
         // Цвета и линии
         ctx.lineWidth = 1;
         ctx.strokeStyle = '#000';
@@ -183,7 +169,6 @@ export class Ant {
         ctx.lineTo(x + fw.size15 - pose * 0.5, y - fw.size45);
         ctx.stroke();
         ctx.closePath();
-        // Сброс координат
         ctx.restore();
     }
 
@@ -212,14 +197,6 @@ export class Colony {
     }
 
     drawSilhouette(ctx) {
-        if(control.setLabyrinth){
-            init();
-            drawMap();
-        }
-        else{
-            ctx.fillStyle = '#047344';
-            ctx.fillRect(0, 0, 640, 640);
-        }
         ctx.beginPath();
         ctx.arc(this.x, this.y, 16, 0, Math.PI * 2);
         ctx.fillStyle = "rgba(65,61,61,0.5)";

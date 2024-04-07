@@ -1,6 +1,5 @@
-import {rows, cols} from "./main.js"
 import {generateLabyrinth, init, drawMap, map} from "./labyrinth.js";
-import {control, model} from "./control.js";
+import {control, model, rows, cols} from "./control.js";
 
 let copyMap = map;
 
@@ -8,52 +7,72 @@ export class View {
     constructor() {
         this.layer1 = document.getElementById('layer1');
         this.layer2 = document.getElementById('layer2');
+        this.extraLayer1 = document.getElementById('extraLayer1');
         this.onResize();
         window.addEventListener('resize', this.onResize);
     }
 
-    init(){
+    init() {
         if (control.setLabyrinth) {
             copyMap = generateLabyrinth();
             init();
             drawMap();
-        }
-        else {
+        } else {
             this.ctx1.fillStyle = '#047344';
             this.ctx1.fillRect(0, 0, this.layer1.width, this.layer1.height);
         }
     }
 
     draw() {
+        let brushSize = parseInt(control.brushSize.textContent);
+        let x = control.x;
+        let y = control.y;
 
-        /*for (let food of model.listFood)
-            food.draw(this.ctx);*/
+        if (control.setLabyrinth) {
+            init();
+            drawMap();
+        } else {
+            this.ctx1.clearRect(0, 0, this.layer1.width, this.layer1.height);
+            this.ctx1.fillStyle = '#047344';
+            this.ctx1.fillRect(0, 0, this.layer1.width, this.layer1.height);
 
-        if (control.initColony) {
+            this.extraCtx1.drawImage(this.layer1, 0, 0);
+        }
+
+        if(control.mouseState === 'FOOD' && control.setFood) {
+
+        }
+
+        if (control.mouseState === 'WALL' && control.setWall) {
+            this.ctx2.beginPath();
+
+            this.ctx2.lineWidth = brushSize;
+
+            this.ctx2.lineCap = 'square';
+            this.ctx2.strokeStyle = '#1f1f1f';
+
+            this.ctx2.moveTo(x, y);
+
+            this.ctx2.lineTo(x, y);
+            this.ctx2.stroke();
+            this.ctx2.closePath();
+        }
+        this.ctx1.drawImage(this.layer2, 0, 0);
+
+        if (control.mouseState === 'ERASER' && control.eraserWorks) {
+            this.ctx2.drawImage(this.extraLayer1, x - brushSize / 2, y - brushSize / 2, brushSize, brushSize,
+                x - brushSize / 2, y - brushSize / 2, brushSize, brushSize);
+        }
+
+        if (control.mouseState === 'COLONY' && control.initColony) {
             model.colony.drawSilhouette(this.ctx1);
         }
+
         if (control.setColony) {
             for (let ant of model.ants) {
                 ant.draw(this.ctx1, this.fw);
             }
             model.colony.draw(this.ctx1);
-        }
-        if(control.setWall) {
-            this.ctx2.height = rows;
-            this.ctx2.width = cols;
-            this.ctx2.beginPath();
-
-            this.ctx2.lineWidth = 20;
-
-            this.ctx2.lineCap = 'square';
-            this.ctx2.strokeStyle = '#1f1f1f';
-
-            this.ctx2.moveTo(control.x, control.y);
-
-            this.ctx2.lineTo(control.x, control.y);
-            this.ctx2.stroke();
-            this.ctx2.closePath();
-
         }
     }
 
@@ -62,11 +81,11 @@ export class View {
         this.layer1.width = cols;
         this.layer2.height = rows;
         this.layer2.width = cols;
+        this.extraLayer1.height = rows;
+        this.extraLayer1.width = cols;
         this.ctx1 = this.layer1.getContext('2d');
         this.ctx2 = this.layer2.getContext('2d');
-        this.ctx1.shadowColor = 'Black';
-        this.ctx1.textBaseline = "middle";
-        this.ctx1.textAlign = "center";
+        this.extraCtx1 = this.extraLayer1.getContext('2d');
         this.fw = new Flyweight();
     }
 }

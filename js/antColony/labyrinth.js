@@ -1,11 +1,15 @@
-let rows = 160;
-let cols = 160;
-let squareSide = 4;
+let rows = 130;
+let cols = 130;
+let squareSide = 5;
 let squareRows = rows / squareSide;
 let squareCols = cols / squareSide;
 
-const canvas = document.getElementById('layer1');
-const context = canvas.getContext('2d');
+const layer1 = document.getElementById('layer1');
+const layer2 = document.getElementById('layer2');
+const extraLayer1 = document.getElementById('extraLayer1');
+const context1 = layer1.getContext('2d');
+const context2 = layer2.getContext('2d');
+let extraCtx1 = extraLayer1.getContext('2d');
 
 export let map = new Array(squareRows);
 
@@ -135,29 +139,32 @@ export function generateLabyrinth() {
 }
 
 export function init() {
-    canvas.width = cols * squareSide;
-    canvas.height = rows * squareSide;
+    layer1.width = cols * squareSide;
+    layer1.height = rows * squareSide;
 
-    context.fillStyle = 'black';
-    context.rect(0, 0, canvas.width, canvas.height);
-    context.fill();
+    context1.clearRect(0, 0, layer1.width, layer1.height);
+    //context2.clearRect(0, 0, layer1.width, layer1.height);
 
-    context.fillStyle = '#858080';
-    context.beginPath();
-    context.rect(0, 0, canvas.width, canvas.height);
-    context.fill();
+    context1.fillStyle = 'black';
+    context1.rect(0, 0, layer1.width, layer1.height);
+    context1.fill();
+
+    context1.fillStyle = '#858080';
+    context1.beginPath();
+    context1.rect(0, 0, layer1.width, layer1.height);
+    context1.fill();
 }
 
 export function drawMap() {
     for (let x = 0; x < cols; x++)
         for (let y = 0; y < rows; y++)
             if (getField(Math.floor(x / squareSide), Math.floor(y / squareSide)) === '1') {
-                context.fillStyle = '#000';
-                context.beginPath();
-                context.rect(x * squareSide, y * squareSide, squareSide, squareSide);
-                context.fill();
+                context1.fillStyle = '#000';
+                context1.beginPath();
+                context1.rect(x * squareSide, y * squareSide, squareSide, squareSide);
+                context1.fill();
             }
+
+    extraCtx1.drawImage(layer1, 0, 0);
 }
 
-//init();
-//drawMap();
