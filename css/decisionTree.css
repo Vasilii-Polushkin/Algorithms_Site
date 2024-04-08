@@ -18,16 +18,17 @@
   box-sizing: border-box;
 }
 
+
 * {
   position: relative;
   margin: 0;
   padding: 0;
   
   border: 0 none;
-    
+    /*
   -webkit-transition: all ease .4s;
   -moz-transition: all ease .4s;
-    transition: all ease .4s;
+    transition: all ease .4s;*/
 }
 
 h1 {
@@ -36,12 +37,14 @@ h1 {
 }
 
 .node {
+  white-space: pre-line;
   width: max-content;
   height: max-content;
   overflow:auto;
 }
 
 .node ul {
+  
   position: relative;
   padding-top: 20px; 
 }
@@ -77,7 +80,10 @@ h1 {
   display: none;
 }
 
-.node li:only-child{ padding-top: 0;}
+.node li:only-child{
+  padding-top: 0;
+}
+
 .node li:first-child::before, .node li:last-child::after{
   border: 0 none;
 }

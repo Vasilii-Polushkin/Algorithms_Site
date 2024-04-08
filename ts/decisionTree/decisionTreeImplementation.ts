@@ -281,26 +281,27 @@ export class TreeNode
         return this.getAttributeName() + this.getAttributeCondition();
     }
 
-    getClassesAmounts(): [][]
+    getClassesAmounts(): string
     {
         const obj = {};
 
         this.samplesIDs.forEach(id => {
-            obj[id] = incrementedValue(obj[id]);
+            obj[this.ownerTree.dataTable[id].at(-1)] =
+                incrementedValue(obj[this.ownerTree.dataTable[id].at(-1)]);
         });
 
-        let res = [];
+        let res:string = "";
 
         for (let key in obj)
-            res.push([this.ownerTree.dataTable[key].at(-1), obj[key]]);
+            res += key + ': ' +  obj[key] + '\n';
 
         return res;
     }
 
     getAdditionalVisualContent(): string
     {
-        return "enthropy: " + this.entrophy + " "
-        + this.samplesAmount + " "
+        return "\nenthropy: " + this.entrophy.toFixed(3) + "\n"
+        + "Samples Amount: " + this.samplesAmount + "\n"
         + this.getClassesAmounts();
     }
 }
@@ -498,8 +499,7 @@ export class DecisionTree
 
         // logic
         nodeInfo.append(currNode.getVisualContent());
-         nodeInfo.append("\n\n\n3");
-        //nodeInfo.append(currNode.getAdditionalVisualContent());
+        nodeInfo.append(currNode.getAdditionalVisualContent());
 
         currNode.children.forEach(childNode => {
             this.visualizeTreeDfs(childNode, childrenPlaceholder);
