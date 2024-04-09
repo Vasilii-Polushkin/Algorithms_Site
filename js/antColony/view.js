@@ -1,7 +1,6 @@
 import {generateLabyrinth, init, drawMap, map} from "./labyrinth.js";
 import {control, model, rows, cols} from "./control.js";
 
-let copyMap = map;
 
 export class View {
     constructor() {
@@ -14,10 +13,12 @@ export class View {
 
     init() {
         if (control.setLabyrinth) {
-            copyMap = generateLabyrinth();
+            this.style = '#858080';
+            generateLabyrinth();
             init();
-            drawMap();
+            model.map = drawMap();
         } else {
+            this.style = '#047344';
             this.ctx1.fillStyle = '#047344';
             this.ctx1.fillRect(0, 0, this.layer1.width, this.layer1.height);
         }
@@ -29,8 +30,11 @@ export class View {
         let y = control.y;
 
         if (control.setLabyrinth) {
-            init();
-            drawMap();
+            this.ctx1.clearRect(0, 0, this.layer1.width, this.layer1.height);
+            /*init();
+            drawMap();*/
+            this.ctx1.drawImage(this.extraLayer1, 0, 0);
+
         } else {
             this.ctx1.clearRect(0, 0, this.layer1.width, this.layer1.height);
             this.ctx1.fillStyle = '#047344';
@@ -40,7 +44,7 @@ export class View {
         }
 
         if(control.mouseState === 'FOOD' && control.setFood) {
-
+            //...
         }
 
         if (control.mouseState === 'WALL' && control.setWall) {
@@ -60,8 +64,8 @@ export class View {
         this.ctx1.drawImage(this.layer2, 0, 0);
 
         if (control.mouseState === 'ERASER' && control.eraserWorks) {
-            this.ctx2.drawImage(this.extraLayer1, x - brushSize / 2, y - brushSize / 2, brushSize, brushSize,
-                x - brushSize / 2, y - brushSize / 2, brushSize, brushSize);
+            this.ctx2.fillStyle = this.style;
+            this.ctx2.fillRect(x - brushSize / 2, y - brushSize / 2, brushSize, brushSize);
         }
 
         if (control.mouseState === 'COLONY' && control.initColony) {
@@ -70,7 +74,7 @@ export class View {
 
         if (control.setColony) {
             for (let ant of model.ants) {
-                ant.draw(this.ctx1, this.fw);
+                if(!ant.dead) ant.draw(this.ctx1, this.fw);
             }
             model.colony.draw(this.ctx1);
         }

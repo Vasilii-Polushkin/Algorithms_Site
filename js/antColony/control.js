@@ -14,12 +14,11 @@ export let rows = 650;
 export let cols = 650;
 
 
-export function getNearFields(ant, pheromones) {
+export function isFieldValid(x, y) {
+    return x > 0 && x < cols && y > 0 && y < rows && !model.map[y][x].wall;
+}
 
-    function isFieldValid(x, y) {
-        //TODO: IS THIS RIGHT????????????
-        return x > 0 && x < cols && y > 0 && y < rows && !model.map[y][x].wall;
-    }
+export function getNearFields(ant, pheromones) {
 
     let toFoodPheromone = new Array(availableFields);
 
@@ -78,7 +77,8 @@ export class Control {
         this.initColony = false;
         this.setColony = false;
         this.setLabyrinth = false;
-        this.eraserWorks = true;
+        this.setWall = false;
+        this.eraserWorks = false;
         this.setFood = false;
         this.x = 0;
         this.y = 0;
@@ -98,8 +98,6 @@ export class Control {
         this.PauseBtn.innerHTML = 'Pause';
 
         this.createHandlers();
-
-        //setInterval(() => this.update(), 1000 / FPS);
     }
 
     update() {
@@ -110,51 +108,45 @@ export class Control {
         this.interval = setInterval(() => this.update(), 1000 / FPS);
     }
 
-    foodBtnFunc() {
-        this.mouseState = 'FOOD';
+    start = (e) => {
+        if(this.mouseState === 'ERASER') {
+            this.eraserWorks = true;
+            this.setWall = false;
+        }
+        if(this.mouseState === 'WALL') {
+            this.eraserWorks = false;
+            this.setWall = true;
+        }
 
+        this.getPosition(e);
     }
 
-    eraserBtnFunc = () => {
+    stop = () => {
+        if(this.mouseState === 'ERASER') this.eraserWorks = false;
+        if(this.mouseState === 'WALL') this.setWall = false;
+    }
+
+    sketch = (e) => {
+        this.getPosition(e);
+        if(this.eraserWorks) model.set(this.x, this.y, false);
+        if(this.setWall) model.set(this.x, this.y, true);
+    }
+
+    eraserState = () => {
         this.mouseState = 'ERASER';
-        document.addEventListener('mousedown', this.startErase);
-        document.addEventListener('mouseup', this.stopErase);
-        document.addEventListener('mousemove', this.getPosition);
     }
 
-    startErase = (e) => {
-        this.eraserWorks = true;
-        this.getPosition(e);
-    }
-
-    stopErase = () => {
-        this.eraserWorks = false;
-    }
-
-    wallBtnFunc = () => {
+    wallState = () => {
         this.mouseState = 'WALL';
-        document.addEventListener('mousedown', this.startWall);
-        document.addEventListener('mouseup', this.stopWall);
-        document.addEventListener('mousemove', this.sketchWall);
     }
 
-    startWall = (e) => {
-        this.setWall = true;
-        this.getPosition(e);
+    foodState = () => {
+        this.mouseState = 'FOOD';
     }
 
     getPosition = (e) => {
         this.x = e.clientX - view.layer1.offsetLeft;
         this.y = e.clientY - view.layer1.offsetTop;
-    }
-
-    sketchWall = (e) => {
-        this.getPosition(e);
-        model.setWall(this.x, this.y);
-    }
-
-    stopWall = () => {
-        this.setWall = false;
     }
 
     colonyBtnFunc = () => {
@@ -192,10 +184,14 @@ export class Control {
     }
 
     createHandlers() {
-        this.ERASEbtn.addEventListener('click', this.eraserBtnFunc);
-        this.WALLbtn.addEventListener('click', this.wallBtnFunc);
+        document.addEventListener('mousedown', this.start);
+        document.addEventListener('mouseup', this.stop);
+        document.addEventListener('mousemove', this.sketch);
+
+        this.ERASEbtn.onclick = this.eraserState;
+        this.WALLbtn.onclick = this.wallState;
         this.COLONYbtn.addEventListener('click', this.colonyBtnFunc);
-        this.FOODbtn.addEventListener('click', this.foodBtnFunc);
+        this.FOODbtn.onclick = this.foodState;
 
         let brushSizeInput = document.getElementById('brushSizeRange');
         this.brushSize.textContent = brushSizeInput.value;
@@ -221,8 +217,15 @@ export class Control {
 
 
         this.CreateLabyrinth.addEventListener('click', e => {
+            this.initColony = false;
+            this.setColony = false;
             this.setLabyrinth = true;
+            model = new Model();
+            model.initMap();
+            view = new View();
             view.init();
+            this.PauseBtn.innerHTML = 'Pause';
+            this.pause = false;
         }, false);
 
         this.RestartBtn.addEventListener('click', e => {

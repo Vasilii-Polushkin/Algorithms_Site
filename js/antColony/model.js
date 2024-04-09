@@ -32,8 +32,9 @@ export class Model {
         this.map = new Array(rows);
         for (let i = 0; i < this.map.length; i++) {
             this.map[i] = new Array(cols);
-            for (let j = 0; j < this.map[i].length; j++)
+            for (let j = 0; j < this.map[i].length; j++) {
                 this.map[i][j] = new Cell();
+            }
         }
     }
 
@@ -53,8 +54,7 @@ export class Model {
         }
     }
 
-    setWall(x, y) {
-        //TODO REDO
+    set(x, y, state/*, food*/) {
         let brushSize = parseInt(control.brushSize.textContent);
         let sy = 0;
         let sx = 0;
@@ -72,7 +72,8 @@ export class Model {
         let dx = Math.min(this.map.length, sx + brushSize);
         for(let i = sy; i < dy; i++) {
             for(let j = sx; j < dx; j++) {
-                this.map[i][j].wall = true;
+                this.map[i][j].wall = state;
+                //this.map[i][j].food = food;
             }
         }
     }

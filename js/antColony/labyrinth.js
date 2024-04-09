@@ -1,3 +1,5 @@
+import {Cell} from "./objects.js";
+
 let rows = 130;
 let cols = 130;
 let squareSide = 5;
@@ -19,6 +21,7 @@ for (let i = 0; i < map.length; i++) {
         map[i][j] = new Array(squareSide * squareSide);
     }
 }
+
 
 function handleSquare(f, x, y, value) {
     for (let i = 0; i < squareSide; i++)
@@ -115,8 +118,6 @@ export function generateLabyrinth() {
     // выбираем случайным образом чётные координаты на карте с лабиринтом
     const startX = getRandomFrom(Array(squareCols).fill(0).map((item, index) => index).filter(x => isEven(x)));
     const startY = getRandomFrom(Array(squareRows).fill(0).map((item, index) => index).filter(y => isEven(y)));
-    //const startX = 0;
-    //const startY = 0;
 
     let eraser = {};
     eraser.x = startX;
@@ -143,7 +144,6 @@ export function init() {
     layer1.height = rows * squareSide;
 
     context1.clearRect(0, 0, layer1.width, layer1.height);
-    //context2.clearRect(0, 0, layer1.width, layer1.height);
 
     context1.fillStyle = 'black';
     context1.rect(0, 0, layer1.width, layer1.height);
@@ -155,16 +155,31 @@ export function init() {
     context1.fill();
 }
 
+export let answerMap;
+
 export function drawMap() {
-    for (let x = 0; x < cols; x++)
-        for (let y = 0; y < rows; y++)
+    answerMap = new Array(rows * squareSide);
+    for (let i = 0; i < answerMap.length; i++) {
+        answerMap[i] = new Array(cols * squareSide);
+        for (let j = 0; j < answerMap[i].length; j++) {
+            answerMap[i][j] = new Cell();
+        }
+    }
+    for (let y = 0; y < rows; y++)
+        for (let x = 0; x < cols; x++)
             if (getField(Math.floor(x / squareSide), Math.floor(y / squareSide)) === '1') {
-                context1.fillStyle = '#000';
+                context1.fillStyle = '#1f1f1f';
                 context1.beginPath();
                 context1.rect(x * squareSide, y * squareSide, squareSide, squareSide);
                 context1.fill();
+                for(let k = 0; k < squareSide; k++)
+                    for(let l = 0; l < squareSide; l++)
+                        answerMap[y * squareSide + k][x * squareSide + l].wall = true;
             }
 
+    extraCtx1.clearRect(0, 0, layer1.width, layer1.height);
     extraCtx1.drawImage(layer1, 0, 0);
+    return answerMap;
 }
+
 

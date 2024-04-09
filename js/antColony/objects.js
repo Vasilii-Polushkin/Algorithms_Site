@@ -1,9 +1,10 @@
 import {Flyweight} from "./view.js";
-import {availableFields} from "./control.js";
+import {availableFields, isFieldValid} from "./control.js";
 import {step} from "./model.js";
 
 export class Ant {
     constructor(direction, colony) {
+        this.dead = false;
         /**
          * 0  up-left
          * 1  up
@@ -112,6 +113,10 @@ export class Ant {
 
     draw(ctx, fw) {
         let x = this.location.x, y = this.location.y, angle = this.angle;
+        if(!isFieldValid(x, y)) {
+            this.dead = true;
+            return;
+        }
 
         this.roundCoordinates();
 
