@@ -21,15 +21,13 @@
 	<link rel="stylesheet" href="../css/media.css">
 
 	<script src="../libs/jquery/jquery-3.6.0.min.js" defer></script>
-	<script src="../js/common.js" defer></script>
 
 	<script src="../libs/bootstrap/js/bootstrap.bundle.min.js"></script>
 	<!-- default -->
 
 	<link rel="stylesheet" href="../css/decisionTree.css" defer>
-	<script type = "module" src="../js/decisionTree/mainModule.js" defer></script>
-	<script type = "module" src="../ts/decisionTree/bindings.js" defer></script>
-	<script type = "module" src="../ts/decisionTree/MoveScaleLogic.js" defer></script>
+	<script type = "module" src="../js/decisionTree/ts/decisionTree/mainModule.js" defer></script>
+	<script type = "module" src="../js/decisionTree/ts/decisionTree/bindings.js" defer></script>
 	
 </head>
 
@@ -54,24 +52,84 @@
 			</div>
 		</div>
 	</header>
+	
+	<div class="offcanvas offcanvas-end mainBg" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+		<div class="offcanvas-header">
+			<h5 class="offcanvas-title" id="offcanvasRightLabel">Create New Tree</h5>
+			<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+		</div>
 
-	<!-- main -->
-	<h1>Menu parent children as a diagram...</h1>
+		<div class="offcanvas-body">
 
-	<div class="file-upload">
-		<div class="file-select">
-		  <div class="file-select-button" id="fileName">Choose File</div>
-		  <div class="file-select-name" id="noFile">No file chosen...</div> 
-		  <input type="file" name="chooseFile" id="chooseFile">
+			<div class="form-check">
+				<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+				<!-- file uppload -->
+				<div class="file-upload">
+					<div class="file-select">
+						<div class="file-select-button" id="fileName">Choose File</div>
+						<div class="file-select-name" id="noFile">No file chosen...</div> 
+						<input type="file" name="chooseFile" id="chooseFile">
+					</div>
+				</div>
+			  </div>
+			  <div class="form-check">
+				<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked>
+				<div class="dropdown">
+					<button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+					  Select Built-in Dataset
+					</button>
+					<ul class="dropdown-menu">
+					  <li><a class="dropdown-item" href="#">Heart Attacks</a></li>
+					  <li><a class="dropdown-item" href="#">Iris</a></li>
+					</ul>
+				  </div>
+			  </div>
+
+			<!-- max depth range form --><br><br>
+			<label for="MaxDepthRange" class="form-label">Tree Max Depth: <output id="MaxDepthOutput"></output> </label>
+			<input type="range" class="form-range" min="0" max="100" step="1" id="MaxDepthRange" value="10">
+
+			<!-- min knowledge range form --><br><br>
+			<label for="MinKnowledgeRange" class="form-label">Min Knowledge Gain: <output id="MinKnowledgeOutput"></output> </label>
+			<input type="range" class="form-range" min="0" max="100" step="1" id="MinKnowledgeRange" value="15">
+
+			<!-- create tree button -->
+			<button type="button" class="btn btn-outline-light" id = "CreateTreeBtn">Create Tree</button><br><br>
+
 		</div>
 	</div>
-	  
-	<div class = "center">
+	<div class = "row g-0 text-center padding">
+		<div class="col-sm-3 col-md-3">
+			<button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+				Create New Tree
+			</button>
+		</div>
+
+			<!-- statictics -->
+		<div class="col-sm-3 col-md-3">
+			Classified: <output id="Classified">0</output><br>
+			Classified Wrong: <output id="WrongClassified">0</output>%
+		</div>
+
+			<!-- iterations delay range form -->
+		<div class="col-sm-3 col-md-3">
+			<label for="IterationsDelayRange" class="form-label">Iterations Delay: <output id="IterationsDelayOutput"></output> ms</label>
+			<input type="range" class="form-range" min="0" max="1000" step="10" id="IterationsDelayRange" value="10">
+		</div>
+			<!-- classify btn -->
+		<div class="col-sm-3 col-md-3">
+			<button type="button" class="btn btn-outline-light" id = "ClassifyBtn">Classify</button>
+		</div>
+	</div>
+	<div class = "container-fluid">
 		<div class = "window" id = "movable">
-			<div class="node">
-				<ul id = "placeHolder">
+			<!-- tree -->
+			<div class = "center movble">
+				<div class="node">
+					<ul id = "placeHolder">
 					
-				</ul>
+					</ul>
+				</div>
 			</div>
 		</div>
 	</div>

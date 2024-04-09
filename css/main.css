@@ -90,3 +90,8 @@ input[type=range]::-ms-track {
 	color: var(--accent);
 	font-weight: bold;
 }
+
+.mainBg{
+	color: rgb(205, 198, 195);
+	background-image: url(../images/background.jpg);
+}

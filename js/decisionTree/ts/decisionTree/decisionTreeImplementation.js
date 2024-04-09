@@ -10,7 +10,7 @@ export class TreeNode {
     attributeType = null;
     attributeID = null;
     conditionValue = null; // string некруто
-    entrophy = 0;
+    entropy = 0;
     samplesAmount = 0;
     samplesIDs = [];
     ownerTree;
@@ -41,7 +41,7 @@ export class TreeNode {
     // для каждого неиспользовавшегося условия из списка считаем энтропию для текущего списка семплов
     // выбираем лучшее условие (с наименьшей энтропией) и добавляем ноду
     addConditionAndChildren(usedCategiralIDs, usedIntervalIDsValues) {
-        if (this.entrophy == 0)
+        if (this.entropy == 0)
             return undefined;
         // interval
         let bestIntervalAttributeID = 0;
@@ -149,7 +149,7 @@ export class TreeNode {
             }
         });
         if (this.ownerTree.minKnowledge != undefined &&
-            this.entrophy - Math.min(currMinIntervalEntrophy, currMinCategoricalEntrophy) < this.ownerTree.minKnowledge
+            this.entropy - Math.min(currMinIntervalEntrophy, currMinCategoricalEntrophy) < this.ownerTree.minKnowledge
             || currMinIntervalEntrophy == maxEnthropy && currMinCategoricalEntrophy == maxEnthropy)
             return undefined;
         if (currMinIntervalEntrophy < currMinCategoricalEntrophy) {
@@ -159,13 +159,13 @@ export class TreeNode {
             this.conditionValue = this.ownerTree.intervalAttributesList[bestIntervalAttributeID].values[bestIntervalValueID];
             // left child
             let leftChild = new TreeNode(this.ownerTree, this);
-            leftChild.entrophy = bestLeftEnthrophy;
+            leftChild.entropy = bestLeftEnthrophy;
             leftChild.samplesAmount = bestLeftTotal;
             leftChild.samplesIDs = bestLeftIDs;
             this.children.push(leftChild);
             // right child
             let rightChild = new TreeNode(this.ownerTree, this);
-            rightChild.entrophy = bestRightEnthrophy;
+            rightChild.entropy = bestRightEnthrophy;
             rightChild.samplesAmount = bestRightTotal;
             rightChild.samplesIDs = bestRightIDs;
             this.children.push(rightChild);
@@ -178,7 +178,7 @@ export class TreeNode {
                 let newNode = new TreeNode(this.ownerTree, this);
                 newNode.categoricalID = i;
                 newNode.samplesIDs = bestCategoricalSamplesIds[i];
-                newNode.entrophy = bestEnthrophies[i];
+                newNode.entropy = bestEnthrophies[i];
                 newNode.samplesAmount = bestCategoricalSamplesIds[i].length;
                 this.children.push(newNode);
             }
@@ -204,7 +204,7 @@ export class TreeNode {
     getVisualContent() {
         // root
         if (this.parent == null)
-            return `${this.entrophy}`;
+            return `root node`;
         return this.getAttributeName() + this.getAttributeCondition();
     }
     getClassesAmounts() {
@@ -219,10 +219,13 @@ export class TreeNode {
         return res;
     }
     getAdditionalVisualContent() {
-        return "\nenthropy: " + this.entrophy.toFixed(3) + "\n"
+        return "\nentropy: " + this.entropy.toFixed(3) + "\n"
             + "Samples Amount: " + this.samplesAmount + "\n"
             + this.getClassesAmounts();
     }
+}
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 export class DecisionTree {
     // таблица, где первая строка с названиями колонок
@@ -287,18 +290,28 @@ export class DecisionTree {
     }
     classifySingle(inputAttributes) {
         let currNode = this.rootNode;
+        let currElement = document.getElementById("node");
         while (!currNode.isLeaf()) {
+            currElement.classList.add("select");
+            // go to ul
+            currElement = currElement.lastElementChild;
             if (currNode.attributeType == attributeTypes.INTERVAL) {
-                currNode =
-                    (parseFloat(inputAttributes[this.intervalAttributesList[currNode.attributeID].GlobalID]) <=
-                        Number(currNode.conditionValue)) ?
-                        currNode.children[0] : currNode.children[1];
+                if (parseFloat(inputAttributes[this.intervalAttributesList[currNode.attributeID].GlobalID]) <=
+                    Number(currNode.conditionValue)) {
+                    currNode = currNode.children[0];
+                    currElement = currElement.firstElementChild;
+                }
+                else {
+                    currNode = currNode.children[1];
+                    currElement = currElement.lastElementChild;
+                }
             }
             else {
                 for (let i in this.categoricalAttributesList[currNode.attributeID].values) {
                     if (inputAttributes[this.categoricalAttributesList[currNode.attributeID].GlobalID] ==
                         this.categoricalAttributesList[currNode.attributeID].values[i]) {
                         currNode = currNode.children[i];
+                        currElement = currElement.getElementsByTagName("li")[i];
                         break;
                     }
                 }
@@ -309,9 +322,7 @@ export class DecisionTree {
     classifyFromThisCSV(precentageToClassify) {
         const amountToClasify = this.dataTable.length * precentageToClassify / 100;
         for (let i = 1; i < amountToClasify - 1; ++i) {
-            let res = this.classifySingle(this.dataTable[i]);
-            //console.log(this.dataTable[i][this.dataTable[0].length - 1]);
-            //console.log(res);
+            const res = this.classifySingle(this.dataTable[i]);
             console.log(this.dataTable[i][this.dataTable[0].length - 1] == res);
         }
     }
@@ -332,9 +343,9 @@ export class DecisionTree {
         let samplesClassesProbabilities = [];
         for (let key in samplesClasses)
             samplesClassesProbabilities.push(samplesClasses[key] / (this.dataTable.length - 1));
-        this.rootNode.entrophy = calcEnthrophy(samplesClassesProbabilities);
+        this.rootNode.entropy = calcEnthrophy(samplesClassesProbabilities);
         if (minKnowledgePersentage != undefined)
-            this.minKnowledge = this.rootNode.entrophy * minKnowledgePersentage / 100;
+            this.minKnowledge = this.rootNode.entropy * minKnowledgePersentage / 100;
         let usedCategiralIDs = [];
         usedCategiralIDs.length = this.categoricalAttributesList.length;
         usedCategiralIDs.fill(false);

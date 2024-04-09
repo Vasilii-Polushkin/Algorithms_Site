@@ -1,5 +1,6 @@
 import { attributeTypes, attribute} from "./utilities/attribute.js";
 import { sortUnique, calcEnthrophy, maxEnthropy, adjustMedians, incrementedValue} from "./utilities/math.js";
+import { iterationsDelay } from "./bindings.js";
 
 //обрабатываем каждый столбец(атрибут) поочередно
 //сначала определяем тип атрибута
@@ -15,7 +16,7 @@ export class TreeNode
     attributeID: number | null = null;
     conditionValue: number | string | null = null; // string некруто
 
-    entrophy: number = 0;
+    entropy: number = 0;
     samplesAmount: number = 0;
     samplesIDs: number[] = [];
 
@@ -59,7 +60,7 @@ export class TreeNode
         usedCategiralIDs: boolean[],
         usedIntervalIDsValues: boolean[][]):number
     {
-        if (this.entrophy == 0)
+        if (this.entropy == 0)
             return undefined;
         
         // interval
@@ -201,7 +202,7 @@ export class TreeNode
         });
 
         if (this.ownerTree.minKnowledge != undefined && 
-            this.entrophy - Math.min(currMinIntervalEntrophy, currMinCategoricalEntrophy) < this.ownerTree.minKnowledge
+            this.entropy - Math.min(currMinIntervalEntrophy, currMinCategoricalEntrophy) < this.ownerTree.minKnowledge
             || currMinIntervalEntrophy == maxEnthropy && currMinCategoricalEntrophy == maxEnthropy)
             return undefined;
 
@@ -214,14 +215,14 @@ export class TreeNode
 
             // left child
             let leftChild = new TreeNode(this.ownerTree, this);
-            leftChild.entrophy = bestLeftEnthrophy;
+            leftChild.entropy = bestLeftEnthrophy;
             leftChild.samplesAmount = bestLeftTotal;
             leftChild.samplesIDs = bestLeftIDs;
             this.children.push(leftChild);
 
             // right child
             let rightChild = new TreeNode(this.ownerTree, this);
-            rightChild.entrophy = bestRightEnthrophy;
+            rightChild.entropy = bestRightEnthrophy;
             rightChild.samplesAmount = bestRightTotal;
             rightChild.samplesIDs = bestRightIDs;
             this.children.push(rightChild);
@@ -238,7 +239,7 @@ export class TreeNode
 
                 newNode.categoricalID = i;
                 newNode.samplesIDs = bestCategoricalSamplesIds[i];
-                newNode.entrophy = bestEnthrophies[i];
+                newNode.entropy = bestEnthrophies[i];
                 newNode.samplesAmount = bestCategoricalSamplesIds[i].length;
 
                 this.children.push(newNode);
@@ -276,7 +277,7 @@ export class TreeNode
     {
         // root
         if (this.parent == null)
-            return `${this.entrophy}`
+            return `root node`
 
         return this.getAttributeName() + this.getAttributeCondition();
     }
@@ -300,10 +301,14 @@ export class TreeNode
 
     getAdditionalVisualContent(): string
     {
-        return "\nenthropy: " + this.entrophy.toFixed(3) + "\n"
+        return "\nentropy: " + this.entropy.toFixed(3) + "\n"
         + "Samples Amount: " + this.samplesAmount + "\n"
         + this.getClassesAmounts();
     }
+}
+
+function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 export class DecisionTree
 {
@@ -400,14 +405,27 @@ export class DecisionTree
     classifySingle(inputAttributes: string[]): string
     {
         let currNode:TreeNode = this.rootNode;
+        let currElement:any = document.getElementById("node");
+
         while (!currNode.isLeaf())
         {
+            currElement.classList.add("select");
+            // go to ul
+            currElement = currElement.lastElementChild;
+
             if (currNode.attributeType == attributeTypes.INTERVAL)
             {
-                currNode = 
-                    (parseFloat(inputAttributes[this.intervalAttributesList[currNode.attributeID].GlobalID]) <=
-                    Number(currNode.conditionValue))?
-                    currNode.children[0]: currNode.children[1];
+                if(parseFloat(inputAttributes[this.intervalAttributesList[currNode.attributeID].GlobalID]) <=
+                    Number(currNode.conditionValue))
+                {
+                    currNode = currNode.children[0];
+                    currElement = currElement.firstElementChild;
+                }
+                else
+                {
+                    currNode = currNode.children[1];
+                    currElement = currElement.lastElementChild;
+                }
             }
             else
             {
@@ -417,12 +435,12 @@ export class DecisionTree
                         this.categoricalAttributesList[currNode.attributeID].values[i])
                     {
                         currNode = currNode.children[i];
+                        currElement = currElement.getElementsByTagName("li")[i];
                         break;
                     }
                 }
             }
         }
-
         return currNode.mostPopularClassName(this.dataTable);
     }
 
@@ -431,11 +449,8 @@ export class DecisionTree
         const amountToClasify = this.dataTable.length * precentageToClassify / 100;
         for (let i = 1; i < amountToClasify - 1; ++i)
         {
-            let res = this.classifySingle(this.dataTable[i]);
-
-            //console.log(this.dataTable[i][this.dataTable[0].length - 1]);
-            //console.log(res);
-            console.log(this.dataTable[i][this.dataTable[0].length - 1] == res);
+                const res = this.classifySingle(this.dataTable[i]);
+                console.log(this.dataTable[i][this.dataTable[0].length - 1] == res);
         }
     }
 
@@ -464,10 +479,10 @@ export class DecisionTree
             for (let key in samplesClasses)
                 samplesClassesProbabilities.push(samplesClasses[key] / (this.dataTable.length - 1));
 
-        this.rootNode.entrophy = calcEnthrophy(samplesClassesProbabilities);
+        this.rootNode.entropy = calcEnthrophy(samplesClassesProbabilities);
 
         if (minKnowledgePersentage != undefined)
-            this.minKnowledge = this.rootNode.entrophy * minKnowledgePersentage / 100;
+            this.minKnowledge = this.rootNode.entropy * minKnowledgePersentage / 100;
 
         let usedCategiralIDs:boolean[] = [];
         usedCategiralIDs.length = this.categoricalAttributesList.length;
