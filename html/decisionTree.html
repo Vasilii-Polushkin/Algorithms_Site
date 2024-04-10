@@ -56,13 +56,12 @@
 	<div class="offcanvas offcanvas-end mainBg" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
 		<div class="offcanvas-header">
 			<h5 class="offcanvas-title" id="offcanvasRightLabel">Create New Tree</h5>
-			<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
 		</div>
 
 		<div class="offcanvas-body">
 
 			<div class="form-check">
-				<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+				<input class="form-check-input" type="radio" name="CreateTreeRadio" id="CreateTreeRadioNewCSV">
 				<!-- file uppload -->
 				<div class="file-upload">
 					<div class="file-select">
@@ -71,50 +70,73 @@
 						<input type="file" name="chooseFile" id="chooseFile">
 					</div>
 				</div>
-			  </div>
-			  <div class="form-check">
-				<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked>
-				<div class="dropdown">
-					<button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-					  Select Built-in Dataset
-					</button>
-					<ul class="dropdown-menu">
-					  <li><a class="dropdown-item" href="#">Heart Attacks</a></li>
-					  <li><a class="dropdown-item" href="#">Iris</a></li>
-					</ul>
-				  </div>
-			  </div>
+			</div>
 
-			<!-- max depth range form --><br><br>
+			<div class="form-check">
+				<input class="form-check-input" type="radio" name="CreateTreeRadio" id="CreateTreeRadioBuilInCSV" checked>
+				<label for = "city-select">Or Choose Built-in Dataset Selector</label>
+				<select class = "form-select" id = "BuiltInDatasetSelector">
+					<option value="1" selected>Iris</option>
+					<option value="2">HeartAttacks</option>
+				</select>
+			</div>
+
+			<!-- max depth range form --><br>
 			<label for="MaxDepthRange" class="form-label">Tree Max Depth: <output id="MaxDepthOutput"></output> </label>
 			<input type="range" class="form-range" min="0" max="100" step="1" id="MaxDepthRange" value="10">
 
-			<!-- min knowledge range form --><br><br>
+			<!-- min knowledge range form --><br>
 			<label for="MinKnowledgeRange" class="form-label">Min Knowledge Gain: <output id="MinKnowledgeOutput"></output> </label>
 			<input type="range" class="form-range" min="0" max="100" step="1" id="MinKnowledgeRange" value="15">
 
-			<!-- create tree button -->
+			<!-- create tree button --><br><br>
 			<button type="button" class="btn btn-outline-light" id = "CreateTreeBtn">Create Tree</button><br><br>
 
+		</div>
+
+
+		<div class="offcanvas-header">
+			<h5 class="offcanvas-title" id="offcanvasRightLabel">Select Classification Dataset</h5>
+		</div>
+
+		<div class="offcanvas-body">
+
+			<div class="form-check">
+				<input class="form-check-input" type="radio" name="ClassificationRadio" id="ClassificationRadioNewCSV">
+				<!-- file uppload -->
+				<div class="file-upload">
+					<div class="file-select">
+						<div class="file-select-button" id="fileName">Choose File</div>
+						<div class="file-select-name" id="noFile">No file chosen...</div> 
+						<input type="file" name="chooseFile" id="chooseFile">
+					</div>
+				</div>
+			</div>
+			<div class="form-check">
+				<input class="form-check-input" type="radio" name="ClassificationRadio" id="ClassificationRadioThisCSV" checked>
+				<!-- percent to classify range form -->
+				<label for="PercentToClassifyRange" class="form-label">Or Classify From Training Dataset: <output id="PercentToClassifyOutput"></output>%</label>
+				<input type="range" class="form-range" min="0" max="100" step="1" id="PercentToClassifyRange" value="30">
+			</div>
 		</div>
 	</div>
 	<div class = "row g-0 text-center padding">
 		<div class="col-sm-3 col-md-3">
 			<button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
-				Create New Tree
+				Tree Settings
 			</button>
 		</div>
 
 			<!-- statictics -->
 		<div class="col-sm-3 col-md-3">
-			Classified: <output id="Classified">0</output><br>
-			Classified Wrong: <output id="WrongClassified">0</output>%
+			Classified: <output id="Classified">0</output>/<output id="TotalToClassify">0</output><br>
+			Classified Wrong: <output id="WrongClassified">0</output>
 		</div>
 
 			<!-- iterations delay range form -->
 		<div class="col-sm-3 col-md-3">
 			<label for="IterationsDelayRange" class="form-label">Iterations Delay: <output id="IterationsDelayOutput"></output> ms</label>
-			<input type="range" class="form-range" min="0" max="1000" step="10" id="IterationsDelayRange" value="10">
+			<input type="range" class="form-range" min="0" max="1000" step="10" id="IterationsDelayRange" value="200">
 		</div>
 			<!-- classify btn -->
 		<div class="col-sm-3 col-md-3">
@@ -124,9 +146,9 @@
 	<div class = "container-fluid">
 		<div class = "window" id = "movable">
 			<!-- tree -->
-			<div class = "center movble">
-				<div class="node">
-					<ul id = "placeHolder">
+			<div class = "center" style="top: -50px;">
+				<div class="node" id = "tree">
+					<ul id = "placeHolder" style="height: 0px;">
 					
 					</ul>
 				</div>

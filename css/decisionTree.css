@@ -1,11 +1,14 @@
 .window{
+  display: flex;
+  flex-flow: column;
+  height: 82vh;
   overflow: hidden;
-  width: 1400px;
-  height: 700px;
   box-shadow: 0 0 0px #000;
 }
 
 .center{
+  width: max-content;
+  height: max-content;
   display: grid;
   place-items: center;
 }
@@ -25,10 +28,6 @@
   padding: 0;
   
   border: 0 none;
-    /*
-  -webkit-transition: all ease .4s;
-  -moz-transition: all ease .4s;
-    transition: all ease .4s;*/
 }
 
 .node {
@@ -51,6 +50,8 @@
   
   text-align: center;
   list-style-type: none; 
+
+  
 }
 
 .node li::before, .node li::after{
@@ -60,14 +61,14 @@
   right: 50%;
   width: 50%; 
   height: 20px;
-  border-top: 3px solid #ccc;
+  border-top: 3px solid #ffffff;
 }
 
 .node li::after{
   left: 50%;
   right: auto; 
   
-  border-left: 3px solid #ccc;
+  border-left: 3px solid #ffffff;
 }
 
 .node li:only-child::after, .node li:only-child::before {
@@ -84,7 +85,7 @@
 }
 
 .node li:last-child::before{
-  border-right: 3px solid #ccc;
+  border-right: 3px solid #ffffff;
   border-radius: 0 5px 0 0;
 }
 
@@ -94,7 +95,7 @@
 .node ul ul::before{
   content: '';
   position: absolute; top: 0; left: 50%;
-  border-left: 3px solid #ccc;
+  border-left: 3px solid rgba(255, 255, 255, 0.9);
   width: 0; 
   height: 20px;
 }
@@ -104,25 +105,46 @@
   padding: 5px 10px;
   
   border-radius: 5px;
-  border: 3px solid #ccc;
+  border: 3px solid #ffffff;
   
   text-decoration:none;
   text-transform: uppercase;
-  color: #ccc;
+  color: #ffffff;
   font-size: 13px;
+
+  -webkit-transition: all ease .1s;
+  -moz-transition: all ease .1s;
+    transition: all ease .1s;
 }
 
 .select{
-  color: #000;
-  background: #c8e4f8; 
+  color: #2a1f1a !important;
+  background: #ffffff !important;
+}
+
+.success{
+  background: #33ad1b !important; 
+}
+
+.fail{
+  background: #ad1b1b !important; 
 }
 
 .node li a:hover, .node li a:hover+ul li a {
-  color: #000;
-  background: #c8e4f8;   
-  border: 3px solid #94a0b4;
+  border: 3px solid rgba(226, 147, 3, 0.9);
+  -webkit-transition: all ease .1s;
+  -moz-transition: all ease .1s;
+    transition: all ease .1s;
 }
 
 .padding{
   padding: .5%;
+}
+
+.node li a:hover+ul li::after, 
+.node li a:hover+ul li::before, 
+.node li a:hover+ul::before, 
+.node li a:hover+ul ul::before{
+  content: '';
+  border-color: rgba(226, 147, 3, 0.9);
 }

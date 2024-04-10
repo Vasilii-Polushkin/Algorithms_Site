@@ -1,9 +1,34 @@
-export let selectedFilename;
+export let newCSVFilename, builtInCSVFilename;
 export let maxDepthInput;
 export let minKnowledgeInput;
 export let iterationsDelay;
-export const ClassifiedElement = document.getElementById("Classified");
-export const WrongClassifiedElement = document.getElementById("WrongClassified");
+export let percentToClassify;
+export const NewCSV = 0;
+export const BuiltInCSV = 1;
+export let createTreeMethod = BuiltInCSV;
+export const ClassifyBtn = document.getElementById("ClassifyBtn");
+export const CreateTreeBtn = document.getElementById("CreateTreeBtn");
+const ClassifiedElement = document.getElementById("Classified");
+const TotalToClassify = document.getElementById("TotalToClassify");
+const WrongClassifiedElement = document.getElementById("WrongClassified");
+export function SetClassifiedAmount(number) {
+    ClassifiedElement.value = number;
+}
+export function SetClassifiedWrong(number) {
+    WrongClassifiedElement.value = number;
+}
+export function SetTotalToClassify(number) {
+    TotalToClassify.value = number;
+}
+// create tree method radio
+const CreateTreeRadioNewCSV = document.getElementById("CreateTreeRadioNewCSV");
+CreateTreeRadioNewCSV.addEventListener('input', () => {
+    createTreeMethod = NewCSV;
+});
+const CreateTreeRadioBuilInCSV = document.getElementById("CreateTreeRadioBuilInCSV");
+CreateTreeRadioBuilInCSV.addEventListener('input', () => {
+    createTreeMethod = BuiltInCSV;
+});
 // max depth range
 const MaxDepthOutput = document.getElementById("MaxDepthOutput");
 const MaxDepthInput = document.getElementById("MaxDepthRange");
@@ -31,19 +56,25 @@ IterationsDelayInput.addEventListener("input", () => {
     iterationsDelay = IterationsDelayInput.value;
     IterationsDelayOutput.textContent = iterationsDelay;
 });
-// classify btn
-export const ClassifyBtn = document.getElementById("ClassifyBtn");
-//ClassifyBtn.addEventListener("click", runAstar);
+// percent to classify range
+const PercentToClassifyOutput = document.getElementById("PercentToClassifyOutput");
+const PercentToClassifyInput = document.getElementById("PercentToClassifyRange");
+percentToClassify = PercentToClassifyInput.value;
+PercentToClassifyOutput.textContent = percentToClassify;
+PercentToClassifyInput.addEventListener("input", () => {
+    percentToClassify = PercentToClassifyInput.value;
+    PercentToClassifyOutput.textContent = percentToClassify;
+});
 // file load
 $('#chooseFile').bind('change', function () {
-    selectedFilename = $("#chooseFile").val();
-    if (/^\s*$/.test(selectedFilename)) {
+    newCSVFilename = $("#chooseFile").val();
+    if (/^\s*$/.test(newCSVFilename)) {
         $(".file-upload").removeClass('active');
         $("#noFile").text("No file chosen...");
     }
     else {
         $(".file-upload").addClass('active');
-        $("#noFile").text(selectedFilename.replace("C:\\fakepath\\", ""));
+        $("#noFile").text(newCSVFilename.replace("C:\\fakepath\\", ""));
     }
 });
 // movability logic
@@ -85,4 +116,22 @@ function mouseUp() {
 window.addEventListener('mousedown', mouseDown);
 document.addEventListener('mousemove', mouseMove);
 document.addEventListener('mouseup', mouseUp);
+// scroll logic
+let scale = 1;
+function zoom(event) {
+    event.preventDefault();
+    scale += event.deltaY * -0.003;
+    // Restrict scale
+    scale = Math.min(Math.max(0.125, scale), 4);
+    // Apply scale transform
+    movableDiv.style.transform = `scale(${scale})`;
+}
+window.addEventListener('wheel', zoom);
+// reset transformations
+export function resetTreeTransformation() {
+    scale = 1;
+    movableDiv.style.transform = `scale(${scale})`;
+    movableDiv.style.top = '0px';
+    movableDiv.style.left = '0px';
+}
 //# sourceMappingURL=bindings.js.map

@@ -43,7 +43,6 @@ body {
 	overflow-x: hidden;
 	background-image: url(../images/background.jpg);
 	background-size: 50px;
-	overflow-x: hidden;
 
     -webkit-user-drag: none;
     user-select: none;
@@ -70,6 +69,62 @@ input[type=range]::-moz-range-track {
 }
 input[type=range]::-ms-track {
     background:rgb(205, 198, 195);
+}
+
+.form-check-input:checked {
+    background-color: rgba(226, 147, 3, 0.9);
+    border-color: rgba(226, 147, 3, 0.9);
+}
+.form-check-input {
+    margin-top: 0.72em;
+}
+
+element.style {
+}
+.dropdown-item {
+    display: block;
+    width: 100%;
+    padding: var(--bs-dropdown-item-padding-y) var(--bs-dropdown-item-padding-x);
+    clear: both;
+    font-weight: 400;
+    color: var(--bs-dropdown-link-color);
+    text-align: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+    border-radius: var(--bs-dropdown-item-border-radius,0);
+}
+a {
+    color: rgba(var(--bs-link-color-rgb),var(--bs-link-opacity,1));
+    text-decoration: underline;
+}
+* {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    border: 0 none;
+}
+*, *:before, *:after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+*, ::after, ::before {
+    box-sizing: border-box;
+}
+user agent stylesheet
+a:-webkit-any-link {
+    color: -webkit-link;
+    cursor: pointer;
+    text-decoration: underline;
+}
+user agent stylesheet
+li {
+    text-align: -webkit-match-parent;
+}
+.dropdown-menu {
+	--bs-dropdown-link-active-bg: rgba(226, 147, 3, 0.9);
 }
 
 /* USER STYLES */

@@ -1,5 +1,6 @@
 import { attributeTypes, attribute } from "./utilities/attribute.js";
 import { sortUnique, calcEnthrophy, maxEnthropy, adjustMedians, incrementedValue } from "./utilities/math.js";
+import { iterationsDelay, SetClassifiedAmount, SetClassifiedWrong, SetTotalToClassify } from "./bindings.js";
 //обрабатываем каждый столбец(атрибут) поочередно
 //сначала определяем тип атрибута
 //потом преобразуем столб в сет и находим всевозможные условия, которые могут быть в узлах дерева
@@ -288,42 +289,68 @@ export class DecisionTree {
             }
         }
     }
-    classifySingle(inputAttributes) {
+    async classifySingle(inputAttributes) {
         let currNode = this.rootNode;
-        let currElement = document.getElementById("node");
+        // currElment is <li>
+        let currElement = document.getElementById("placeHolder").firstElementChild;
+        let currA = () => { return currElement.firstElementChild; };
+        let nextElement;
         while (!currNode.isLeaf()) {
-            currElement.classList.add("select");
+            currA().classList.add("select");
             // go to ul
-            currElement = currElement.lastElementChild;
+            nextElement = currElement.lastElementChild;
             if (currNode.attributeType == attributeTypes.INTERVAL) {
                 if (parseFloat(inputAttributes[this.intervalAttributesList[currNode.attributeID].GlobalID]) <=
                     Number(currNode.conditionValue)) {
                     currNode = currNode.children[0];
-                    currElement = currElement.firstElementChild;
+                    nextElement = nextElement.firstElementChild;
                 }
                 else {
                     currNode = currNode.children[1];
-                    currElement = currElement.lastElementChild;
+                    nextElement = nextElement.lastElementChild;
                 }
             }
             else {
-                for (let i in this.categoricalAttributesList[currNode.attributeID].values) {
+                nextElement = nextElement.firstElementChild;
+                for (let i = 0; i < this.categoricalAttributesList[currNode.attributeID].values.length; ++i) {
                     if (inputAttributes[this.categoricalAttributesList[currNode.attributeID].GlobalID] ==
                         this.categoricalAttributesList[currNode.attributeID].values[i]) {
                         currNode = currNode.children[i];
-                        currElement = currElement.getElementsByTagName("li")[i];
                         break;
                     }
+                    nextElement = nextElement.nextElementSibling;
                 }
             }
+            await sleep(iterationsDelay);
+            currA().classList.remove("select");
+            currElement = nextElement;
         }
-        return currNode.mostPopularClassName(this.dataTable);
+        const res = currNode.mostPopularClassName(this.dataTable);
+        if (res == inputAttributes.at(-1)) {
+            currA().classList.add("success");
+            await sleep(iterationsDelay);
+            currA().classList.remove("success");
+        }
+        else {
+            currA().classList.add("fail");
+            await sleep(iterationsDelay);
+            currA().classList.remove("fail");
+        }
+        return res;
     }
-    classifyFromThisCSV(precentageToClassify) {
-        const amountToClasify = this.dataTable.length * precentageToClassify / 100;
-        for (let i = 1; i < amountToClasify - 1; ++i) {
-            const res = this.classifySingle(this.dataTable[i]);
-            console.log(this.dataTable[i][this.dataTable[0].length - 1] == res);
+    async classifyDataTable(precentageToClassify, dataTable = this.dataTable) {
+        SetClassifiedAmount(0);
+        SetClassifiedWrong(0);
+        let classifiedWrong = 0;
+        const amountToClasify = Math.floor(dataTable.length * precentageToClassify / 100);
+        SetTotalToClassify(amountToClasify - 1);
+        for (let i = 1; i < amountToClasify; ++i) {
+            const res = await this.classifySingle(dataTable[i]);
+            if (dataTable[i].at(-1) != res) {
+                classifiedWrong++;
+                SetClassifiedWrong(classifiedWrong);
+            }
+            SetClassifiedAmount(i);
         }
     }
     constructor(newDataTable, maxDepth, minKnowledgePersentage) {
@@ -377,6 +404,10 @@ export class DecisionTree {
     visualizeTree() {
         let placeHolder = document.getElementById("placeHolder");
         this.visualizeTreeDfs(this.rootNode, placeHolder);
+    }
+    freeVisuals() {
+        let placeHolder = document.getElementById("placeHolder");
+        placeHolder.innerHTML = '';
     }
 }
 //# sourceMappingURL=decisionTreeImplementation.js.map
