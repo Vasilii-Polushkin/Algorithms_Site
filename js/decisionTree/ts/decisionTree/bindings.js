@@ -66,17 +66,73 @@ PercentToClassifyInput.addEventListener("input", () => {
     PercentToClassifyOutput.textContent = percentToClassify;
 });
 // file load
-$('#chooseFile').bind('change', function () {
-    newCSVFilename = $("#chooseFile").val();
+const firstCSVPathElement = document.getElementById('chooseFile1');
+firstCSVPathElement.addEventListener('change', () => {
+    newCSVFilename = readFile(firstCSVPathElement);
     if (/^\s*$/.test(newCSVFilename)) {
         $(".file-upload").removeClass('active');
-        $("#noFile").text("No file chosen...");
+        $("#noFile1").text("No file chosen...");
     }
     else {
         $(".file-upload").addClass('active');
-        $("#noFile").text(newCSVFilename.replace("C:\\fakepath\\", ""));
+        $("#noFile1").text(newCSVFilename);
     }
 });
+function parseCSV(text) {
+    let prevSymbol = '', currString = [''], result = [currString], index = 0, stringIndex = 0, insideQuotes = true, symbol;
+    for (symbol of text) {
+        if (symbol === '"') {
+            if (insideQuotes && symbol === prevSymbol)
+                currString[index] += symbol;
+            insideQuotes = !insideQuotes;
+        }
+        else if (symbol === ',' && insideQuotes)
+            symbol = currString[++index] = '';
+        else if (symbol === '\n' && insideQuotes) {
+            if (prevSymbol === '\r')
+                currString[index] = currString[index].slice(0, -1);
+            currString = result[++stringIndex] = [symbol = ''];
+            index = 0;
+        }
+        else
+            currString[index] += symbol;
+        prevSymbol = symbol;
+    }
+    return result;
+}
+function readFile(input) {
+    let file = input.files[0];
+    let reader = new FileReader();
+    reader.readAsText(file);
+    reader.onload = function () {
+        //console.table(parseCSV(reader.result));
+        return parseCSV(reader.result);
+    };
+    reader.onerror = function () {
+        console.log(reader.error);
+        return null;
+    };
+}
+/*
+$('#chooseFile1').bind('change', function () {
+    newCSVFilename = $("#chooseFile1").files[0];
+
+    var fReader = new FileReader();
+    fReader.readAsDataURL(newCSVFilename);
+    fReader.onloadend = function(event){
+      newCSVFilename = event.target.result;
+
+      if (/^\s*$/.test(newCSVFilename)) {
+        $(".file-upload").removeClass('active');
+        $("#noFile1").text("No file chosen...");
+      }
+      else {
+        $(".file-upload").addClass('active');
+        $("#noFile1").text(newCSVFilename);
+      }
+    }
+
+});*/
 // movability logic
 const window = document.getElementById('movable');
 const movableDiv = window.lastElementChild;
