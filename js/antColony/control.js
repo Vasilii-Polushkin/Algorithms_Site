@@ -1,5 +1,5 @@
 import {View} from "./view.js";
-import {Model, step, currFPS} from "./model.js";
+import {Model, step, currFPS, square} from "./model.js";
 
 
 export let model;
@@ -10,60 +10,80 @@ let FPS = 40;
 
 
 export let availableFields = 8;
-export let rows = 650;
-export let cols = 650;
+export let rows = 640;
+export let cols = 640;
 
 
 export function isFieldValid(x, y) {
-    return x > 0 && x < cols && y > 0 && y < rows && !model.map[y][x].wall;
+    return x >= 0 && x < (cols / square) && y >= 0 && y < (rows / square) && !model.map[y][x].wall;
 }
 
-export function getNearFields(ant, pheromones) {
+export function getNearFields(ant, allPheromones) {
 
-    let toFoodPheromone = new Array(availableFields);
+    let pheromones = new Array(availableFields);
 
-    for (let j = 0; j < toFoodPheromone.length; j++) {
+    for (let j = 0; j < pheromones.length; j++) {
         let pheromoneX;
         let pheromoneY;
         let b;
-        if (j === 0) {
-            pheromoneX = ant.location.x - step;
-            pheromoneY = ant.location.y - step;
-            b = isFieldValid(pheromoneX, pheromoneY);
-        } else if (j === 1) {
-            pheromoneX = ant.location.x;
-            pheromoneY = ant.location.y - step;
-            b = isFieldValid(pheromoneX, pheromoneY);
-        } else if (j === 2) {
-            pheromoneX = ant.location.x + step;
-            pheromoneY = ant.location.y - step;
-            b = isFieldValid(pheromoneX, pheromoneY);
-        } else if (j === 3) {
-            pheromoneX = ant.location.x - step;
-            pheromoneY = ant.location.y;
-            b = isFieldValid(pheromoneX, pheromoneY);
-        } else if (j === 4) {
-            pheromoneX = ant.location.x + step;
-            pheromoneY = ant.location.y;
-            b = isFieldValid(pheromoneX, pheromoneY);
-        } else if (j === 5) {
-            pheromoneX = ant.location.x - step;
-            pheromoneY = ant.location.y + step;
-            b = isFieldValid(pheromoneX, pheromoneY);
-        } else if (j === 6) {
-            pheromoneX = ant.location.x;
-            pheromoneY = ant.location.y + step;
-            b = isFieldValid(pheromoneX, pheromoneY);
-        } else if (j === 7) {
-            pheromoneX = ant.location.x + step;
-            pheromoneY = ant.location.y + step;
-            b = isFieldValid(pheromoneX, pheromoneY);
+
+        switch(j){
+            case 0: {
+                pheromoneX = ant.location.x - step;
+                pheromoneY = ant.location.y - step;
+                b = isFieldValid(pheromoneX, pheromoneY);
+                break;
+            }
+            case 1: {
+                pheromoneX = ant.location.x;
+                pheromoneY = ant.location.y - step;
+                b = isFieldValid(pheromoneX, pheromoneY);
+                break;
+            }
+            case 2: {
+                pheromoneX = ant.location.x + step;
+                pheromoneY = ant.location.y - step;
+                b = isFieldValid(pheromoneX, pheromoneY);
+                break;
+            }
+            case 3: {
+                pheromoneX = ant.location.x - step;
+                pheromoneY = ant.location.y;
+                b = isFieldValid(pheromoneX, pheromoneY);
+                break;
+            }
+            case 4: {
+                pheromoneX = ant.location.x + step;
+                pheromoneY = ant.location.y;
+                b = isFieldValid(pheromoneX, pheromoneY);
+                break;
+            }
+            case 5: {
+                pheromoneX = ant.location.x - step;
+                pheromoneY = ant.location.y + step;
+                b = isFieldValid(pheromoneX, pheromoneY);
+                break;
+            }
+            case 6: {
+                pheromoneX = ant.location.x;
+                pheromoneY = ant.location.y + step;
+                b = isFieldValid(pheromoneX, pheromoneY);
+                break;
+            }
+            case 7: {
+                pheromoneX = ant.location.x + step;
+                pheromoneY = ant.location.y + step;
+                b = isFieldValid(pheromoneX, pheromoneY);
+            }
         }
         if (!b) {
-            toFoodPheromone[j] = 0;
-        } else toFoodPheromone[j] = pheromones[pheromoneY][pheromoneX].toFood;
+            pheromones[j] = 0;
+        } else {
+            if(!ant.target) pheromones[j] = allPheromones[pheromoneY][pheromoneX].toFood;
+            else pheromones[j] = allPheromones[pheromoneY][pheromoneX].toHome
+        }
     }
-    return toFoodPheromone;
+    return pheromones;
 }
 
 
@@ -109,27 +129,44 @@ export class Control {
     }
 
     start = (e) => {
-        if(this.mouseState === 'ERASER') {
+        if (this.mouseState === 'ERASER') {
             this.eraserWorks = true;
             this.setWall = false;
+            this.setFood = false;
         }
-        if(this.mouseState === 'WALL') {
+        if (this.mouseState === 'WALL') {
             this.eraserWorks = false;
             this.setWall = true;
+            this.setFood = false;
+        }
+        if (this.mouseState === 'FOOD') {
+            this.eraserWorks = false;
+            this.setWall = false;
+            this.setFood = true;
         }
 
         this.getPosition(e);
+
+        let x = Math.floor(this.x / square);
+        let y = Math.floor(this.y / square);
+        if (this.eraserWorks) model.set(x, y, false, false);
+        if (this.setWall) model.set(x, y, true, false);
+        if (this.setFood) model.set(x, y, false, true);
     }
 
     stop = () => {
-        if(this.mouseState === 'ERASER') this.eraserWorks = false;
-        if(this.mouseState === 'WALL') this.setWall = false;
+        if (this.mouseState === 'ERASER') this.eraserWorks = false;
+        if (this.mouseState === 'WALL') this.setWall = false;
+        if (this.mouseState === 'FOOD') this.setFood = false;
     }
 
     sketch = (e) => {
         this.getPosition(e);
-        if(this.eraserWorks) model.set(this.x, this.y, false);
-        if(this.setWall) model.set(this.x, this.y, true);
+        let x = Math.floor(this.x / square);
+        let y = Math.floor(this.y / square);
+        if (this.eraserWorks) model.set(x, y, false, false);
+        if (this.setWall) model.set(x, y, true, false);
+        if (this.setFood) model.set(x, y, false, true);
     }
 
     eraserState = () => {
@@ -156,17 +193,14 @@ export class Control {
     }
 
     mouseMoveColony = (e) => {
-        if (this.mouseState !== 'COLONY') return;
-        let x = e.clientX - view.layer1.offsetLeft;
-        let y = e.clientY - view.layer1.offsetTop;
+        //if (this.mouseState !== 'COLONY') return;
         this.initColony = true;
-        model.initColony(x, y);
         view.layer1.addEventListener('click', this.setColonyFunc);
         view.layer1.addEventListener('mouseout', this.mouseOutColony);
-        if (this.mouseState !== 'COLONY') {
+       /* if (this.mouseState !== 'COLONY') {
             this.setColony = false;
             this.initColony = false;
-        }
+        }*/
     }
 
     mouseOutColony = (e) => {
@@ -174,10 +208,12 @@ export class Control {
         this.setColony = false;
     }
 
-    setColonyFunc = () => {
+    setColonyFunc = (e) => {
+        if (this.mouseState !== 'COLONY') return;
         view.layer1.removeEventListener('mousemove', this.mouseMoveColony, false);
         this.initColony = false;
         this.setColony = true;
+        model.initColony(this.x, this.y);
         model.initAnts(parseInt(this.antsNumber.textContent));
         view.layer1.removeEventListener('click', this.setColonyFunc, false);
         view.layer1.removeEventListener('mouseout', this.mouseOutColony, false);

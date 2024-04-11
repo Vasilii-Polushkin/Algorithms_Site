@@ -1,8 +1,9 @@
-import {cols, control, getNearFields, rows} from "./control.js";
+import {cols, control, getNearFields, isFieldValid, rows} from "./control.js";
 import {Ant, Cell, Colony} from "./objects.js";
 
-export let step;
+export let step = 3;
 export let currFPS;
+export let square = 5;
 
 export class Model {
     ants = [];
@@ -10,17 +11,30 @@ export class Model {
     colony = new Colony(0, 0);
 
     update() {
-        //step = parseInt(control.antsSpeed.textContent);
         currFPS = parseInt(control.antsSpeed.textContent);
 
-        step = 3;
         for (let i = 0; i < this.ants.length; i++) {
-            let delta = this.ants[i].update(getNearFields(this.ants[i], this.map));
-            this.ants[i].location.x += delta.x;
-            this.ants[i].location.y += delta.y;
-        }
+            if(!this.ants[i].dead) {
+                this.ants[i].update(getNearFields(this.ants[i], this.map));
 
-        this.colony.update();
+                if (!isFieldValid(this.ants[i].location.x, this.ants[i].location.y)) {
+                    this.dead = true;
+                    continue;
+                }
+
+                if (!this.ants[i].target && this.map[this.ants[i].location.y][this.ants[i].location.x].food.saturation !== 0) {
+                    this.ants[i].target = true;
+                }
+                if (this.ants[i].target && this.ants[i].location.y === this.colony.y && this.ants[i].location.x === this.colony.x) {
+                    this.ants[i].target = false;
+                }
+
+                if (!this.ants[i].target) this.map[this.ants[i].location.y][this.ants[i].location.x].toHome += 0.2;
+                else this.map[this.ants[i].location.y][this.ants[i].location.x].toFood += 0.2;
+
+
+            }
+        }
 
         // update map
         // ...
@@ -29,9 +43,9 @@ export class Model {
     }
 
     initMap() {
-        this.map = new Array(rows);
+        this.map = new Array(rows / square);
         for (let i = 0; i < this.map.length; i++) {
-            this.map[i] = new Array(cols);
+            this.map[i] = new Array(cols / square);
             for (let j = 0; j < this.map[i].length; j++) {
                 this.map[i][j] = new Cell();
             }
@@ -54,8 +68,8 @@ export class Model {
         }
     }
 
-    set(x, y, state/*, food*/) {
-        let brushSize = parseInt(control.brushSize.textContent);
+    set(x, y, state, food) {
+        let brushSize = parseInt(control.brushSize.textContent) / square;
         let sy = 0;
         let sx = 0;
         if(y - brushSize / 2 > 0 && y - brushSize / 2 < this.map.length) {
@@ -72,8 +86,8 @@ export class Model {
         let dx = Math.min(this.map.length, sx + brushSize);
         for(let i = sy; i < dy; i++) {
             for(let j = sx; j < dx; j++) {
-                this.map[i][j].wall = state;
-                //this.map[i][j].food = food;
+                if(!food) this.map[i][j].wall = state;
+                else this.map[i][j].food.addFood();
             }
         }
     }

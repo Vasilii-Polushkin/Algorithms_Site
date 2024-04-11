@@ -1,5 +1,6 @@
 import {generateLabyrinth, init, drawMap, map} from "./labyrinth.js";
-import {control, model, rows, cols} from "./control.js";
+import {control, model, rows, cols, isFieldValid} from "./control.js";
+import {square} from "./model.js";
 
 
 export class View {
@@ -26,13 +27,11 @@ export class View {
 
     draw() {
         let brushSize = parseInt(control.brushSize.textContent);
-        let x = control.x;
-        let y = control.y;
+        let x = Math.floor(control.x / square) * square;
+        let y = Math.floor(control.y / square) * square;
 
         if (control.setLabyrinth) {
             this.ctx1.clearRect(0, 0, this.layer1.width, this.layer1.height);
-            /*init();
-            drawMap();*/
             this.ctx1.drawImage(this.extraLayer1, 0, 0);
 
         } else {
@@ -43,38 +42,39 @@ export class View {
             this.extraCtx1.drawImage(this.layer1, 0, 0);
         }
 
-        if(control.mouseState === 'FOOD' && control.setFood) {
-            //...
+        if (control.mouseState === 'FOOD' && control.setFood) {
+            for (let i = 0; i < brushSize; i += square * 2) {
+                for (let j = 0; j < brushSize; j += square * 2) {
+                    let _x = (x - brushSize / 2 + j) / square;
+                    let _y = (y - brushSize / 2 + i) / square;
+                    if (isFieldValid(_x, _y)) {
+                        model.map[_y][_x].food.addFood();
+                        model.map[_y][_x].food.drawFood(this.ctx2, _x * square, _y * square);
+                    }
+                }
+            }
         }
 
         if (control.mouseState === 'WALL' && control.setWall) {
-            this.ctx2.beginPath();
-
-            this.ctx2.lineWidth = brushSize;
-
-            this.ctx2.lineCap = 'square';
-            this.ctx2.strokeStyle = '#1f1f1f';
-
-            this.ctx2.moveTo(x, y);
-
-            this.ctx2.lineTo(x, y);
-            this.ctx2.stroke();
-            this.ctx2.closePath();
+            this.ctx2.fillStyle = '#1f1f1f';
+            this.ctx2.fillRect(Math.floor(x / square / 2) * square * 2 - brushSize / 2,
+                Math.floor(y / square / 2) * square * 2 - brushSize / 2, brushSize, brushSize);
         }
         this.ctx1.drawImage(this.layer2, 0, 0);
 
         if (control.mouseState === 'ERASER' && control.eraserWorks) {
             this.ctx2.fillStyle = this.style;
-            this.ctx2.fillRect(x - brushSize / 2, y - brushSize / 2, brushSize, brushSize);
+            this.ctx2.fillRect(Math.floor(x / square / 2) * square * 2 - brushSize / 2,
+                Math.floor(y / square / 2) * square * 2 - brushSize / 2, brushSize, brushSize);
         }
 
         if (control.mouseState === 'COLONY' && control.initColony) {
-            model.colony.drawSilhouette(this.ctx1);
+            model.colony.drawSilhouette(this.ctx1, control.x, control.y);
         }
 
         if (control.setColony) {
             for (let ant of model.ants) {
-                if(!ant.dead) ant.draw(this.ctx1, this.fw);
+                if (!ant.dead) ant.draw(this.ctx1, this.fw);
             }
             model.colony.draw(this.ctx1);
         }

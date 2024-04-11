@@ -1,6 +1,6 @@
 import {Flyweight} from "./view.js";
 import {availableFields, isFieldValid} from "./control.js";
-import {step} from "./model.js";
+import {square} from "./model.js";
 
 export class Ant {
     constructor(direction, colony) {
@@ -16,109 +16,116 @@ export class Ant {
          * 7  down-right
          */
         this.direction = direction;
-        this.location = {x: colony.x, y: colony.y};
+        this.location = {x: Math.floor(colony.x / square), y: Math.floor(colony.y / square)};
+        this.colonyLocation = {x: Math.floor(colony.x / square), y: Math.floor(colony.y / square)};
         this.grab = false;
         this.drop = false;
-        //this.turn = false;
-        //this.move = false;
-        //this.back = false;
         this.angle = 0;
         this.pose = 0;
-        this.path = [];
         /**
          * false - food
          * true - home
          */
         this.target = false;
         this.vision = 10;
-        this.stepCount = 0;
         this.prevStep = 0;
-        this.step = Math.floor(Math.random() * 10) + 10;
+        this.step = 0;
     }
 
-    doStep(toFoodPheromone) {
-        let answerField = 0;
-        if (this.target) {
-            //go home
-        } else {
-            // find food
-            if(this.stepCount === this.step || this.stepCount === 0 || toFoodPheromone[this.prevStep] === 0){
-                if(this.stepCount === this.step) {
-                    this.step = Math.floor(Math.random() * 10) + 10;
-                    this.stepCount = 0;
-                }
-                else this.stepCount++;
+    doStep(pheromones) {
 
-                let desireToMove = new Array(availableFields);
-                let probabilities = new Array(availableFields);
-                for (let i = 0; i < desireToMove.length; i++) {
-                    //if (toFoodPheromone[i] > 0) {
-                        desireToMove[i] = Math.pow(toFoodPheromone[i], 1);
-                    //}
-                }
+        if (this.step === 0 || pheromones[this.prevStep] === 0) {
 
+            this.step = Math.floor(Math.random() * 10 + 5);
+
+            let maxDesire = 0;
+            let desireToMove = new Array(availableFields);
+            let probabilities = new Array(availableFields);
+            for (let i = 0; i < desireToMove.length; i++) {
+                desireToMove[i] = Math.pow(pheromones[i], 2);
+                if(desireToMove[i] > maxDesire){
+                    maxDesire = desireToMove[i];
+                    this.prevStep = i;
+                }
+            }
+
+            if(!this.target){
                 const sum = desireToMove.reduce((partialSum, a) => partialSum + a, 0);
                 probabilities[0] = desireToMove[0] / sum;
                 for (let i = 1; i < probabilities.length; i++) {
                     probabilities[i] = desireToMove[i] / sum + probabilities[i - 1];
                 }
 
-                answerField = 0;
+                this.prevStep = 0;
                 let temp = Math.random();
                 for (let i = 1; i < probabilities.length; i++) {
                     if (temp < probabilities[i] && temp > probabilities[i - 1]) {
-                        answerField = i;
+                        this.prevStep = i;
                         break;
                     }
                 }
+            }
 
-                this.prevStep = answerField;
-            }
-            else{
-                this.stepCount++;
-                answerField = this.prevStep;
-            }
+
+
+        } else {
+            this.step--;
         }
 
-        if (answerField === 0) {
-            this.angle = -45;
-            return {x: -step, y: -step};
-        } else if (answerField === 1) {
-            this.angle = 0;
-            return {x: 0, y: -step};
-        } else if (answerField === 2) {
-            this.angle = 45;
-            return {x: step, y: -step};
-        } else if (answerField === 3) {
-            this.angle = -90;
-            return {x: -step, y: 0};
-        } else if (answerField === 4) {
-            this.angle = 90;
-            return {x: step, y: 0};
-        } else if (answerField === 5) {
-            this.angle = -135;
-            return {x: -step, y: step};
-        } else if (answerField === 6) {
-            this.angle = 180;
-            return {x: 0, y: step};
-        } else if (answerField === 7) {
-            this.angle = 135;
-            return {x: step, y: step};
+        switch(this.prevStep){
+            case 0: {
+                this.angle = -45;
+                return {x: -1, y: -1};
+            }
+            case 1: {
+                this.angle = 0;
+                return {x: 0, y: -1};
+            }
+            case 2: {
+                this.angle = 45;
+                return {x: 1, y: -1};
+            }
+            case 3: {
+                this.angle = -90;
+                return {x: -1, y: 0};
+            }
+            case 4: {
+                this.angle = 90;
+                return {x: 1, y: 0};
+            }
+            case 5: {
+                this.angle = -135;
+                return {x: -1, y: 1};
+            }
+            case 6: {
+                this.angle = 180;
+                return {x: 0, y: 1};
+            }
+            case 7: {
+                this.angle = 135;
+                return {x: 1, y: 1};
+            }
         }
     }
 
-    update(toFoodPheromone) {
-        return this.doStep(toFoodPheromone);
+    update(pheromones) {
+        let delta = this.doStep(pheromones);
+        if(isFieldValid(this.location.x + delta.x, this.location.y + delta.y)){
+            this.location.x += delta.x;
+            this.location.y += delta.y;
+        }
     }
 
     draw(ctx, fw) {
         let x = this.location.x, y = this.location.y, angle = this.angle;
-        if(!isFieldValid(x, y)) {
+        if (!isFieldValid(x, y)) {
             this.dead = true;
             return;
         }
+        x *= square;
+        y *= square;
 
-        this.roundCoordinates();
+        //this.roundCoordinates();
 
         let pose = this.pose * 0.5;
         // Смена координат для поворота
@@ -189,10 +196,6 @@ export class Colony {
         this.y = y;
     }
 
-    update() {
-
-    }
-
     draw(ctx) {
         ctx.beginPath();
         ctx.arc(this.x, this.y, 16, 0, Math.PI * 2);
@@ -201,9 +204,9 @@ export class Colony {
         ctx.closePath();
     }
 
-    drawSilhouette(ctx) {
+    drawSilhouette(ctx, x, y) {
         ctx.beginPath();
-        ctx.arc(this.x, this.y, 16, 0, Math.PI * 2);
+        ctx.arc(x, y, 16, 0, Math.PI * 2);
         ctx.fillStyle = "rgba(65,61,61,0.5)";
         ctx.fill();
         ctx.closePath();
@@ -211,18 +214,33 @@ export class Colony {
 }
 
 class Food {
-    constructor(saturation, color) {
-        this.saturation = saturation;
-        this.color = color;
+    saturation = 0;
+    colors = [
+        '#260b00', '#3b1500', '#6e2700',
+        '#944000', '#c7571c', '#f6791f'
+    ];
+
+    addFood() {
+        if (this.saturation < 5)
+            this.saturation++;
+    }
+
+    drawFood(ctx, x, y) {
+        ctx.beginPath();
+        x = Math.floor(x / square / 2) * square * 2;
+        y = Math.floor(y / square / 2) * square * 2;
+        ctx.arc(x + square, y + square, square, 0, Math.PI * 2);
+        ctx.fillStyle = this.colors[this.saturation];
+        ctx.fill();
+        ctx.closePath();
     }
 }
 
 export class Cell {
     constructor() {
-        // color of food is????
-        this.food = new Food(0.0,);
+        this.food = new Food();
         this.wall = false;
-        this.toHome = 0.0;
-        this.toFood = 0.2;
+        this.toHome = 0.01;
+        this.toFood = 0.01;
     }
 }
