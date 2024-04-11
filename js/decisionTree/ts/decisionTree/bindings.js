@@ -1,4 +1,4 @@
-export let newCSVFilename, builtInCSVFilename;
+export let newCSVDataTable, builtInCSVFilename;
 export let maxDepthInput;
 export let minKnowledgeInput;
 export let iterationsDelay;
@@ -68,7 +68,8 @@ PercentToClassifyInput.addEventListener("input", () => {
 // file load
 const firstCSVPathElement = document.getElementById('chooseFile1');
 firstCSVPathElement.addEventListener('change', () => {
-    newCSVFilename = readFile(firstCSVPathElement);
+    newCSVDataTable = readFile(firstCSVPathElement);
+    const newCSVFilename = firstCSVPathElement.files[0].name;
     if (/^\s*$/.test(newCSVFilename)) {
         $(".file-upload").removeClass('active');
         $("#noFile1").text("No file chosen...");
@@ -105,7 +106,6 @@ function readFile(input) {
     let reader = new FileReader();
     reader.readAsText(file);
     reader.onload = function () {
-        //console.table(parseCSV(reader.result));
         return parseCSV(reader.result);
     };
     reader.onerror = function () {
@@ -113,26 +113,6 @@ function readFile(input) {
         return null;
     };
 }
-/*
-$('#chooseFile1').bind('change', function () {
-    newCSVFilename = $("#chooseFile1").files[0];
-
-    var fReader = new FileReader();
-    fReader.readAsDataURL(newCSVFilename);
-    fReader.onloadend = function(event){
-      newCSVFilename = event.target.result;
-
-      if (/^\s*$/.test(newCSVFilename)) {
-        $(".file-upload").removeClass('active');
-        $("#noFile1").text("No file chosen...");
-      }
-      else {
-        $(".file-upload").addClass('active');
-        $("#noFile1").text(newCSVFilename);
-      }
-    }
-
-});*/
 // movability logic
 const window = document.getElementById('movable');
 const movableDiv = window.lastElementChild;
