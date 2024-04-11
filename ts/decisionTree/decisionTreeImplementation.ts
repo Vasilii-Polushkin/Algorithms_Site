@@ -468,7 +468,7 @@ export class DecisionTree
 
         return res;
     }
-
+    
     async classifyDataTable(precentageToClassify: number, dataTable: string[][] = this.dataTable)
     {
         SetClassifiedAmount(0);

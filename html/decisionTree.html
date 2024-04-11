@@ -17,17 +17,18 @@
 	<link rel="stylesheet" href="../libs/bootstrap/new css/bootstrap.min.css">
 
 	<link rel="stylesheet" href="../css/main.css">
-	<link rel="stylesheet" href="../css/UploadFile.css">
 	<link rel="stylesheet" href="../css/media.css">
 
 	<script src="../libs/jquery/jquery-3.6.0.min.js" defer></script>
 
 	<script src="../libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+
 	<!-- default -->
 
-	<link rel="stylesheet" href="../css/decisionTree.css" defer>
+	<link rel="stylesheet" href="../css/UploadFile.css">
+	<link rel="stylesheet" href="../css/decisionTree.css">
+	
 	<script type = "module" src="../js/decisionTree/ts/decisionTree/mainModule.js" defer></script>
-	<script type = "module" src="../js/decisionTree/ts/decisionTree/bindings.js" defer></script>
 	
 </head>
 
@@ -63,11 +64,11 @@
 			<div class="form-check">
 				<input class="form-check-input" type="radio" name="CreateTreeRadio" id="CreateTreeRadioNewCSV">
 				<!-- file uppload -->
-				<div class="file-upload">
+				<div class="file-upload" id = "file-upload-train">
 					<div class="file-select">
-						<div class="file-select-button" id="fileName1">Choose File</div>
-						<div class="file-select-name" id="noFile1">No file chosen...</div> 
-						<input type="file" name="chooseFile1" id="chooseFile1">
+						<div class="file-select-button" id="chooseTrainingFileBtn">Choose File</div>
+						<div class="file-select-name" id="noTrainigFile">No file chosen...</div> 
+						<input type="file" name="chooseTrainingFile" id="chooseTrainingFile">
 					</div>
 				</div>
 			</div>
@@ -102,18 +103,18 @@
 		<div class="offcanvas-body">
 
 			<div class="form-check">
-				<input class="form-check-input" type="radio" name="ClassificationRadio" id="ClassificationRadioNewCSV">
+				<input class="form-check-input" type="radio" name="ClassificationRadio" id="ClassifyRadioNewCSV">
 				<!-- file uppload -->
-				<div class="file-upload">
+				<div class="file-upload" id = "file-upload-classify">
 					<div class="file-select">
-						<div class="file-select-button" id="fileName2">Choose File</div>
-						<div class="file-select-name" id="noFile2">No file chosen...</div> 
-						<input type="file" name="chooseFile2" id="chooseFile2">
+						<div class="file-select-button" id="chooseClassificationFileBtn">Choose File</div>
+						<div class="file-select-name" id="noClassificationFile">No file chosen...</div> 
+						<input type="file" name="chooseClassificationFile" id="chooseClassificationFile">
 					</div>
 				</div>
 			</div>
 			<div class="form-check">
-				<input class="form-check-input" type="radio" name="ClassificationRadio" id="ClassificationRadioThisCSV" checked>
+				<input class="form-check-input" type="radio" name="ClassificationRadio" id="ClassifyRadioThisCSV" checked>
 				<!-- percent to classify range form -->
 				<label for="PercentToClassifyRange" class="form-label">Or Classify From Training Dataset: <output id="PercentToClassifyOutput"></output>%</label>
 				<input type="range" class="form-range" min="0" max="100" step="1" id="PercentToClassifyRange" value="30">

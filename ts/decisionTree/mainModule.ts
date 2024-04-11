@@ -1,23 +1,27 @@
-import { loadBuiltInCSV } from "./utilities/SVGhandler.js";
-import { CSVurls } from "./utilities/CSVurls.js";
 import { DecisionTree } from "./decisionTreeImplementation.js";
-import { maxDepthInput, minKnowledgeInput, newCSVDataTable, builtInCSVFilename, ClassifyBtn,
-    CreateTreeBtn, percentToClassify,resetTreeTransformation,NewCSV,BuiltInCSV,createTreeMethod } from "./bindings.js";
+import { maxDepthInput, minKnowledgeInput, newTrainingDataTable, builtInDataTable, ClassifyBtn,
+    CreateTreeBtn, percentToClassify,NewCSV,BuiltInCSV,createTreeMethod,
+    classifyMethod,ThisCSV,newClassifyDataTable } from "./bindings.js";
 
+import { resetTreeTransformation } from "./transformations.js";
 
-let tree = new DecisionTree(await loadBuiltInCSV(CSVurls.heartAttack), maxDepthInput, minKnowledgeInput);
+let tree = new DecisionTree(builtInDataTable, maxDepthInput, minKnowledgeInput);
 
 CreateTreeBtn.addEventListener("click", async ()=>{
     resetTreeTransformation();
     tree.freeVisuals();
 
     if (createTreeMethod == NewCSV)
-        tree = new DecisionTree(newCSVDataTable, maxDepthInput, minKnowledgeInput);
+        tree = new DecisionTree(newTrainingDataTable, maxDepthInput, minKnowledgeInput);
 
     else
-        tree = new DecisionTree(await loadBuiltInCSV(CSVurls.heartAttack), maxDepthInput, minKnowledgeInput);
+        tree = new DecisionTree(builtInDataTable, maxDepthInput, minKnowledgeInput);
 });
 
 ClassifyBtn.addEventListener("click", ()=>{
-    tree.classifyDataTable(percentToClassify)
+    //console.log(classifyMethod)
+    if (classifyMethod == ThisCSV)
+        tree.classifyDataTable(percentToClassify)
+    else
+        tree.classifyDataTable(100, newClassifyDataTable)
 });

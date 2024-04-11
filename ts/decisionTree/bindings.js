@@ -1,13 +1,18 @@
-export let newCSVDataTable,
-           builtInCSVFilename;
+import { heartAttackDataTable } from "../../csvs/BuiltInCsvs.js";
+
+export let newTrainingDataTable,
+           builtInDataTable,
+           newClassifyDataTable;
 export let maxDepthInput;
 export let minKnowledgeInput;
 export let iterationsDelay;
 export let percentToClassify;
 
 export const NewCSV = 0;
-export const BuiltInCSV = 1;
+export const BuiltInCSV = 1, ThisCSV = 1;
+
 export let createTreeMethod = BuiltInCSV;
+export let classifyMethod = ThisCSV;
 
 export const ClassifyBtn = document.getElementById("ClassifyBtn");
 export const CreateTreeBtn = document.getElementById("CreateTreeBtn");
@@ -33,13 +38,24 @@ export function SetTotalToClassify(number)
 
 // create tree method radio
 const CreateTreeRadioNewCSV = document.getElementById("CreateTreeRadioNewCSV");
-CreateTreeRadioNewCSV.addEventListener('input', () => {
+CreateTreeRadioNewCSV.addEventListener('click', () => {
   createTreeMethod = NewCSV;
 })
 
 const CreateTreeRadioBuilInCSV = document.getElementById("CreateTreeRadioBuilInCSV");
-CreateTreeRadioBuilInCSV.addEventListener('input', () => {
+CreateTreeRadioBuilInCSV.addEventListener('click', () => {
   createTreeMethod = BuiltInCSV;
+})
+
+// classify tree method radio
+const ClassifyRadioNewCSV = document.getElementById("ClassifyRadioNewCSV");
+ClassifyRadioNewCSV.addEventListener('click', () => {
+  classifyMethod = NewCSV;
+})
+
+const ClassifyRadioThisCSV = document.getElementById("ClassifyRadioThisCSV");
+ClassifyRadioThisCSV.addEventListener('click', () => {
+  classifyMethod = ThisCSV;
 })
 
 // max depth range
@@ -86,20 +102,9 @@ PercentToClassifyInput.addEventListener("input", () => {
   PercentToClassifyOutput.textContent = percentToClassify;
 });
 
-// file load
-const firstCSVPathElement = document.getElementById('chooseFile1');
-firstCSVPathElement.addEventListener('change',() => {
-  newCSVDataTable = readFile(firstCSVPathElement);
-  const newCSVFilename = firstCSVPathElement.files[0].name;
-  if (/^\s*$/.test(newCSVFilename)) {
-    $(".file-upload").removeClass('active');
-    $("#noFile1").text("No file chosen..."); 
-  }
-  else {
-    $(".file-upload").addClass('active');
-    $("#noFile1").text(newCSVFilename);
-  }
-});
+// -------------------------------------------- file load------------------------------------------
+
+builtInDataTable = heartAttackDataTable;
 
 function parseCSV(text) {
   let prevSymbol = '', currString = [''], result = [currString], index = 0, stringIndex = 0, insideQuotes = true, symbol;
@@ -117,103 +122,62 @@ function parseCSV(text) {
   return result;
 }
 
-function readFile(input) {
-  let file = input.files[0];
+const TrainingCSVPathElement = document.getElementById('chooseTrainingFile');
+TrainingCSVPathElement.addEventListener('change',() => {
+  readTrainFile(TrainingCSVPathElement.files[0]);
+  const newCSVFilename = TrainingCSVPathElement.files[0].name;
+  if (/^\s*$/.test(newCSVFilename)) {
+    $("#file-upload-train").removeClass('active');
+    $("#noTrainigFile").text("No file chosen..."); 
+  }
+  else {
+    $("#file-upload-train").addClass('active');
+    $("#noTrainigFile").text(newCSVFilename);
+  }
+});
+
+const ClassificationCSVPathElement = document.getElementById('chooseClassificationFile');
+ClassificationCSVPathElement.addEventListener('change',() => {
+  readClassifyFile(ClassificationCSVPathElement.files[0]);
+  const newCSVFilename = ClassificationCSVPathElement.files[0].name;
+  if (/^\s*$/.test(newCSVFilename)) {
+    $("#file-upload-classify").removeClass('active');
+    $("#noClassificationFile").text("No file chosen..."); 
+  }
+  else {
+    $("#file-upload-classify").addClass('active');
+    $("#noClassificationFile").text(newCSVFilename);
+  }
+});
+
+function readTrainFile(filename) {
 
   let reader = new FileReader();
 
-  reader.readAsText(file);
+  reader.readAsText(filename);
 
   reader.onload = function() {
-    return parseCSV(reader.result);
+    newTrainingDataTable = parseCSV(reader.result);
   };
 
   reader.onerror = function() {
     console.log(reader.error);
-    return null;
   };
 }
 
-// movability logic
-const window = document.getElementById('movable');
-const movableDiv = window.lastElementChild;
+function readClassifyFile(filename) {
 
-let diffY,
-    diffX,
-    elmWidth,
-    elmHeight,
-    isMouseDown = false;
+  let reader = new FileReader();
 
-function mouseDown(e) {
-  isMouseDown = true;
-  // get initial mousedown coordinated
-  const mouseY = e.clientY;
-  const mouseX = e.clientX;
-  
-  // get element top and left positions
-  const elmY = movableDiv.offsetTop;
-  const elmX = movableDiv.offsetLeft;
-  
-  // get elm dimensions
-  elmWidth = movableDiv.offsetWidth;
-  elmHeight = movableDiv.offsetHeight;
-  
-  // get diff from (0,0) to mousedown point
-  diffY = mouseY - elmY;
-  diffX = mouseX - elmX;
+  reader.readAsText(filename);
+
+  reader.onload = function() {
+    newClassifyDataTable = parseCSV(reader.result);
+  };
+
+  reader.onerror = function() {
+    console.log(reader.error);
+  };
 }
 
-function mouseMove(e)
-{
-  if (!isMouseDown) return;
-  // get new mouse coordinates
-  const newMouseY = e.clientY;
-  const newMouseX = e.clientX;
-  
-  // calc new top, left pos of elm
-  let newElmTop = newMouseY - diffY,
-      newElmLeft = newMouseX - diffX;
-
-  moveElm(newElmTop, newElmLeft);
-}
-
-function moveElm(yPos, xPos) {
-  movableDiv.style.top = yPos + 'px';
-  movableDiv.style.left = xPos + 'px';
-}
-
-function mouseUp() {
-  isMouseDown = false;
-}
-
-window.addEventListener('mousedown', mouseDown);
-document.addEventListener('mousemove', mouseMove);
-document.addEventListener('mouseup', mouseUp);
-
-// scroll logic
-
-let scale = 1;
-
-function zoom(event)
-{
-  event.preventDefault();
-
-  scale += event.deltaY * -0.003;
-
-  // Restrict scale
-  scale = Math.min(Math.max(0.125, scale), 4);
-
-  // Apply scale transform
-  movableDiv.style.transform = `scale(${scale})`;
-}
-
-window.addEventListener('wheel', zoom)
-
-// reset transformations
-export function resetTreeTransformation()
-{
-  scale = 1;
-  movableDiv.style.transform = `scale(${scale})`;
-  movableDiv.style.top = '0px';
-  movableDiv.style.left = '0px';
-}
+// ---------------------------------- movability logic
