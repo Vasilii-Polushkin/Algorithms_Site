@@ -29,3 +29,5 @@ async function loadCSV(url)
 
 export const heartAttackDataTable = await loadCSV('../csvs/heartAttack.csv');
 export const irisDataTable = await loadCSV('../csvs/iris.csv');
+
+export const dataTablesArray = [heartAttackDataTable, irisDataTable];

@@ -189,7 +189,7 @@ export class TreeNode
                 }
 
                 entrophies[i] = calcEnthrophy(samplesClassesProbabilities);
-                currEntrophy -= entrophies[i] * total / this.samplesAmount;
+                currEntrophy += entrophies[i] * total / this.samplesAmount;
             }
 
             if (currEntrophy < currMinCategoricalEntrophy)
@@ -312,6 +312,12 @@ function sleep(ms: number) {
 }
 export class DecisionTree
 {
+    shouldStopClassify = false;
+    stopClassifying()
+    {
+        this.shouldStopClassify = true;
+    };
+
     // таблица, где первая строка с названиями колонок
     dataTable: string[][];
 
@@ -326,10 +332,13 @@ export class DecisionTree
     
     buildTreeDFS(currNode: TreeNode, usedCategiralIDs: boolean[], usedIntervalIDsValues:boolean[][], currDepth: number): void
     {
+        if (this.maxDepth != undefined && currDepth == this.maxDepth - 1)
+            return;
+
         let intervalValueID = currNode.addConditionAndChildren(
             usedCategiralIDs, usedIntervalIDsValues);
 
-        if (this.maxDepth != undefined && currDepth == this.maxDepth || currNode.attributeType == undefined)
+        if (currNode.attributeType == undefined)
             return;
 
         if (currNode.attributeType == attributeTypes.CATEGORICAL)
@@ -446,6 +455,7 @@ export class DecisionTree
                 }
             }
             await sleep(iterationsDelay);
+            if (this.shouldStopClassify) return null;
             currA().classList.remove("select");
             currElement = nextElement;
         }
@@ -456,6 +466,7 @@ export class DecisionTree
         {
             currA().classList.add("success");
             await sleep(iterationsDelay);
+            if (this.shouldStopClassify) return null;
             currA().classList.remove("success");
         }
 
@@ -463,14 +474,17 @@ export class DecisionTree
         {
             currA().classList.add("fail");
             await sleep(iterationsDelay);
+            if (this.shouldStopClassify) return null;
             currA().classList.remove("fail");
         }
 
         return res;
     }
-    
+
     async classifyDataTable(precentageToClassify: number, dataTable: string[][] = this.dataTable)
     {
+        this.shouldStopClassify = false;
+
         SetClassifiedAmount(0);
         SetClassifiedWrong(0);
 
@@ -482,7 +496,7 @@ export class DecisionTree
         for (let i = 1; i < amountToClasify; ++i)
         {
             const res:string = await this.classifySingle(dataTable[i])
-
+            if (this.shouldStopClassify) return;
             if (dataTable[i].at(-1) != res)
             {
                 classifiedWrong++;

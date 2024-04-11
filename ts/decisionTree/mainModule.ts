@@ -9,6 +9,7 @@ let tree = new DecisionTree(builtInDataTable, maxDepthInput, minKnowledgeInput);
 
 CreateTreeBtn.addEventListener("click", async ()=>{
     resetTreeTransformation();
+    tree.stopClassifying();
     tree.freeVisuals();
 
     if (createTreeMethod == NewCSV)
@@ -19,7 +20,8 @@ CreateTreeBtn.addEventListener("click", async ()=>{
 });
 
 ClassifyBtn.addEventListener("click", ()=>{
-    //console.log(classifyMethod)
+    tree.stopClassifying();
+    
     if (classifyMethod == ThisCSV)
         tree.classifyDataTable(percentToClassify)
     else

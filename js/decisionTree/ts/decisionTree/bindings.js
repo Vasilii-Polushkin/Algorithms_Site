@@ -1,4 +1,4 @@
-import { heartAttackDataTable } from "../../csvs/BuiltInCsvs.js";
+import { heartAttackDataTable, dataTablesArray } from "../../../../csvs/BuiltInCsvs.js";
 export let newTrainingDataTable, builtInDataTable, newClassifyDataTable;
 export let maxDepthInput;
 export let minKnowledgeInput;
@@ -76,8 +76,13 @@ PercentToClassifyInput.addEventListener("input", () => {
     percentToClassify = PercentToClassifyInput.value;
     PercentToClassifyOutput.textContent = percentToClassify;
 });
-// -------------------------------------------- file load------------------------------------------
+//--------------------------------------------- buit in datatable --------------------------------
 builtInDataTable = heartAttackDataTable;
+const BuiltInDatasetSelector = document.getElementById("BuiltInDatasetSelector");
+BuiltInDatasetSelector.addEventListener('change', () => {
+    builtInDataTable = dataTablesArray[BuiltInDatasetSelector.selectedIndex];
+});
+// -------------------------------------------- file load------------------------------------------
 function parseCSV(text) {
     let prevSymbol = '', currString = [''], result = [currString], index = 0, stringIndex = 0, insideQuotes = true, symbol;
     for (symbol of text) {
@@ -146,5 +151,4 @@ function readClassifyFile(filename) {
         console.log(reader.error);
     };
 }
-// ---------------------------------- movability logic
 //# sourceMappingURL=bindings.js.map
