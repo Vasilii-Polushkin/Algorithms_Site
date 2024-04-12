@@ -24,7 +24,7 @@ async function loadCSV(url)
     })
   .catch(error => console.error(error));
 
-    return table;
+  return table;
 }
 
 export const heartAttackDataTable = await loadCSV('../csvs/heartAttack.csv');

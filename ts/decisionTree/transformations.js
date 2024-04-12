@@ -12,7 +12,7 @@ function mouseDown(e) {
   // get initial mousedown coordinated
   const mouseY = e.clientY;
   const mouseX = e.clientX;
-  
+
   // get element top and left positions
   const elmY = movableDiv.offsetTop;
   const elmX = movableDiv.offsetLeft;
@@ -67,7 +67,7 @@ function zoom(event)
   scale = Math.min(Math.max(0.125, scale), 4);
 
   // Apply scale transform
-  movableDiv.style.transform = `scale(${scale})`;
+  movableDiv.style.scale = scale;
 }
 
 window.addEventListener('wheel', zoom)
@@ -75,8 +75,12 @@ window.addEventListener('wheel', zoom)
 // reset transformations
 export function resetTreeTransformation()
 {
-  scale = 1080 / movableDiv.elmWidth;
-  movableDiv.style.transform = `scale(${scale})`;
-  movableDiv.style.top = '0px';
-  movableDiv.style.left = '0px';
+  scale = 1;
+  movableDiv.style.scale = scale;
+
+  scale = window.clientWidth / movableDiv.clientWidth * 0.7;
+  movableDiv.style.scale = scale;
+
+  movableDiv.style.top = '50%';
+  movableDiv.style.left = '50%';
 }

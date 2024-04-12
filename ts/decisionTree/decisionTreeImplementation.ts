@@ -481,8 +481,12 @@ export class DecisionTree
         return res;
     }
 
+    classifyCounter = 0;
+
     async classifyDataTable(precentageToClassify: number, dataTable: string[][] = this.dataTable)
     {
+        this.classifyCounter++;
+
         this.shouldStopClassify = false;
 
         SetClassifiedAmount(0);
@@ -496,7 +500,8 @@ export class DecisionTree
         for (let i = 1; i < amountToClasify; ++i)
         {
             const res:string = await this.classifySingle(dataTable[i])
-            if (this.shouldStopClassify) return;
+            if (this.shouldStopClassify || this.classifyCounter > 1)
+                break;
             if (dataTable[i].at(-1) != res)
             {
                 classifiedWrong++;
@@ -505,6 +510,8 @@ export class DecisionTree
 
             SetClassifiedAmount(i);
         }
+
+        this.classifyCounter--;
     }
 
     constructor(newDataTable: string[][], maxDepth?: number, minKnowledgePersentage?: number)
@@ -553,7 +560,7 @@ export class DecisionTree
         this.buildTreeDFS(this.rootNode, usedCategiralIDs, usedIntervalIDsValues, 0);
         this.visualizeTree();
     }
-
+    
     visualizeTreeDfs(currNode:TreeNode, currUlElement: Element):void
     {
         const subtree = document.createElement('li');

@@ -351,7 +351,9 @@ export class DecisionTree {
         }
         return res;
     }
+    classifyCounter = 0;
     async classifyDataTable(precentageToClassify, dataTable = this.dataTable) {
+        this.classifyCounter++;
         this.shouldStopClassify = false;
         SetClassifiedAmount(0);
         SetClassifiedWrong(0);
@@ -360,14 +362,15 @@ export class DecisionTree {
         SetTotalToClassify(amountToClasify - 1);
         for (let i = 1; i < amountToClasify; ++i) {
             const res = await this.classifySingle(dataTable[i]);
-            if (this.shouldStopClassify)
-                return;
+            if (this.shouldStopClassify || this.classifyCounter > 1)
+                break;
             if (dataTable[i].at(-1) != res) {
                 classifiedWrong++;
                 SetClassifiedWrong(classifiedWrong);
             }
             SetClassifiedAmount(i);
         }
+        this.classifyCounter--;
     }
     constructor(newDataTable, maxDepth, minKnowledgePersentage) {
         this.dataTable = newDataTable;

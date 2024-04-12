@@ -76,6 +76,24 @@ PercentToClassifyInput.addEventListener("input", () => {
     percentToClassify = PercentToClassifyInput.value;
     PercentToClassifyOutput.textContent = percentToClassify;
 });
+// toasts
+const trainingToast = document.getElementById('noTrainingFileToast');
+const noTrainingFileToast = bootstrap.Toast.getOrCreateInstance(trainingToast);
+export function makeNoTrainingFileSelectedError() {
+    noTrainingFileToast.show();
+}
+const ClassifyToast = document.getElementById('noClassifyFileToast');
+const noClassifyFileToast = bootstrap.Toast.getOrCreateInstance(ClassifyToast);
+export function makeNoClassifyFileSelectedError() {
+    noClassifyFileToast.show();
+}
+const fileValidationOutput = document.getElementById("fileValidationOutput");
+const validationToast = document.getElementById('notValidFileToast');
+const notValidFileToast = bootstrap.Toast.getOrCreateInstance(validationToast);
+export function makeFileNotValidError(output) {
+    fileValidationOutput.value = output;
+    notValidFileToast.show();
+}
 //--------------------------------------------- buit in datatable --------------------------------
 builtInDataTable = heartAttackDataTable;
 const BuiltInDatasetSelector = document.getElementById("BuiltInDatasetSelector");
@@ -136,19 +154,57 @@ function readTrainFile(filename) {
     reader.readAsText(filename);
     reader.onload = function () {
         newTrainingDataTable = parseCSV(reader.result);
+        const err = isDataTableValid(newTrainingDataTable);
+        if (err != undefined) {
+            newTrainingDataTable = undefined;
+            $("#file-upload-train").removeClass('active');
+            $("#noTrainigFile").text("No file chosen...");
+            makeFileNotValidError(err);
+            return;
+        }
     };
     reader.onerror = function () {
-        console.log(reader.error);
+        makeFileNotValidError(reader.error);
     };
+}
+function isDataTableValid(dataTable) {
+    if (dataTable.length == 1)
+        return "File Has No Commas";
+    const rowLenght = dataTable[0].length;
+    for (let i = 1; i < dataTable.legth; ++i)
+        if (dataTable[i].length != rowLenght)
+            return `Row #${i + 1} contains ${dataTable[i].length} colums, while previous has ${rowLenght}`;
+}
+function isClassifyDataTableValid(dataTable) {
+    const trainRowLength = 3; // = createTreeMethod == NewCSV? newTrainingDataTable[0].length: builtInDataTable[0].length;
+    for (let i = 0; i < trainRowLength; ++i)
+        if (dataTable[i].length != trainRowLength)
+            return `Row #${i + 1} contains ${dataTable[i].length} colums, while training file has ${trainRowLength}`;
 }
 function readClassifyFile(filename) {
     let reader = new FileReader();
     reader.readAsText(filename);
     reader.onload = function () {
         newClassifyDataTable = parseCSV(reader.result);
+        let err = isDataTableValid(newClassifyDataTable);
+        if (err != undefined) {
+            newClassifyDataTable = undefined;
+            $("#file-upload-classify").removeClass('active');
+            $("#noClassificationFile").text("No file chosen...");
+            makeFileNotValidError(err);
+            return;
+        }
+        err = isClassifyDataTableValid(newClassifyDataTable);
+        if (err != undefined) {
+            newClassifyDataTable = undefined;
+            $("#file-upload-classify").removeClass('active');
+            $("#noClassificationFile").text("No file chosen...");
+            makeFileNotValidError(err);
+            return;
+        }
     };
     reader.onerror = function () {
-        console.log(reader.error);
+        makeFileNotValidError(reader.error);
     };
 }
 //# sourceMappingURL=bindings.js.map

@@ -38,10 +38,6 @@
 	<header class="p-2 text-bg-dark">
 		<div class="container">
 			<div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-				<a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-					<svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"/></svg>
-				</a>
-	
 				<ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
 				<li><a href="../index.html" class="nav-link px-2 text-secondary">Home</a></li>
 				<li><a href="#" class="nav-link px-2 text-white-50">Clusterization</a></li>
@@ -53,6 +49,49 @@
 			</div>
 		</div>
 	</header>
+
+	<!-- TOASTS -->
+
+	<div class="toast-container position-fixed bottom-0 end-0 p-3">
+
+		<!-- TRAINING FILE -->
+		<div id="noTrainingFileToast" class="toast bg-white" role="alert" aria-live="assertive" aria-atomic="true">
+		  <div class="toast-header">
+			<!--<img src="..." class="rounded me-2" alt="...">-->
+			<strong class="me-auto">No File Selected!</strong>
+			<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+		  </div>
+		  <div class="toast-body">
+			Select Training File
+		  </div>
+		</div>
+
+		<!-- CLASSIFICATION FILE -->
+		<div id="noClassifyFileToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+			<div class="toast-header">
+			  <!--<img src="..." class="rounded me-2" alt="...">-->
+			  <strong class="me-auto">No File Selected!</strong>
+			  <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+			</div>
+			<div class="toast-body">
+				Select Classification File
+			</div>
+		</div>
+
+		<!-- FILE VALIDATION -->
+		<div id="notValidFileToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+			<div class="toast-header">
+			  <!--<img src="..." class="rounded me-2" alt="...">-->
+			  <strong class="me-auto">File Is Not Valid!</strong>
+			  <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+			</div>
+			<div class="toast-body">
+				<output id = "fileValidationOutput"></output>
+			</div>
+		</div>
+	</div>
+
+	<!-- MAIN -->
 	
 	<div class="offcanvas offcanvas-end mainBg" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
 		<div class="offcanvas-header">
@@ -137,7 +176,7 @@
 			<!-- iterations delay range form -->
 		<div class="col-sm-3 col-md-3">
 			<label for="IterationsDelayRange" class="form-label">Iterations Delay: <output id="IterationsDelayOutput"></output> ms</label>
-			<input type="range" class="form-range" min="0" max="1000" step="10" id="IterationsDelayRange" value="200">
+			<input type="range" class="form-range" min="10" max="1000" step="10" id="IterationsDelayRange" value="200">
 		</div>
 			<!-- classify btn -->
 		<div class="col-sm-3 col-md-3">
@@ -147,10 +186,10 @@
 	<div class = "container-fluid">
 		<div class = "window" id = "movable">
 			<!-- tree -->
-			<div class = "center" style="top: -50px;">
+			<div class = "center">
 				<div class="node" id = "tree">
 					<ul id = "placeHolder" style="height: 0px;">
-					
+				
 					</ul>
 				</div>
 			</div>

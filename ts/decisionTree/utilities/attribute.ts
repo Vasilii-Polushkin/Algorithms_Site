@@ -11,7 +11,7 @@ export class attribute
         this.id = attributeID;
         this.values = valuesI;
     }
-    GlobalID: number;
+    GlobalID: number; 
     id: number;
     values: number[] | string[];
 }

@@ -3,5 +3,5 @@ export enum CSVurls
 {
     iris = "../../csvs/iris.csv",
     heartAttack = "../../csvs/heartAttack.csv",
-    monks = "../../csvs/monks.csv",
+    monks = "../../csvs/monks.csv", 
 }

@@ -26,7 +26,7 @@ export function sortUnique(arr: any) {
     return ret;
 }
 
-export function adjustMedians(arr: any){
+export function adjustMedians(arr: any){ 
     let res:any[] = [];
     for (let i = 0; i < arr.length - 1; ++i)
         res.push((arr[i] + arr[i + 1]) / 2);

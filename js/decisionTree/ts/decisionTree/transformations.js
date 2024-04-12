@@ -44,14 +44,16 @@ function zoom(event) {
     // Restrict scale
     scale = Math.min(Math.max(0.125, scale), 4);
     // Apply scale transform
-    movableDiv.style.transform = `scale(${scale})`;
+    movableDiv.style.scale = scale;
 }
 window.addEventListener('wheel', zoom);
 // reset transformations
 export function resetTreeTransformation() {
-    scale = 0.3; //1080 / movableDiv.elmWidth;
-    movableDiv.style.transform = `scale(${scale})`;
-    movableDiv.style.top = '90px';
-    movableDiv.style.left = '0px';
+    scale = 1;
+    movableDiv.style.scale = scale;
+    scale = window.clientWidth / movableDiv.clientWidth * 0.7;
+    movableDiv.style.scale = scale;
+    movableDiv.style.top = '50%';
+    movableDiv.style.left = '50%';
 }
 //# sourceMappingURL=transformations.js.map
