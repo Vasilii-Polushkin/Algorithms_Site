@@ -75,7 +75,7 @@ window.addEventListener('wheel', zoom)
 // reset transformations
 export function resetTreeTransformation()
 {
-  scale = 1;
+  scale = 1080 / movableDiv.elmWidth;
   movableDiv.style.transform = `scale(${scale})`;
   movableDiv.style.top = '0px';
   movableDiv.style.left = '0px';

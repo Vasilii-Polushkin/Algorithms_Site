@@ -579,7 +579,7 @@ export class DecisionTree
         let placeHolder:Element = document.getElementById("placeHolder");
         this.visualizeTreeDfs(this.rootNode, placeHolder);
     }
-
+    
     freeVisuals(): void
     {
         let placeHolder:Element = document.getElementById("placeHolder");

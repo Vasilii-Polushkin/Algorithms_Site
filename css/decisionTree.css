@@ -39,18 +39,17 @@
 
 .node ul {
   position: relative;
-  padding-top: 20px; 
+  padding-top: 20px;
+  padding: 20px 3px 3px 3px;
 }
 
 .node li {
   position: relative;
-  padding: 20px 3px 0 3px; 
+  padding: 20px 3px 3px 3px; 
   float: left; 
   
   text-align: center;
   list-style-type: none; 
-
-  
 }
 
 .node li::before, .node li::after{

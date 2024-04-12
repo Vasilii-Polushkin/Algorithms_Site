@@ -49,9 +49,9 @@ function zoom(event) {
 window.addEventListener('wheel', zoom);
 // reset transformations
 export function resetTreeTransformation() {
-    scale = 1;
+    scale = 0.3; //1080 / movableDiv.elmWidth;
     movableDiv.style.transform = `scale(${scale})`;
-    movableDiv.style.top = '0px';
+    movableDiv.style.top = '90px';
     movableDiv.style.left = '0px';
 }
 //# sourceMappingURL=transformations.js.map
