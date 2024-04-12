@@ -1,12 +1,14 @@
-import {generateLabyrinth, init, drawMap, map} from "./labyrinth.js";
+import {Labyrinth} from "./labyrinth.js";
 import {control, model, rows, cols, isFieldValid} from "./control.js";
 import {square} from "./model.js";
 
 
 export class View {
     constructor() {
+        this.labyrinth = new Labyrinth();
         this.layer1 = document.getElementById('layer1');
         this.layer2 = document.getElementById('layer2');
+        this.layer3 = document.getElementById('layer3');
         this.extraLayer1 = document.getElementById('extraLayer1');
         this.onResize();
         window.addEventListener('resize', this.onResize);
@@ -15,9 +17,9 @@ export class View {
     init() {
         if (control.setLabyrinth) {
             this.style = '#858080';
-            generateLabyrinth();
-            init();
-            model.map = drawMap();
+            this.labyrinth.init();
+            this.labyrinth.drawMap();
+            model.map = this.labyrinth.answerMap;
         } else {
             this.style = '#047344';
             this.ctx1.fillStyle = '#047344';
@@ -69,15 +71,36 @@ export class View {
         }
 
         if (control.mouseState === 'COLONY' && control.initColony) {
-            model.colony.drawSilhouette(this.ctx1, control.x, control.y);
+            model.colony.drawSilhouette(this.ctx1, Math.floor(control.x / square), Math.floor(control.y / square));
         }
 
         if (control.setColony) {
             for (let ant of model.ants) {
-                if (!ant.dead) ant.draw(this.ctx1, this.fw);
+                if (!ant.dead) {
+                    ant.draw(this.ctx1, this.fw);
+                    //ant.path.add({x: ant.location.x, y: ant.location.y});
+                }
+                /*for(let i = 0; i < ant.path.size; i++){
+                    let pair = this.getFromSet(i, ant.path);
+                    model.map[pair.y][pair.x].draw(this.ctx3, pair.x, pair.y);
+                }*/
             }
             model.colony.draw(this.ctx1);
+            //this.ctx1.drawImage(this.layer3, 0, 0);
         }
+    }
+
+    getFromSet(index, path) {
+        let i = 0;
+        let [res] = path;
+        for(let pair of path){
+            if(i === index) {
+                res = pair;
+                break;
+            }
+            i++;
+        }
+        return res;
     }
 
     onResize() {
@@ -85,10 +108,13 @@ export class View {
         this.layer1.width = cols;
         this.layer2.height = rows;
         this.layer2.width = cols;
+        this.layer3.height = rows;
+        this.layer3.width = cols;
         this.extraLayer1.height = rows;
         this.extraLayer1.width = cols;
         this.ctx1 = this.layer1.getContext('2d');
         this.ctx2 = this.layer2.getContext('2d');
+        this.ctx3 = this.layer3.getContext('2d');
         this.extraCtx1 = this.extraLayer1.getContext('2d');
         this.fw = new Flyweight();
     }

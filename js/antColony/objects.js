@@ -2,26 +2,22 @@ import {Flyweight} from "./view.js";
 import {availableFields, isFieldValid} from "./control.js";
 import {square} from "./model.js";
 
+const CONST = 4;
+
 export class Ant {
     constructor(direction, colony) {
         this.dead = false;
         /**
-         * 0  up-left
-         * 1  up
-         * 2  up-right
-         * 3  left
-         * 4  right
-         * 5  down-left
-         * 6  down
-         * 7  down-right
+         * 0  up
+         * 1  left
+         * 2  right
+         * 3  down
          */
         this.direction = direction;
-        this.location = {x: Math.floor(colony.x / square), y: Math.floor(colony.y / square)};
-        this.colonyLocation = {x: Math.floor(colony.x / square), y: Math.floor(colony.y / square)};
+        this.location = {x: colony.x, y: colony.y};
         this.grab = false;
         this.drop = false;
         this.angle = 0;
-        this.pose = 0;
         /**
          * false - food
          * true - home
@@ -30,6 +26,8 @@ export class Ant {
         this.vision = 10;
         this.prevStep = 0;
         this.step = 0;
+        this.path = new Set();
+        this.length = 0;
     }
 
     doStep(pheromones) {
@@ -38,79 +36,153 @@ export class Ant {
 
             this.step = Math.floor(Math.random() * 10 + 5);
 
-            let maxDesire = 0;
+            this.length += this.step;
+
             let desireToMove = new Array(availableFields);
             let probabilities = new Array(availableFields);
             for (let i = 0; i < desireToMove.length; i++) {
-                desireToMove[i] = Math.pow(pheromones[i], 2);
-                if(desireToMove[i] > maxDesire){
-                    maxDesire = desireToMove[i];
+                desireToMove[i] = Math.pow(pheromones[i], 2) / this.length * CONST;
+            }
+
+            if(desireToMove[this.direction] === 0) {
+                do {
+                    this.direction = Math.floor(Math.random() * 10);
+                } while (this.direction > 3);
+            }
+
+
+            const sum = desireToMove.reduce((partialSum, a) => partialSum + a, 0);
+            probabilities[0] = desireToMove[0] / sum;
+            for (let i = 1; i < probabilities.length; i++) {
+                probabilities[i] = desireToMove[i] / sum + probabilities[i - 1];
+            }
+
+            this.prevStep = 0;
+            let temp = Math.random();
+            for (let i = 1; i < probabilities.length; i++) {
+                if (temp < probabilities[i] && temp > probabilities[i - 1]) {
                     this.prevStep = i;
+                    break;
                 }
             }
-
-            if(!this.target){
-                const sum = desireToMove.reduce((partialSum, a) => partialSum + a, 0);
-                probabilities[0] = desireToMove[0] / sum;
-                for (let i = 1; i < probabilities.length; i++) {
-                    probabilities[i] = desireToMove[i] / sum + probabilities[i - 1];
-                }
-
-                this.prevStep = 0;
-                let temp = Math.random();
-                for (let i = 1; i < probabilities.length; i++) {
-                    if (temp < probabilities[i] && temp > probabilities[i - 1]) {
-                        this.prevStep = i;
-                        break;
-                    }
-                }
-            }
-
 
 
         } else {
             this.step--;
         }
-
-        switch(this.prevStep){
-            case 0: {
-                this.angle = -45;
-                return {x: -1, y: -1};
+        if (this.direction === 0) {
+            switch (this.prevStep) {
+                case 0: {
+                    this.angle = -45;
+                    return {x: -1, y: -1};
+                }
+                case 1: {
+                    this.angle = 0;
+                    return {x: 0, y: -1};
+                }
+                case 2: {
+                    this.angle = 45;
+                    return {x: 1, y: -1};
+                }
+                case 3: {
+                    this.angle = -30;
+                    return {x: -1, y: -2};
+                }
+                case 4: {
+                    this.angle = 30;
+                    return {x: 1, y: -2};
+                }
+                /*case 5: {
+                    this.angle = -135;
+                    return {x: -1, y: 1};
+                }
+                case 6: {
+                    this.angle = 180;
+                    return {x: 0, y: 1};
+                }
+                case 7: {
+                    this.angle = 135;
+                    return {x: 1, y: 1};
+                }*/
             }
-            case 1: {
-                this.angle = 0;
-                return {x: 0, y: -1};
+        }
+        if (this.direction === 1) {
+            switch (this.prevStep) {
+                case 0: {
+                    this.angle = -135;
+                    return {x: -1, y: 1};
+                }
+                case 1: {
+                    this.angle = -90;
+                    return {x: -1, y: 0};
+                }
+                case 2: {
+                    this.angle = -45;
+                    return {x: -1, y: -1};
+                }
+                case 3: {
+                    this.angle = -120;
+                    return {x: -2, y: 1};
+                }
+                case 4: {
+                    this.angle = -60;
+                    return {x: -2, y: -1};
+                }
             }
-            case 2: {
-                this.angle = 45;
-                return {x: 1, y: -1};
+        }
+        if (this.direction === 2) {
+            switch (this.prevStep) {
+                case 0: {
+                    this.angle = 45;
+                    return {x: 1, y: -1};
+                }
+                case 1: {
+                    this.angle = 90;
+                    return {x: 1, y: 0};
+                }
+                case 2: {
+                    this.angle = 135;
+                    return {x: 1, y: 1};
+                }
+                case 3: {
+                    this.angle = 60;
+                    return {x: 2, y: -1};
+                }
+                case 4: {
+                    this.angle = 120;
+                    return {x: 2, y: 1};
+                }
             }
-            case 3: {
-                this.angle = -90;
-                return {x: -1, y: 0};
-            }
-            case 4: {
-                this.angle = 90;
-                return {x: 1, y: 0};
-            }
-            case 5: {
-                this.angle = -135;
-                return {x: -1, y: 1};
-            }
-            case 6: {
-                this.angle = 180;
-                return {x: 0, y: 1};
-            }
-            case 7: {
-                this.angle = 135;
-                return {x: 1, y: 1};
+        }
+        if (this.direction === 3) {
+            switch (this.prevStep) {
+                case 0: {
+                    this.angle = 135;
+                    return {x: 1, y: 1};
+                }
+                case 1: {
+                    this.angle = 180;
+                    return {x: 0, y: 1};
+                }
+                case 2: {
+                    this.angle = -135;
+                    return {x: -1, y: 1};
+                }
+                case 3: {
+                    this.angle = 150;
+                    return {x: 1, y: 2};
+                }
+                case 4: {
+                    this.angle = -150;
+                    return {x: -1, y: 2};
+                }
             }
         }
     }
 
     update(pheromones) {
         let delta = this.doStep(pheromones);
-        if(isFieldValid(this.location.x + delta.x, this.location.y + delta.y)){
+        if (isFieldValid(this.location.x + delta.x, this.location.y + delta.y)) {
             this.location.x += delta.x;
             this.location.y += delta.y;
         }
@@ -125,9 +197,6 @@ export class Ant {
         x *= square;
         y *= square;
 
-        //this.roundCoordinates();
-
-        let pose = this.pose * 0.5;
         // Смена координат для поворота
         ctx.save();
         ctx.translate(x, y);
@@ -139,20 +208,20 @@ export class Ant {
         ctx.fillStyle = '#1a0505';
         // Лапки 1-4
         ctx.beginPath();
-        ctx.moveTo(x - fw.size25, y - fw.size3 - pose * 2);
-        ctx.lineTo(x - fw.size2, y - fw.size15 - pose);
-        ctx.lineTo(x + fw.size28, y + fw.size2 + pose * 2);
-        ctx.lineTo(x + fw.size4, y + fw.size6 + pose * 4);
+        ctx.moveTo(x - fw.size25, y - fw.size3);
+        ctx.lineTo(x - fw.size2, y - fw.size15);
+        ctx.lineTo(x + fw.size28, y + fw.size2);
+        ctx.lineTo(x + fw.size4, y + fw.size6);
         // Лапки 2-5
-        ctx.moveTo(x - fw.size35, y + fw.size + pose);
-        ctx.lineTo(x - fw.size22, y - fw.size025 + pose);
-        ctx.lineTo(x + fw.size22, y + fw.size025 - pose);
-        ctx.lineTo(x + fw.size35, y + fw.size15 - pose);
+        ctx.moveTo(x - fw.size35, y + fw.size);
+        ctx.lineTo(x - fw.size22, y - fw.size025);
+        ctx.lineTo(x + fw.size22, y + fw.size025);
+        ctx.lineTo(x + fw.size35, y + fw.size15);
         // Лапки 3-6
-        ctx.moveTo(x - fw.size4, y + fw.size8 - pose * 4);
-        ctx.lineTo(x - fw.size28, y + fw.size3 - pose * 2);
-        ctx.lineTo(x + fw.size2, y - fw.size2 + pose);
-        ctx.lineTo(x + fw.size25, y - fw.size4 + pose * 2);
+        ctx.moveTo(x - fw.size4, y + fw.size8);
+        ctx.lineTo(x - fw.size28, y + fw.size3);
+        ctx.lineTo(x + fw.size2, y - fw.size2);
+        ctx.lineTo(x + fw.size25, y - fw.size4);
         ctx.stroke();
         ctx.closePath();
         // Грудь
@@ -176,9 +245,9 @@ export class Ant {
         // Усики
         ctx.beginPath();
         ctx.moveTo(x - fw.size05, y - fw.size22);
-        ctx.lineTo(x - fw.size15 + pose * 0.5, y - fw.size45);
+        ctx.lineTo(x - fw.size15, y - fw.size45);
         ctx.moveTo(x + fw.size05, y - fw.size22);
-        ctx.lineTo(x + fw.size15 - pose * 0.5, y - fw.size45);
+        ctx.lineTo(x + fw.size15, y - fw.size45);
         ctx.stroke();
         ctx.closePath();
         ctx.restore();
@@ -198,7 +267,7 @@ export class Colony {
 
     draw(ctx) {
         ctx.beginPath();
-        ctx.arc(this.x, this.y, 16, 0, Math.PI * 2);
+        ctx.arc(this.x * square, this.y * square, 15, 0, Math.PI * 2);
         ctx.fillStyle = '#943b16';
         ctx.fill();
         ctx.closePath();
@@ -206,7 +275,7 @@ export class Colony {
 
     drawSilhouette(ctx, x, y) {
         ctx.beginPath();
-        ctx.arc(x, y, 16, 0, Math.PI * 2);
+        ctx.arc(x * square, y * square, 15, 0, Math.PI * 2);
         ctx.fillStyle = "rgba(65,61,61,0.5)";
         ctx.fill();
         ctx.closePath();
@@ -242,5 +311,32 @@ export class Cell {
         this.wall = false;
         this.toHome = 0.01;
         this.toFood = 0.01;
+    }
+
+    draw(ctx, x, y) {
+
+        if (this.toFood > 0.001) {
+            this.toFood -= 0.001;
+            ctx.beginPath();
+            ctx.arc(x * square, y * square, 0.5, 0, Math.PI * 2);
+            ctx.fillStyle = '#ef0000';
+            ctx.fill();
+            ctx.closePath();
+        }
+        /*else {
+            ctx.clearRect(x * square - 0.5, y * square - 0.5, 1, 1);
+        }*/
+
+        if (this.toHome > 0.001) {
+            this.toHome -= 0.001;
+            ctx.beginPath();
+            ctx.arc(x * square, y * square, 0.5, 0, Math.PI * 2);
+            ctx.fillStyle = '#0800ff';
+            ctx.fill();
+            ctx.closePath();
+        }
+        /*else {
+            ctx.clearRect(x * square - 0.5, y * square - 0.5, 1, 1);
+        }*/
     }
 }

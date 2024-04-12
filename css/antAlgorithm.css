@@ -15,6 +15,6 @@ canvas {
     border-radius: 6px;
 }
 
-#layer2, #extraLayer1 {
+#layer2, #layer3, #extraLayer1 {
     display: none;
 }

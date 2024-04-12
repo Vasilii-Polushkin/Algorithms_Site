@@ -1,7 +1,7 @@
 import {cols, control, getNearFields, isFieldValid, rows} from "./control.js";
 import {Ant, Cell, Colony} from "./objects.js";
 
-export let step = 3;
+export let step = 1;
 export let currFPS;
 export let square = 5;
 
@@ -24,13 +24,18 @@ export class Model {
 
                 if (!this.ants[i].target && this.map[this.ants[i].location.y][this.ants[i].location.x].food.saturation !== 0) {
                     this.ants[i].target = true;
+                    this.ants[i].length = 0;
                 }
-                if (this.ants[i].target && this.ants[i].location.y === this.colony.y && this.ants[i].location.x === this.colony.x) {
-                    this.ants[i].target = false;
+                if (this.ants[i].target) {
+                    if(this.ants[i].location.x <= this.colony.x + 3 && this.ants[i].location.x >= this.colony.x - 3 &&
+                        this.ants[i].location.y <= this.colony.y + 3 && this.ants[i].location.y >= this.colony.y - 3){
+                        this.ants[i].target = false;
+                        this.ants[i].length = 0;
+                    }
                 }
 
-                if (!this.ants[i].target) this.map[this.ants[i].location.y][this.ants[i].location.x].toHome += 0.2;
-                else this.map[this.ants[i].location.y][this.ants[i].location.x].toFood += 0.2;
+                if (!this.ants[i].target) this.map[this.ants[i].location.y][this.ants[i].location.x].toHome += 0.01;
+                else this.map[this.ants[i].location.y][this.ants[i].location.x].toFood += 0.01;
 
 
             }
@@ -63,7 +68,7 @@ export class Model {
         for (let i = 0; i < this.ants.length; i++) {
             do {
                 direction = Math.floor(Math.random() * 10);
-            } while (direction > 7);
+            } while (direction > 3);
             this.ants[i] = new Ant(direction, this.colony);
         }
     }
