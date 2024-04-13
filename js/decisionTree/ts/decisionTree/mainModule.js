@@ -1,7 +1,8 @@
 import { DecisionTree } from "./decisionTreeImplementation.js";
-import { maxDepthInput, minKnowledgeInput, newTrainingDataTable, builtInDataTable, ClassifyBtn, CreateTreeBtn, percentToClassify, NewCSV, createTreeMethod, classifyMethod, ThisCSV, newClassifyDataTable, makeNoClassifyFileSelectedError, makeNoTrainingFileSelectedError } from "./bindings.js";
+import { maxDepthInput, minKnowledgeInput, newTrainingDataTable, builtInDataTable, ClassifyBtn, CreateTreeBtn, percentToClassify, NewCSV, createTreeMethod, isNewClassifyDataTableValid, classifyMethod, ThisCSV, newClassifyDataTable, makeNoClassifyFileSelectedError, makeNoTrainingFileSelectedError } from "./bindings.js";
 import { resetTreeTransformation } from "./transformations.js";
 let tree = new DecisionTree(builtInDataTable, maxDepthInput, minKnowledgeInput);
+resetTreeTransformation();
 CreateTreeBtn.addEventListener("click", async () => {
     tree.stopClassifying();
     tree.freeVisuals();
@@ -22,9 +23,11 @@ ClassifyBtn.addEventListener("click", () => {
     if (classifyMethod == ThisCSV)
         tree.classifyDataTable(percentToClassify);
     else {
-        if (newClassifyDataTable == undefined)
+        if (newClassifyDataTable == undefined) {
             makeNoClassifyFileSelectedError();
-        else
+            return;
+        }
+        if (isNewClassifyDataTableValid(tree.dataTable[0].length, tree.categoricalAttributesList))
             tree.classifyDataTable(100, newClassifyDataTable);
     }
 });

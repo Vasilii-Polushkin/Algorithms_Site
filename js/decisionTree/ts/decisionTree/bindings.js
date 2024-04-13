@@ -168,18 +168,32 @@ function readTrainFile(filename) {
     };
 }
 function isDataTableValid(dataTable) {
-    if (dataTable.length == 1)
-        return "File Has No Commas";
+    if (dataTable.length <= 1)
+        return "File Has Only One Row";
     const rowLenght = dataTable[0].length;
-    for (let i = 1; i < dataTable.legth; ++i)
+    for (let i = 1; i < dataTable.length; ++i)
         if (dataTable[i].length != rowLenght)
             return `Row #${i + 1} contains ${dataTable[i].length} colums, while previous has ${rowLenght}`;
 }
-function isClassifyDataTableValid(dataTable) {
-    const trainRowLength = 3; // = createTreeMethod == NewCSV? newTrainingDataTable[0].length: builtInDataTable[0].length;
-    for (let i = 0; i < trainRowLength; ++i)
-        if (dataTable[i].length != trainRowLength)
-            return `Row #${i + 1} contains ${dataTable[i].length} colums, while training file has ${trainRowLength}`;
+export function isNewClassifyDataTableValid(trainRowLength, categoricalList) {
+    for (let i = 0; i < newClassifyDataTable.length; ++i)
+        if (newClassifyDataTable[i].length != trainRowLength) {
+            makeFileNotValidError(`Row #${i + 1} contains ${newClassifyDataTable[i].length} colums, while training file has ${trainRowLength}`);
+            return false;
+        }
+    for (const id in categoricalList) {
+        const columID = categoricalList[id].GlobalID;
+        for (let i = 1; i < newClassifyDataTable.length; ++i) {
+            let val = parseFloat(newClassifyDataTable[i][columID]);
+            if (isNaN(val))
+                val = newClassifyDataTable[i][columID];
+            if (categoricalList[id].values.includes(val) == false) {
+                makeFileNotValidError(`Colum #${columID + 1} contains categorical value ${val} in row #${i + 1} which doesn't exists in the training file`);
+                return false;
+            }
+        }
+    }
+    return true;
 }
 function readClassifyFile(filename) {
     let reader = new FileReader();
@@ -187,14 +201,6 @@ function readClassifyFile(filename) {
     reader.onload = function () {
         newClassifyDataTable = parseCSV(reader.result);
         let err = isDataTableValid(newClassifyDataTable);
-        if (err != undefined) {
-            newClassifyDataTable = undefined;
-            $("#file-upload-classify").removeClass('active');
-            $("#noClassificationFile").text("No file chosen...");
-            makeFileNotValidError(err);
-            return;
-        }
-        err = isClassifyDataTableValid(newClassifyDataTable);
         if (err != undefined) {
             newClassifyDataTable = undefined;
             $("#file-upload-classify").removeClass('active');

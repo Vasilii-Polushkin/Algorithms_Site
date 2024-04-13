@@ -384,9 +384,7 @@ export class DecisionTree
                     if (isNaN(floatNum))
                     {
                         attribuleType = attributeTypes.CATEGORICAL;
-                        break;
                     }
-                    // для категоральных не очень мб
                     else
                     {
                         colum[rowID] = floatNum;
@@ -421,7 +419,8 @@ export class DecisionTree
 
         while (!currNode.isLeaf())
         {
-            currA().classList.add("select");
+            if (iterationsDelay >= 40)
+                currA().classList.add("select");
             // go to ul
             nextElement = currElement.lastElementChild;
 
@@ -455,7 +454,12 @@ export class DecisionTree
                 }
             }
             await sleep(iterationsDelay);
-            if (this.shouldStopClassify) return null;
+            if (this.shouldStopClassify)
+            {
+                if (currElement != undefined)
+                    currA().classList.remove("select");
+                return null;
+            }
             currA().classList.remove("select");
             currElement = nextElement;
         }
@@ -465,17 +469,26 @@ export class DecisionTree
         if (res == inputAttributes.at(-1))
         {
             currA().classList.add("success");
+            setTimeout(function() {
+                if (currElement != undefined)
+                    currA().classList.remove("success");
+                }, Math.max(iterationsDelay, 100));
+
             await sleep(iterationsDelay);
-            if (this.shouldStopClassify) return null;
-            currA().classList.remove("success");
+            if (this.shouldStopClassify)
+                return null;
         }
 
         else
         {
             currA().classList.add("fail");
+            setTimeout(function() {
+                if (currElement != undefined)
+                    currA().classList.remove("fail");
+                }, Math.max(iterationsDelay, 100));
             await sleep(iterationsDelay);
-            if (this.shouldStopClassify) return null;
-            currA().classList.remove("fail");
+            if (this.shouldStopClassify)
+                return null;
         }
 
         return res;

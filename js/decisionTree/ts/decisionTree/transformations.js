@@ -51,9 +51,9 @@ window.addEventListener('wheel', zoom);
 export function resetTreeTransformation() {
     scale = 1;
     movableDiv.style.scale = scale;
-    scale = window.clientWidth / movableDiv.clientWidth * 0.7;
+    movableDiv.style.top = `${(window.clientHeight - movableDiv.clientHeight) / 2}px`;
+    movableDiv.style.left = `${(window.clientWidth - movableDiv.clientWidth) / 2}px`;
+    scale = Math.min(window.clientWidth / movableDiv.clientWidth, window.clientHeight / movableDiv.clientHeight);
     movableDiv.style.scale = scale;
-    movableDiv.style.top = '50%';
-    movableDiv.style.left = '50%';
 }
 //# sourceMappingURL=transformations.js.map
