@@ -1,4 +1,5 @@
 import { heartAttackDataTable, dataTablesArray } from "../../../../csvs/BuiltInCsvs.js";
+import { tree } from "./mainModule.js";
 export let newTrainingDataTable, builtInDataTable, newClassifyDataTable;
 export let maxDepthInput;
 export let minKnowledgeInput;
@@ -87,12 +88,21 @@ const noClassifyFileToast = bootstrap.Toast.getOrCreateInstance(ClassifyToast);
 export function makeNoClassifyFileSelectedError() {
     noClassifyFileToast.show();
 }
+const validationRequestOutput = document.getElementById('validationRequestOutput');
 const fileValidationOutput = document.getElementById("fileValidationOutput");
 const validationToast = document.getElementById('notValidFileToast');
 const notValidFileToast = bootstrap.Toast.getOrCreateInstance(validationToast);
-export function makeFileNotValidError(output) {
-    fileValidationOutput.value = output;
+export function makeFileNotValidError(errOutput, requestOutput) {
+    validationRequestOutput.value = requestOutput;
+    fileValidationOutput.value = errOutput;
     notValidFileToast.show();
+}
+const fileValidationOutputWithNoValidateBtn = document.getElementById("fileValidationOutputWithNoValidateBtn");
+const validationToastWithNoValidateBtn = document.getElementById('notValidFileToastWithNoValidateBtn');
+const notValidFileToastWithNoValidateBtn = bootstrap.Toast.getOrCreateInstance(validationToastWithNoValidateBtn);
+export function makeFileNotValidErrorWithNoValidateBtn(output) {
+    fileValidationOutputWithNoValidateBtn.value = output;
+    notValidFileToastWithNoValidateBtn.show();
 }
 //--------------------------------------------- buit in datatable --------------------------------
 builtInDataTable = heartAttackDataTable;
@@ -127,60 +137,87 @@ const TrainingCSVPathElement = document.getElementById('chooseTrainingFile');
 TrainingCSVPathElement.addEventListener('change', () => {
     readTrainFile(TrainingCSVPathElement.files[0]);
     const newCSVFilename = TrainingCSVPathElement.files[0].name;
-    if (/^\s*$/.test(newCSVFilename)) {
-        $("#file-upload-train").removeClass('active');
-        $("#noTrainigFile").text("No file chosen...");
-    }
-    else {
-        $("#file-upload-train").addClass('active');
-        $("#noTrainigFile").text(newCSVFilename);
-    }
+    $("#file-upload-train").addClass('active');
+    $("#noTrainigFile").text(newCSVFilename);
 });
 const ClassificationCSVPathElement = document.getElementById('chooseClassificationFile');
 ClassificationCSVPathElement.addEventListener('change', () => {
     readClassifyFile(ClassificationCSVPathElement.files[0]);
     const newCSVFilename = ClassificationCSVPathElement.files[0].name;
-    if (/^\s*$/.test(newCSVFilename)) {
-        $("#file-upload-classify").removeClass('active');
-        $("#noClassificationFile").text("No file chosen...");
-    }
-    else {
-        $("#file-upload-classify").addClass('active');
-        $("#noClassificationFile").text(newCSVFilename);
-    }
+    $("#file-upload-classify").addClass('active');
+    $("#noClassificationFile").text(newCSVFilename);
 });
+function SetNoClassificationFile() {
+    newClassifyDataTable = undefined;
+    $("#file-upload-classify").removeClass('active');
+    $("#noClassificationFile").text("No file chosen...");
+}
+function SetNoTrainingFile() {
+    newTrainingDataTable = undefined;
+    $("#file-upload-train").removeClass('active');
+    $("#noTrainigFile").text("No file chosen...");
+}
+const validateRequestBtn = document.getElementById('validateRequest');
+function isTrainingDataTableValid(dataTable) {
+    if (dataTable.length <= 1) {
+        makeFileNotValidErrorWithNoValidateBtn("File Has Only One Row");
+        return undefined;
+    }
+    const rowLenght = dataTable[0].length;
+    for (let i = 1; i < dataTable.length; ++i)
+        if (dataTable[i].length != rowLenght) {
+            return `Row #${i + 1} contains ${dataTable[i].length} colums, while previous has ${rowLenght}`;
+        }
+}
 function readTrainFile(filename) {
     let reader = new FileReader();
     reader.readAsText(filename);
     reader.onload = function () {
         newTrainingDataTable = parseCSV(reader.result);
-        const err = isDataTableValid(newTrainingDataTable);
-        if (err != undefined) {
-            newTrainingDataTable = undefined;
-            $("#file-upload-train").removeClass('active');
-            $("#noTrainigFile").text("No file chosen...");
-            makeFileNotValidError(err);
+        const err = dataTableValidError(newTrainingDataTable);
+        if (err == undefined)
             return;
-        }
+        validateRequestBtn.onclick = validateTrainingTableByLength;
+        makeFileNotValidError(err, 'Filter file by length');
     };
     reader.onerror = function () {
-        makeFileNotValidError(reader.error);
+        newTrainingDataTable = undefined;
+        makeFileNotValidErrorWithNoValidateBtn(reader.error);
     };
 }
-function isDataTableValid(dataTable) {
-    if (dataTable.length <= 1)
-        return "File Has Only One Row";
-    const rowLenght = dataTable[0].length;
-    for (let i = 1; i < dataTable.length; ++i)
-        if (dataTable[i].length != rowLenght)
-            return `Row #${i + 1} contains ${dataTable[i].length} colums, while previous has ${rowLenght}`;
+function readClassifyFile(filename) {
+    let reader = new FileReader();
+    reader.readAsText(filename);
+    reader.onload = function () {
+        newClassifyDataTable = parseCSV(reader.result);
+        const err = dataTableValidError(newClassifyDataTable);
+        if (err == undefined)
+            return;
+        makeFileNotValidError(err, 'fix');
+    };
+    reader.onerror = function () {
+        newClassifyDataTable = undefined;
+        makeFileNotValidErrorWithNoValidateBtn(reader.error);
+    };
 }
-export function isNewClassifyDataTableValid(trainRowLength, categoricalList) {
-    for (let i = 0; i < newClassifyDataTable.length; ++i)
+export function isNewClassifyDataTableValid() {
+    const trainRowLength = tree.dataTable[0].length;
+    const categoricalList = tree.categoricalAttributesList;
+    const intervalList = tree.intervalAttributesList;
+    // валидация по длине
+    if (newClassifyDataTable[0].length != trainRowLength) {
+        validationRequestOutput.value = "";
+        makeFileNotValidError(`First row contains ${newClassifyDataTable[0].length} colums, while training file has ${trainRowLength}`);
+        return false;
+    }
+    for (let i = 1; i < newClassifyDataTable.length; ++i)
         if (newClassifyDataTable[i].length != trainRowLength) {
+            validateRequestBtn.onclick = validateNewDataTableByLength;
+            validationRequestOutput.value = "filter samples with invalid rows length";
             makeFileNotValidError(`Row #${i + 1} contains ${newClassifyDataTable[i].length} colums, while training file has ${trainRowLength}`);
             return false;
         }
+    // валидация значений категоральных атрибутов
     for (const id in categoricalList) {
         const columID = categoricalList[id].GlobalID;
         for (let i = 1; i < newClassifyDataTable.length; ++i) {
@@ -188,29 +225,80 @@ export function isNewClassifyDataTableValid(trainRowLength, categoricalList) {
             if (isNaN(val))
                 val = newClassifyDataTable[i][columID];
             if (categoricalList[id].values.includes(val) == false) {
+                validateRequestBtn.onclick = validateNewDataTableByCategoricalVals;
+                validationRequestOutput.value = "filter samples by invalid categorical values";
                 makeFileNotValidError(`Colum #${columID + 1} contains categorical value ${val} in row #${i + 1} which doesn't exists in the training file`);
+                return false;
+            }
+        }
+    }
+    // валидация значений интервальных атрибутов
+    for (const id in intervalList) {
+        const columID = intervalList[id].GlobalID;
+        for (let i = 1; i < newClassifyDataTable.length; ++i) {
+            let val = newClassifyDataTable[i][columID];
+            if (isNaN(parseFloat(val))) {
+                validateRequestBtn.onclick = validateNewDataTableByIntervalVals;
+                validationRequestOutput.value = "delete samples by invalid interval values";
+                makeFileNotValidError(`Colum #${columID + 1} contains value "${val}" in row #${i + 1} which should be interval`);
                 return false;
             }
         }
     }
     return true;
 }
-function readClassifyFile(filename) {
-    let reader = new FileReader();
-    reader.readAsText(filename);
-    reader.onload = function () {
-        newClassifyDataTable = parseCSV(reader.result);
-        let err = isDataTableValid(newClassifyDataTable);
-        if (err != undefined) {
-            newClassifyDataTable = undefined;
-            $("#file-upload-classify").removeClass('active');
-            $("#noClassificationFile").text("No file chosen...");
-            makeFileNotValidError(err);
-            return;
+function validateTrainingTableByLength() {
+    const trainRowLength = tree.dataTable[0].length;
+    for (let i = 0; i < tree.dataTable.length; ++i)
+        if (tree.dataTable[i] != trainRowLength) {
+            delete tree.dataTable[i];
         }
-    };
-    reader.onerror = function () {
-        makeFileNotValidError(reader.error);
-    };
+    tree.dataTable = tree.dataTable.filter(el => el != undefined);
+}
+// валидация по длине
+function validateNewDataTableByLength() {
+    const trainRowLength = tree.dataTable[0].length;
+    for (let i = 0; i < newClassifyDataTable.length; ++i)
+        if (newClassifyDataTable[i].length != trainRowLength) {
+            delete newClassifyDataTable[i];
+        }
+    newClassifyDataTable = newClassifyDataTable.filter(el => el != undefined);
+    isNewClassifyDataTableValid();
+}
+// валидация значений категоральных атрибутов
+function validateNewDataTableByCategoricalVals() {
+    const categoricalList = tree.categoricalAttributesList;
+    for (const id in categoricalList) {
+        const columID = categoricalList[id].GlobalID;
+        for (let i = 1; i < newClassifyDataTable.length; ++i) {
+            if (newClassifyDataTable[i] == undefined)
+                continue;
+            let val = parseFloat(newClassifyDataTable[i][columID]);
+            if (isNaN(val))
+                val = newClassifyDataTable[i][columID];
+            if (categoricalList[id].values.includes(val) == false) {
+                delete newClassifyDataTable[i];
+            }
+        }
+    }
+    newClassifyDataTable = newClassifyDataTable.filter(el => el != undefined);
+    isNewClassifyDataTableValid();
+}
+// валидация значений интервальных атрибутов
+function validateNewDataTableByIntervalVals() {
+    const intervalList = tree.intervalAttributesList;
+    for (const id in intervalList) {
+        const columID = intervalList[id].GlobalID;
+        for (let i = 1; i < newClassifyDataTable.length; ++i) {
+            if (newClassifyDataTable[i] == undefined)
+                continue;
+            let val = newClassifyDataTable[i][columID];
+            if (isNaN(parseFloat(val))) {
+                delete newClassifyDataTable[i];
+            }
+        }
+    }
+    newClassifyDataTable = newClassifyDataTable.filter(el => el != undefined);
+    isNewClassifyDataTableValid();
 }
 //# sourceMappingURL=bindings.js.map

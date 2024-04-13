@@ -87,6 +87,16 @@ li {
 
 /* BOOSTRAP STYLES*/
 
+.toast{
+	background-color: rgb(123, 36, 36) !important;
+	color: var(--color-text)
+}
+
+.toast-header{
+	background-color: rgba(142, 44, 44, 0.8) !important;
+	color: var(--color-text)
+}
+
 .dropdown-menu {
 	--bs-dropdown-link-active-bg: rgb(226, 147, 3);
 }
@@ -148,4 +158,8 @@ select option:hover {
 .mainBg{
 	color: rgb(205, 198, 195);
 	background-image: url(../images/background.jpg);
+}
+
+.whitespaces-pre {
+	white-space: pre;
 }

@@ -23,6 +23,7 @@
 
 	<script src="../libs/bootstrap/js/bootstrap.bundle.min.js"></script>
 
+	<link rel="stylesheet" href="../node_modules/bootstrap-icons/font/bootstrap-icons.min.css">
 	<!-- default -->
 
 	<link rel="stylesheet" href="../css/UploadFile.css">
@@ -36,16 +37,23 @@
 
 	<!-- header -->
 	<header class="p-2 text-bg-dark">
-		<div class="container">
+		<div class = "container">
 			<div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-				<ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-				<li><a href="../index.html" class="nav-link px-2 text-secondary">Home</a></li>
-				<li><a href="#" class="nav-link px-2 text-white-50">Clusterization</a></li>
-				<li><a href="#" class="nav-link px-2 text-white-50">Genetic tree</a></li>
-				<li><a href="#" class="nav-link px-2 text-white-50">Neural network</a></li>
-				<li><a href="#" class="nav-link px-2 text-white-50">Decision tree</a></li>
-				<li><a href="#" class="nav-link px-2 text-white-50">Ant colony</a></li>
-			</ul>
+				<ul class="nav col-7 col-lg-auto me-lg-auto justify-content-center mb-md-0">
+					<li><a href="../index.html" class="nav-link px-2 text-secondary">Home</a></li>
+					<li><a href="../html/Astar.html" class="nav-link px-2 text-white-50">A* algorithm</a></li>
+					<li><a href="#" class="nav-link px-2 text-white-50">Clusterization</a></li>
+					<li><a href="#" class="nav-link px-2 text-white-50">Genetic tree</a></li>
+					<li><a href="#" class="nav-link px-2 text-white-50">Neural network</a></li>
+					<li><a href="../html/decisionTree.html" class="nav-link px-2 text-white-50">Decision tree</a></li>
+					<li><a href="#" class="nav-link px-2 text-white-50">Ant colony</a></li>
+				</ul>
+
+				<ul class="nav col-1 col-lg-auto me-lg-5 justify-content-end mb-md-0">
+					<a class="navbar-brand" href="https://github.com/Vasilii-Polushkin/Algorithms_Site">
+							<i class="bi bi-github" style="font-size: 1.6rem; color: rgba(213, 204, 204, 0.85);"></i>
+					</a>
+				</ul>
 			</div>
 		</div>
 	</header>
@@ -55,10 +63,10 @@
 	<div class="toast-container position-fixed bottom-0 end-0 p-3">
 
 		<!-- TRAINING FILE -->
-		<div id="noTrainingFileToast" class="toast bg-white" role="alert" aria-live="assertive" aria-atomic="true">
+		<div id="noTrainingFileToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
 		  <div class="toast-header">
-			<!--<img src="..." class="rounded me-2" alt="...">-->
-			<strong class="me-auto">No File Selected!</strong>
+			<i class="bi-exclamation-triangle"></i>
+			<strong class="me-auto whitespaces-pre">   No File Selected!</strong>
 			<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
 		  </div>
 		  <div class="toast-body">
@@ -69,9 +77,9 @@
 		<!-- CLASSIFICATION FILE -->
 		<div id="noClassifyFileToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
 			<div class="toast-header">
-			  <!--<img src="..." class="rounded me-2" alt="...">-->
-			  <strong class="me-auto">No File Selected!</strong>
-			  <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+				<i class="bi-exclamation-triangle"></i>
+				<strong class="me-auto whitespaces-pre">   No File Selected!</strong>
+				<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
 			</div>
 			<div class="toast-body">
 				Select Classification File
@@ -81,12 +89,30 @@
 		<!-- FILE VALIDATION -->
 		<div id="notValidFileToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
 			<div class="toast-header">
-			  <!--<img src="..." class="rounded me-2" alt="...">-->
-			  <strong class="me-auto">File Is Not Valid!</strong>
-			  <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+				<i class="bi-exclamation-triangle"></i>
+				<strong class="me-auto whitespaces-pre">   File Is Not Valid!</strong>
+				<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
 			</div>
 			<div class="toast-body">
 				<output id = "fileValidationOutput"></output>
+				<button type="button" class="btn btn-outline-dark" data-bs-dismiss="toast" aria-label="Close" id = "validateRequest">
+					<output id = "validationRequestOutput"></output>
+				</button>
+			</div>
+		</div>
+
+		<!-- FILE VALIDATION WITH NO VALIDATE BUTTON-->
+		<div id="notValidFileToastWithNoValidateBtn" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+			<div class="toast-header">
+				<i class="bi-exclamation-triangle"></i>
+				<strong class="me-auto whitespaces-pre">   File Is Not Valid!</strong>
+				<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+			</div>
+			<div class="toast-body">
+				<output id = "fileValidationOutputWithNoValidateBtn"></output>
+				<button type="button" class="btn btn-outline-dark" data-bs-dismiss="toast" aria-label="Close" id = "validateRequestWithNoValidateBtn">
+					<output id = "validationRequestOutputWithNoValidateBtn"></output>
+				</button>
 			</div>
 		</div>
 	</div>

@@ -5,7 +5,7 @@ import { maxDepthInput, minKnowledgeInput, newTrainingDataTable, builtInDataTabl
 
 import { resetTreeTransformation } from "./transformations.js";
 
-let tree = new DecisionTree(builtInDataTable, maxDepthInput, minKnowledgeInput);
+export let tree = new DecisionTree(builtInDataTable, maxDepthInput, minKnowledgeInput);
 resetTreeTransformation();
 
 CreateTreeBtn.addEventListener("click", async ()=>{
@@ -43,7 +43,7 @@ ClassifyBtn.addEventListener("click", ()=>{
             return;
         }
 
-        if (isNewClassifyDataTableValid(tree.dataTable[0].length, tree.categoricalAttributesList))
+        if (isNewClassifyDataTableValid())
             tree.classifyDataTable(100, newClassifyDataTable)
     }
 });
