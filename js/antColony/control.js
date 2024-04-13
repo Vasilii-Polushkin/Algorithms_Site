@@ -1,4 +1,5 @@
 import {View} from "./view.js";
+import {vision} from "./objects.js";
 import {Model, step, currFPS, square} from "./model.js";
 
 
@@ -20,189 +21,45 @@ export function isFieldValid(x, y) {
 
 export function getNearFields(ant, allPheromones) {
 
-    let pheromones = new Array(availableFields);
-    pheromones.fill(0);
-
-    if (ant.direction === 0) {
-
-        for (let j = 0; j < pheromones.length; j++) {
-            let pheromoneX;
-            let pheromoneY;
-            let b;
-            switch (j) {
-                case 0: {
-                    pheromoneX = ant.location.x - step;
-                    pheromoneY = ant.location.y - step;
-                    b = isFieldValid(pheromoneX, pheromoneY);
-                    break;
-                }
-                case 1: {
-                    pheromoneX = ant.location.x;
-                    pheromoneY = ant.location.y - step;
-                    b = isFieldValid(pheromoneX, pheromoneY);
-                    break;
-                }
-                case 2: {
-                    pheromoneX = ant.location.x + step;
-                    pheromoneY = ant.location.y - step;
-                    b = isFieldValid(pheromoneX, pheromoneY);
-                    break;
-                }
-                case 3: {
-                    pheromoneX = ant.location.x - step;
-                    pheromoneY = ant.location.y;
-                    b = isFieldValid(pheromoneX, pheromoneY);
-                    break;
-                }
-                case 4: {
-                    pheromoneX = ant.location.x + step;
-                    pheromoneY = ant.location.y;
-                    b = isFieldValid(pheromoneX, pheromoneY);
-                }
-            }
-            if (!b) {
-                pheromones[j] = 0;
-            } else {
-                if (!ant.target) pheromones[j] = Math.max(allPheromones[pheromoneY][pheromoneX].toFood, pheromones[j]);
-                else pheromones[j] = Math.max(allPheromones[pheromoneY][pheromoneX].toHome, pheromones[j]);
-            }
-        }
+    let pheromones = new Array(vision);
+    for (let i = 0; i < pheromones.length; i++) {
+        pheromones[i] = new Array(vision);
     }
 
-    if (ant.direction === 1) {
+    for (let i = 0; i < pheromones.length; i++) {
+        let pheromoneY = i - pheromones.length;
 
-        for (let j = 0; j < pheromones.length; j++) {
-            let pheromoneX;
-            let pheromoneY;
-            let b;
-            switch (j) {
+        for (let j = 0; j < pheromones[i].length; j++) {
+            let pheromoneX = j - (pheromones[i].length - 1) / 2;
+
+            switch (ant.direction) {
                 case 0: {
-                    pheromoneX = ant.location.x - step;
-                    pheromoneY = ant.location.y + step;
-                    b = isFieldValid(pheromoneX, pheromoneY);
                     break;
                 }
                 case 1: {
-                    pheromoneX = ant.location.x - step;
-                    pheromoneY = ant.location.y;
-                    b = isFieldValid(pheromoneX, pheromoneY);
+                    let temp = pheromoneX;
+                    pheromoneX = pheromoneY;
+                    pheromoneY = -temp;
                     break;
                 }
                 case 2: {
-                    pheromoneX = ant.location.x - step;
-                    pheromoneY = ant.location.y - step;
-                    b = isFieldValid(pheromoneX, pheromoneY);
+                    let temp = pheromoneY;
+                    pheromoneY = pheromoneX;
+                    pheromoneX = -temp;
                     break;
                 }
                 case 3: {
-                    pheromoneX = ant.location.x - step * 2;
-                    pheromoneY = ant.location.y + step;
-                    b = isFieldValid(pheromoneX, pheromoneY);
+                    pheromoneX *= -1;
+                    pheromoneY *= -1;
                     break;
                 }
-                case 4: {
-                    pheromoneX = ant.location.x - step * 2;
-                    pheromoneY = ant.location.y - step;
-                    b = isFieldValid(pheromoneX, pheromoneY);
-                }
             }
-            if (!b) {
-                pheromones[j] = 0;
+
+            if (!isFieldValid(ant.location.x + pheromoneX, ant.location.y + pheromoneY)) {
+                pheromones[i][j] = 0;
             } else {
-                if (!ant.target) pheromones[j] = Math.max(allPheromones[pheromoneY][pheromoneX].toFood, pheromones[j]);
-                else pheromones[j] = Math.max(allPheromones[pheromoneY][pheromoneX].toHome, pheromones[j]);
-            }
-        }
-    }
-
-    if (ant.direction === 2) {
-
-        for (let j = 0; j < pheromones.length; j++) {
-            let pheromoneX;
-            let pheromoneY;
-            let b;
-            switch (j) {
-                case 0: {
-                    pheromoneX = ant.location.x + step;
-                    pheromoneY = ant.location.y - step;
-                    b = isFieldValid(pheromoneX, pheromoneY);
-                    break;
-                }
-                case 1: {
-                    pheromoneX = ant.location.x + step;
-                    pheromoneY = ant.location.y;
-                    b = isFieldValid(pheromoneX, pheromoneY);
-                    break;
-                }
-                case 2: {
-                    pheromoneX = ant.location.x + step;
-                    pheromoneY = ant.location.y + step;
-                    b = isFieldValid(pheromoneX, pheromoneY);
-                    break;
-                }
-                case 3: {
-                    pheromoneX = ant.location.x + step * 2;
-                    pheromoneY = ant.location.y - step;
-                    b = isFieldValid(pheromoneX, pheromoneY);
-                    break;
-                }
-                case 4: {
-                    pheromoneX = ant.location.x + step * 2;
-                    pheromoneY = ant.location.y + step;
-                    b = isFieldValid(pheromoneX, pheromoneY);
-                }
-            }
-            if (!b) {
-                pheromones[j] = 0;
-            } else {
-                if (!ant.target) pheromones[j] = Math.max(allPheromones[pheromoneY][pheromoneX].toFood, pheromones[j]);
-                else pheromones[j] = Math.max(allPheromones[pheromoneY][pheromoneX].toHome, pheromones[j]);
-            }
-        }
-    }
-
-    if (ant.direction === 3) {
-
-        for (let j = 0; j < pheromones.length; j++) {
-            let pheromoneX;
-            let pheromoneY;
-            let b;
-            switch (j) {
-                case 0: {
-                    pheromoneX = ant.location.x + step;
-                    pheromoneY = ant.location.y + step;
-                    b = isFieldValid(pheromoneX, pheromoneY);
-                    break;
-                }
-                case 1: {
-                    pheromoneX = ant.location.x;
-                    pheromoneY = ant.location.y + step;
-                    b = isFieldValid(pheromoneX, pheromoneY);
-                    break;
-                }
-                case 2: {
-                    pheromoneX = ant.location.x - step;
-                    pheromoneY = ant.location.y + step;
-                    b = isFieldValid(pheromoneX, pheromoneY);
-                    break;
-                }
-                case 3: {
-                    pheromoneX = ant.location.x + step;
-                    pheromoneY = ant.location.y + step * 2;
-                    b = isFieldValid(pheromoneX, pheromoneY);
-                    break;
-                }
-                case 4: {
-                    pheromoneX = ant.location.x - step;
-                    pheromoneY = ant.location.y + step * 2;
-                    b = isFieldValid(pheromoneX, pheromoneY);
-                }
-            }
-            if (!b) {
-                pheromones[j] = 0;
-            } else {
-                if (!ant.target) pheromones[j] = Math.max(allPheromones[pheromoneY][pheromoneX].toFood, pheromones[j]);
-                else pheromones[j] = Math.max(allPheromones[pheromoneY][pheromoneX].toHome, pheromones[j]);
+                if (!ant.target) pheromones[i][j] = allPheromones[ant.location.y + pheromoneY][ant.location.x + pheromoneX].toFood;
+                else pheromones[i][j] = allPheromones[ant.location.y + pheromoneY][ant.location.x + pheromoneX].toHome;
             }
         }
     }

@@ -4,6 +4,7 @@ import {Ant, Cell, Colony} from "./objects.js";
 export let step = 1;
 export let currFPS;
 export let square = 5;
+const CONST = 4;
 
 export class Model {
     ants = [];
@@ -14,7 +15,7 @@ export class Model {
         currFPS = parseInt(control.antsSpeed.textContent);
 
         for (let i = 0; i < this.ants.length; i++) {
-            if(!this.ants[i].dead) {
+            if (!this.ants[i].dead) {
                 this.ants[i].update(getNearFields(this.ants[i], this.map));
 
                 if (!isFieldValid(this.ants[i].location.x, this.ants[i].location.y)) {
@@ -22,21 +23,28 @@ export class Model {
                     continue;
                 }
 
-                if (!this.ants[i].target && this.map[this.ants[i].location.y][this.ants[i].location.x].food.saturation !== 0) {
-                    this.ants[i].target = true;
-                    this.ants[i].length = 0;
-                }
-                if (this.ants[i].target) {
-                    if(this.ants[i].location.x <= this.colony.x + 3 && this.ants[i].location.x >= this.colony.x - 3 &&
-                        this.ants[i].location.y <= this.colony.y + 3 && this.ants[i].location.y >= this.colony.y - 3){
-                        this.ants[i].target = false;
-                        this.ants[i].length = 0;
+                switch (this.ants[i].target) {
+                    case false: {
+                        this.map[this.ants[i].location.y][this.ants[i].location.x].toHome += this.ants[i].homePheromones;
+                        this.ants[i].homePheromones *= 0.99;
+                        if (this.map[this.ants[i].location.y][this.ants[i].location.x].food.saturation !== 0) {
+                            this.ants[i].target = true;
+                            this.ants[i].switchDirection();
+                            this.ants[i].foodPheromones = this.map[this.ants[i].location.y][this.ants[i].location.x].food.saturation;
+                        }
+                        break;
+                    }
+                    case true: {
+                        this.map[this.ants[i].location.y][this.ants[i].location.x].toFood += this.ants[i].foodPheromones;
+                        this.ants[i].foodPheromones *= 0.99;
+                        if (this.ants[i].location.x <= this.colony.x + 3 && this.ants[i].location.x >= this.colony.x - 3 &&
+                            this.ants[i].location.y <= this.colony.y + 3 && this.ants[i].location.y >= this.colony.y - 3) {
+                            this.ants[i].target = false;
+                            this.ants[i].homePheromones = 1;
+                            this.ants[i].switchDirection();
+                        }
                     }
                 }
-
-                if (!this.ants[i].target) this.map[this.ants[i].location.y][this.ants[i].location.x].toHome += 0.01;
-                else this.map[this.ants[i].location.y][this.ants[i].location.x].toFood += 0.01;
-
 
             }
         }
@@ -63,12 +71,9 @@ export class Model {
 
     initAnts(antsNumber) {
         this.ants = new Array(antsNumber);
-        let direction;
 
         for (let i = 0; i < this.ants.length; i++) {
-            do {
-                direction = Math.floor(Math.random() * 10);
-            } while (direction > 3);
+            let direction = Math.floor(Math.random() * 10) % 4;
             this.ants[i] = new Ant(direction, this.colony);
         }
     }
@@ -77,21 +82,19 @@ export class Model {
         let brushSize = parseInt(control.brushSize.textContent) / square;
         let sy = 0;
         let sx = 0;
-        if(y - brushSize / 2 > 0 && y - brushSize / 2 < this.map.length) {
+        if (y - brushSize / 2 > 0 && y - brushSize / 2 < this.map.length) {
             sy = y - brushSize / 2;
-        }
-        else if(x - brushSize / 2 > this.map.length) sy = this.map.length;
+        } else if (x - brushSize / 2 > this.map.length) sy = this.map.length;
 
-        if(x - brushSize / 2 > 0 && x - brushSize / 2 < this.map.length) {
+        if (x - brushSize / 2 > 0 && x - brushSize / 2 < this.map.length) {
             sx = x - brushSize / 2;
-        }
-        else if(x - brushSize / 2 > this.map.length) sx = this.map.length;
+        } else if (x - brushSize / 2 > this.map.length) sx = this.map.length;
 
         let dy = Math.min(this.map.length, sy + brushSize);
         let dx = Math.min(this.map.length, sx + brushSize);
-        for(let i = sy; i < dy; i++) {
-            for(let j = sx; j < dx; j++) {
-                if(!food) this.map[i][j].wall = state;
+        for (let i = sy; i < dy; i++) {
+            for (let j = sx; j < dx; j++) {
+                if (!food) this.map[i][j].wall = state;
                 else this.map[i][j].food.addFood();
             }
         }

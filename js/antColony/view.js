@@ -78,15 +78,15 @@ export class View {
             for (let ant of model.ants) {
                 if (!ant.dead) {
                     ant.draw(this.ctx1, this.fw);
-                    //ant.path.add({x: ant.location.x, y: ant.location.y});
+                    ant.path.add({x: ant.location.x, y: ant.location.y});
                 }
-                /*for(let i = 0; i < ant.path.size; i++){
+                for(let i = 0; i < ant.path.size; i++){
                     let pair = this.getFromSet(i, ant.path);
                     model.map[pair.y][pair.x].draw(this.ctx3, pair.x, pair.y);
-                }*/
+                }
             }
             model.colony.draw(this.ctx1);
-            //this.ctx1.drawImage(this.layer3, 0, 0);
+            this.ctx1.drawImage(this.layer3, 0, 0);
         }
     }
 

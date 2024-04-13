@@ -1,8 +1,10 @@
 import {Flyweight} from "./view.js";
-import {availableFields, isFieldValid} from "./control.js";
+import {availableFields, getNearFields, isFieldValid, model} from "./control.js";
 import {square} from "./model.js";
 
-const CONST = 4;
+export let vision = 7;
+let size = vision ** 2;
+let iterationCount = Math.floor(Math.random() * 10) + 5;
 
 export class Ant {
     constructor(direction, colony) {
@@ -15,39 +17,77 @@ export class Ant {
          */
         this.direction = direction;
         this.location = {x: colony.x, y: colony.y};
-        this.grab = false;
-        this.drop = false;
+        this.foodPheromones = 0;
+        this.homePheromones = 1;
+        // в радианах
         this.angle = 0;
         /**
          * false - food
          * true - home
          */
         this.target = false;
-        this.vision = 10;
-        this.prevStep = 0;
-        this.step = 0;
+        this.it = 0;
+        this.vector = {x: 0, y: 0};
+        //this.prevStep = 0;
+        //this.stepIteration = 0;
+        //this.interStep = {x: 0, y: 0};
+        //this.step = {x: 0, y: 0};
         this.path = new Set();
-        this.length = 0;
     }
 
     doStep(pheromones) {
 
-        if (this.step === 0 || pheromones[this.prevStep] === 0) {
+        if(this.it === 0/* || pheromones[this.vector.y][this.vector.x] === 0*/) {
 
-            this.step = Math.floor(Math.random() * 10 + 5);
+            let desireToMove = new Array(size);
+            for(let i = 0; i < desireToMove.length; i++)
+                desireToMove[i] = pheromones[Math.floor(i / vision)][i % vision] ** 3;
+            const sum = desireToMove.reduce((partialSum, a) => partialSum + a, 0);
 
-            this.length += this.step;
+            let probabilities = new Array(size);
+            probabilities[0] = desireToMove[0] / sum;
+            for (let i = 1; i < probabilities.length; i++)
+                probabilities[i] = desireToMove[i] / sum + probabilities[i - 1];
 
-            let desireToMove = new Array(availableFields);
-            let probabilities = new Array(availableFields);
-            for (let i = 0; i < desireToMove.length; i++) {
-                desireToMove[i] = Math.pow(pheromones[i], 2) / this.length * CONST;
+            let temp = Math.random();
+            for (let i = 1; i < probabilities.length; i++) {
+                if (temp < probabilities[i] && temp > probabilities[i - 1]) {
+                    this.vector = {x: i % vision - (vision - 1) / 2, y: Math.floor(i / vision) - vision};
+                    break;
+                }
             }
 
-            if(desireToMove[this.direction] === 0) {
-                do {
-                    this.direction = Math.floor(Math.random() * 10);
-                } while (this.direction > 3);
+            this.it = iterationCount;
+        }
+        else this.it--;
+
+        if(pheromones[this.vector.y + vision][this.vector.x + (vision - 1) / 2] === 0) this.switchDirection();
+        /*if (this.stepIteration === 0 || pheromones[this.location.y + this.interStep.y][this.location.x + this.interStep.x] === 0) {
+
+            //console.log(this.location.x + this.step.x, this.location.y + this.step.y)
+
+            let desireToMove = new Array(size);
+            let probabilities = new Array(size);
+            let row = -1;
+            let col;
+            let width = pheromones[0].length + 1;
+            for (let i = 0; i < desireToMove.length; i++) {
+                if (i % width === 0) {
+                    width--;
+                    row++;
+                    col = 0;
+                } else col++;
+
+                let y = row;
+                let x = col;
+                desireToMove[i] = Math.pow(pheromones[y][x], 4);
+            }
+
+            if (desireToMove[this.prevStep] === 0) {
+                this.switchDirection();
+                this.stepIteration = 0;
+
+                //this.direction = Math.floor(Math.random() * 10) % 4;
             }
 
 
@@ -66,119 +106,81 @@ export class Ant {
                 }
             }
 
+            for (let i = 1; i < pheromones.length; i++) {
+                let leftBorder = (pheromones[0].length + 2 - i) * (i - 1);
+                let rightBorder = (pheromones[0].length + 1 - i) * i;
+                if (this.prevStep >= leftBorder && this.prevStep < rightBorder) {
+                    this.step.y = pheromones.length - i;
+                    this.step.x = (this.prevStep - leftBorder) - (rightBorder - leftBorder - 1) / 2;
+                    console.log(this.step);
+                    break;
+                }
+            }
+
+            if (this.step.y > 0) {
+                this.step.y--;
+                this.interStep.y = 1;
+            } else this.interStep.y = 0;
+            if (this.step.x > 0) {
+                this.step.x--;
+                this.interStep.x = 1;
+            } else if (this.step.x < 0) {
+                this.step.x++;
+                this.interStep.x = -1;
+            } else this.interStep.x = 0;
 
         } else {
-            this.step--;
-        }
-        if (this.direction === 0) {
-            switch (this.prevStep) {
-                case 0: {
-                    this.angle = -45;
-                    return {x: -1, y: -1};
-                }
-                case 1: {
-                    this.angle = 0;
-                    return {x: 0, y: -1};
-                }
-                case 2: {
-                    this.angle = 45;
-                    return {x: 1, y: -1};
-                }
-                case 3: {
-                    this.angle = -30;
-                    return {x: -1, y: -2};
-                }
-                case 4: {
-                    this.angle = 30;
-                    return {x: 1, y: -2};
-                }
-                /*case 5: {
-                    this.angle = -135;
-                    return {x: -1, y: 1};
-                }
-                case 6: {
-                    this.angle = 180;
-                    return {x: 0, y: 1};
-                }
-                case 7: {
-                    this.angle = 135;
-                    return {x: 1, y: 1};
-                }*/
+            this.stepIteration--;
+        }*/
+
+
+        this.angle = Math.atan(this.vector.x / this.vector.y);
+
+        //let step = {x: Math.floor(Math.random() * 10) % 4, y: Math.floor(Math.random() * 10) % 4};
+        //let step = {x: Math.floor(this.vector.x / 2), y: Math.floor(this.vector.y / 2)};
+        let step = {x: this.vector.x, y: this.vector.y};
+
+        switch (this.direction) {
+            case 0: {
+                return {x: step.x, y: step.y};
             }
-        }
-        if (this.direction === 1) {
-            switch (this.prevStep) {
-                case 0: {
-                    this.angle = -135;
-                    return {x: -1, y: 1};
-                }
-                case 1: {
-                    this.angle = -90;
-                    return {x: -1, y: 0};
-                }
-                case 2: {
-                    this.angle = -45;
-                    return {x: -1, y: -1};
-                }
-                case 3: {
-                    this.angle = -120;
-                    return {x: -2, y: 1};
-                }
-                case 4: {
-                    this.angle = -60;
-                    return {x: -2, y: -1};
-                }
+            case 1: {
+                if (this.angle > -Math.PI / 2) this.angle -= Math.PI / 2;
+                return {x: step.y, y: -step.x};
             }
-        }
-        if (this.direction === 2) {
-            switch (this.prevStep) {
-                case 0: {
-                    this.angle = 45;
-                    return {x: 1, y: -1};
-                }
-                case 1: {
-                    this.angle = 90;
-                    return {x: 1, y: 0};
-                }
-                case 2: {
-                    this.angle = 135;
-                    return {x: 1, y: 1};
-                }
-                case 3: {
-                    this.angle = 60;
-                    return {x: 2, y: -1};
-                }
-                case 4: {
-                    this.angle = 120;
-                    return {x: 2, y: 1};
-                }
+            case 2: {
+                if (this.angle < Math.PI / 2) this.angle += Math.PI / 2;
+                return {x: -step.y, y: step.x};
             }
-        }
-        if (this.direction === 3) {
-            switch (this.prevStep) {
-                case 0: {
-                    this.angle = 135;
-                    return {x: 1, y: 1};
-                }
-                case 1: {
-                    this.angle = 180;
-                    return {x: 0, y: 1};
-                }
-                case 2: {
-                    this.angle = -135;
-                    return {x: -1, y: 1};
-                }
-                case 3: {
-                    this.angle = 150;
-                    return {x: 1, y: 2};
-                }
-                case 4: {
-                    this.angle = -150;
-                    return {x: -1, y: 2};
-                }
+            case 3: {
+                this.angle -= Math.PI;
+                return {x: -step.x, y: -step.y};
             }
         }
     }
+
+    switchDirection() {
+        //this.direction = Math.floor(Math.random() * 10) % 4;
+        switch (this.direction) {
+            case 0: {
+                this.direction = 3;
+                break;
+            }
+            case 1: {
+                this.direction = 2;
+                break;
+            }
+            case 2: {
+                this.direction = 1;
+                break;
+            }
+            case 3: {
+                this.direction = 0;
+                break;
+            }
+        }
+    }
+
 
     update(pheromones) {
         let delta = this.doStep(pheromones);
@@ -200,7 +202,7 @@ export class Ant {
         // Смена координат для поворота
         ctx.save();
         ctx.translate(x, y);
-        ctx.rotate(angle * Math.PI / 180);
+        ctx.rotate(angle);
         ctx.translate(-x, -y);
         // Цвета и линии
         ctx.lineWidth = 1;
@@ -309,34 +311,32 @@ export class Cell {
     constructor() {
         this.food = new Food();
         this.wall = false;
-        this.toHome = 0.01;
-        this.toFood = 0.01;
+        this.toHome = 0.0001;
+        this.toFood = 0.0001;
     }
 
     draw(ctx, x, y) {
 
         if (this.toFood > 0.001) {
-            this.toFood -= 0.001;
+            this.toFood *= 0.99;
             ctx.beginPath();
             ctx.arc(x * square, y * square, 0.5, 0, Math.PI * 2);
             ctx.fillStyle = '#ef0000';
             ctx.fill();
             ctx.closePath();
-        }
-        /*else {
+        } else {
             ctx.clearRect(x * square - 0.5, y * square - 0.5, 1, 1);
-        }*/
+        }
 
         if (this.toHome > 0.001) {
-            this.toHome -= 0.001;
+            this.toHome *= 0.9;
             ctx.beginPath();
             ctx.arc(x * square, y * square, 0.5, 0, Math.PI * 2);
             ctx.fillStyle = '#0800ff';
             ctx.fill();
             ctx.closePath();
-        }
-        /*else {
+        } else {
             ctx.clearRect(x * square - 0.5, y * square - 0.5, 1, 1);
-        }*/
+        }
     }
 }
