@@ -22,7 +22,7 @@ export class View {
             model.map = this.labyrinth.answerMap;
         } else {
             this.style = '#047344';
-            this.ctx1.fillStyle = '#047344';
+            this.ctx1.fillStyle = this.style;
             this.ctx1.fillRect(0, 0, this.layer1.width, this.layer1.height);
         }
     }
@@ -50,12 +50,16 @@ export class View {
                     let _x = (x - brushSize / 2 + j) / square;
                     let _y = (y - brushSize / 2 + i) / square;
                     if (isFieldValid(_x, _y)) {
-                        model.map[_y][_x].food.addFood();
                         model.map[_y][_x].food.drawFood(this.ctx2, _x * square, _y * square);
                     }
                 }
             }
         }
+
+        for(let pair of model.food){
+            model.map[pair.y][pair.x].food.drawFood(this.ctx2, pair.x * square, pair.y * square);
+        }
+        model.food.clear();
 
         if (control.mouseState === 'WALL' && control.setWall) {
             this.ctx2.fillStyle = '#1f1f1f';
@@ -77,16 +81,16 @@ export class View {
         if (control.setColony) {
             for (let ant of model.ants) {
                 if (!ant.dead) {
-                    ant.draw(this.ctx1, this.fw);
+                    ant.draw(this.ctx1);
                     ant.path.add({x: ant.location.x, y: ant.location.y});
                 }
-                for(let i = 0; i < ant.path.size; i++){
+                /*for(let i = 0; i < ant.path.size; i++){
                     let pair = this.getFromSet(i, ant.path);
-                    model.map[pair.y][pair.x].draw(this.ctx3, pair.x, pair.y);
-                }
+                    model.map[Math.floor(pair.y / square)][Math.floor(pair.x / square)].draw(this.ctx3, pair.x, pair.y);
+                }*/
             }
             model.colony.draw(this.ctx1);
-            this.ctx1.drawImage(this.layer3, 0, 0);
+            //this.ctx1.drawImage(this.layer3, 0, 0);
         }
     }
 
@@ -116,31 +120,6 @@ export class View {
         this.ctx2 = this.layer2.getContext('2d');
         this.ctx3 = this.layer3.getContext('2d');
         this.extraCtx1 = this.extraLayer1.getContext('2d');
-        this.fw = new Flyweight();
     }
 }
 
-export class Flyweight {
-    static Pi05 = Math.PI / 2;
-    static Pi2 = Math.PI * 2;
-
-    // Статичные данные
-    constructor() {
-        this.size = 2;
-        this.line = this.size * 0.2;
-        this.size025 = this.size * 0.25;
-        this.size05 = this.size * 0.5;
-        this.size125 = this.size * 1.25;
-        this.size15 = this.size * 1.5;
-        this.size2 = this.size * 2;
-        this.size22 = this.size * 2.2;
-        this.size25 = this.size * 2.5;
-        this.size28 = this.size * 2.8;
-        this.size3 = this.size * 3;
-        this.size35 = this.size * 3.5;
-        this.size4 = this.size * 4;
-        this.size45 = this.size * 4.5;
-        this.size6 = this.size * 6;
-        this.size8 = this.size * 8;
-    }
-}

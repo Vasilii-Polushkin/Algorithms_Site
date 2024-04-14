@@ -1,6 +1,6 @@
 import {View} from "./view.js";
 import {vision} from "./objects.js";
-import {Model, step, currFPS, square} from "./model.js";
+import {Model, currFPS, square} from "./model.js";
 
 
 export let model;
@@ -10,7 +10,6 @@ export let control;
 let FPS = 40;
 
 
-export let availableFields = 4;
 export let rows = 640;
 export let cols = 640;
 
@@ -27,9 +26,9 @@ export function getNearFields(ant, allPheromones) {
     }
 
     for (let i = 0; i < pheromones.length; i++) {
-        let pheromoneY = i - pheromones.length;
 
         for (let j = 0; j < pheromones[i].length; j++) {
+            let pheromoneY = i - pheromones.length;
             let pheromoneX = j - (pheromones[i].length - 1) / 2;
 
             switch (ant.direction) {
@@ -55,11 +54,20 @@ export function getNearFields(ant, allPheromones) {
                 }
             }
 
-            if (!isFieldValid(ant.location.x + pheromoneX, ant.location.y + pheromoneY)) {
+            let x = Math.floor(ant.location.x / square);
+            let y = Math.floor(ant.location.y / square);
+
+            if (!isFieldValid(x + pheromoneX, y + pheromoneY)) {
                 pheromones[i][j] = 0;
             } else {
-                if (!ant.target) pheromones[i][j] = allPheromones[ant.location.y + pheromoneY][ant.location.x + pheromoneX].toFood;
-                else pheromones[i][j] = allPheromones[ant.location.y + pheromoneY][ant.location.x + pheromoneX].toHome;
+                if (!ant.target) {
+                    if(allPheromones[y + pheromoneY][x + pheromoneX].food.saturation !== 0) pheromones[i][j] = -100;
+                    else pheromones[i][j] = allPheromones[y + pheromoneY][x + pheromoneX].toFood;
+                }
+                else {
+                    if(allPheromones[y + pheromoneY][x + pheromoneX].colony) pheromones[i][j] = -100;
+                    else pheromones[i][j] = allPheromones[y + pheromoneY][x + pheromoneX].toHome;
+                }
             }
         }
     }
@@ -103,7 +111,8 @@ export class Control {
 
     update() {
         clearInterval(this.interval);
-        if (!this.pause) model.update();
+        if (!this.pause)
+            model.update();
         view.draw();
         FPS = currFPS;
         this.interval = setInterval(() => this.update(), 1000 / FPS);

@@ -9,50 +9,67 @@ const CONST = 4;
 export class Model {
     ants = [];
     map = [];
+    food = new Set();
     colony = new Colony(0, 0);
 
     update() {
         currFPS = parseInt(control.antsSpeed.textContent);
 
         for (let i = 0; i < this.ants.length; i++) {
+
+            for (let pair of this.ants[i].path) this.map[Math.floor(pair.y / square)][Math.floor(pair.x / square)].toHome *= 0.8;
+            for (let pair of this.ants[i].path) this.map[Math.floor(pair.y / square)][Math.floor(pair.x / square)].toFood *= 0.9;
+
+            //this.ants[i].path.clear();
+
+            /*for(let j = 0; j < this.map.length; j++) {
+                for(let k = 0; k < this.map[i].length; k++){
+                    if (this.map[i][j].toHome > 0.001) this.map[i][j].toHome *= 0.8;
+                    if (this.map[i][j].toFood > 0.001) this.map[i][j].toFood *= 0.9;
+                }
+            }*/
+
             if (!this.ants[i].dead) {
                 this.ants[i].update(getNearFields(this.ants[i], this.map));
 
-                if (!isFieldValid(this.ants[i].location.x, this.ants[i].location.y)) {
+                let x = Math.floor(this.ants[i].location.x / square);
+                let y = Math.floor(this.ants[i].location.y / square);
+
+
+                if (!isFieldValid(x, y)) {
                     this.dead = true;
                     continue;
                 }
 
                 switch (this.ants[i].target) {
                     case false: {
-                        this.map[this.ants[i].location.y][this.ants[i].location.x].toHome += this.ants[i].homePheromones;
-                        this.ants[i].homePheromones *= 0.99;
-                        if (this.map[this.ants[i].location.y][this.ants[i].location.x].food.saturation !== 0) {
+                        this.map[y][x].toHome += this.ants[i].homePheromones;
+
+                        if (this.map[y][x].food.saturation !== 0) {
                             this.ants[i].target = true;
-                            this.ants[i].switchDirection();
-                            this.ants[i].foodPheromones = this.map[this.ants[i].location.y][this.ants[i].location.x].food.saturation;
+                            this.map[y][x].food.saturation--;
+                            this.food.add({x: x, y: y});
+                            this.ants[i].switchDirectionFromFood();
+                            this.ants[i].foodPheromones = this.map[y][x].food.saturation / 3;
                         }
                         break;
                     }
                     case true: {
-                        this.map[this.ants[i].location.y][this.ants[i].location.x].toFood += this.ants[i].foodPheromones;
-                        this.ants[i].foodPheromones *= 0.99;
-                        if (this.ants[i].location.x <= this.colony.x + 3 && this.ants[i].location.x >= this.colony.x - 3 &&
-                            this.ants[i].location.y <= this.colony.y + 3 && this.ants[i].location.y >= this.colony.y - 3) {
+                        this.map[y][x].toFood += this.ants[i].foodPheromones;
+
+                        if (x <= this.colony.x + 3 && x >= this.colony.x - 3 &&
+                            y <= this.colony.y + 3 && y >= this.colony.y - 3) {
                             this.ants[i].target = false;
                             this.ants[i].homePheromones = 1;
-                            this.ants[i].switchDirection();
+                            this.ants[i].switchDirectionFromFood();
                         }
                     }
                 }
 
+
+
             }
         }
-
-        // update map
-        // ...
-        // walls locations, food locations
-        // ...
     }
 
     initMap() {
@@ -67,6 +84,11 @@ export class Model {
 
     initColony(colonyX, colonyY) {
         this.colony = new Colony(colonyX, colonyY);
+        this.map[colonyY][colonyX].colony = true;
+        for(let i = -14; i < 14; i++){
+            for(let j = -14; j < 14; j++)
+                if(isFieldValid(colonyX + j, colonyY + i)) this.map[colonyY + i][colonyX + j].colony = true;
+        }
     }
 
     initAnts(antsNumber) {
@@ -78,7 +100,7 @@ export class Model {
         }
     }
 
-    set(x, y, state, food) {
+    set(x, y, wall, food) {
         let brushSize = parseInt(control.brushSize.textContent) / square;
         let sy = 0;
         let sx = 0;
@@ -94,7 +116,11 @@ export class Model {
         let dx = Math.min(this.map.length, sx + brushSize);
         for (let i = sy; i < dy; i++) {
             for (let j = sx; j < dx; j++) {
-                if (!food) this.map[i][j].wall = state;
+                if(!wall && !food) {
+                    this.map[i][j].food.saturation = 0;
+                    this.map[i][j].wall = false;
+                }
+                else if (wall && !food) this.map[i][j].wall = wall;
                 else this.map[i][j].food.addFood();
             }
         }
