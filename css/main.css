@@ -97,6 +97,16 @@ li {
 	color: var(--color-text)
 }
 
+.btn-danger-custom{
+	border-color: var(--color-text);
+	color: var(--color-text);
+}
+
+.btn-danger-custom:hover{
+	background-color: var(--color-header);
+	color: rgb(68, 14, 14);
+}
+
 .dropdown-menu {
 	--bs-dropdown-link-active-bg: rgb(226, 147, 3);
 }

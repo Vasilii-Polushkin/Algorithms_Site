@@ -1,6 +1,6 @@
 import { DecisionTree } from "./decisionTreeImplementation.js";
 import { maxDepthInput, minKnowledgeInput, newTrainingDataTable, builtInDataTable, ClassifyBtn,
-    CreateTreeBtn, percentToClassify,NewCSV,BuiltInCSV,createTreeMethod, isNewClassifyDataTableValid,
+    CreateTreeBtn, percentToClassify,NewCSV,BuiltInCSV,createTreeMethod, handleTrainFileValidation,handleClassifyFileValidation,
     classifyMethod,ThisCSV,newClassifyDataTable, makeNoClassifyFileSelectedError,makeNoTrainingFileSelectedError } from "./bindings.js";
 
 import { resetTreeTransformation } from "./transformations.js";
@@ -17,7 +17,10 @@ CreateTreeBtn.addEventListener("click", async ()=>{
     if (createTreeMethod == NewCSV)
     {
         if (newTrainingDataTable != undefined)
-            tree = new DecisionTree(newTrainingDataTable, maxDepthInput, minKnowledgeInput);
+        {
+            if (handleTrainFileValidation())
+                tree = new DecisionTree(newTrainingDataTable, maxDepthInput, minKnowledgeInput);
+        }
         else
             makeNoTrainingFileSelectedError();
     }
@@ -33,8 +36,15 @@ CreateTreeBtn.addEventListener("click", async ()=>{
 ClassifyBtn.addEventListener("click", ()=>{
     tree.stopClassifying();
     
+    if (tree.dataTable == undefined)
+    {
+        makeNoTrainingFileSelectedError();
+        return;
+    }
+
     if (classifyMethod == ThisCSV)
-        tree.classifyDataTable(percentToClassify)
+        tree.classifyDataTable(percentToClassify);
+
     else
     {
         if (newClassifyDataTable == undefined)
@@ -43,7 +53,7 @@ ClassifyBtn.addEventListener("click", ()=>{
             return;
         }
 
-        if (isNewClassifyDataTableValid())
+        if (handleClassifyFileValidation())
             tree.classifyDataTable(100, newClassifyDataTable)
     }
 });

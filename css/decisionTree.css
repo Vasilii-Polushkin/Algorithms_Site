@@ -144,3 +144,12 @@
   content: '';
   border-color: rgba(226, 147, 3, 0.9);
 }
+
+.grid{
+  display: flex;
+  justify-content: center;
+}
+
+.padding-top{
+  padding-top: 8px;
+}
