@@ -43,7 +43,6 @@ body {
 	overflow-x: hidden;
 	background-image: url(../images/background.jpg);
 	background-size: 50px;
-	overflow-x: hidden;
 
     -webkit-user-drag: none;
     user-select: none;
@@ -52,25 +51,100 @@ body {
     -ms-user-select: none;
 }
 
-input[type=range]::-webkit-slider-thumb {
-    background: #ffffff;
-}
-input[type=range]::-moz-range-thumb {
-    background: #ffffff;
-}
-input[type=range]::-ms-thumb {
-    background: #ffffff;
+a {
+    color: rgba(var(--bs-link-color-rgb),var(--bs-link-opacity,1));
+    text-decoration: underline;
 }
 
-input[type=range]::-webkit-slider-runnable-track {
-    background: rgb(205, 198, 195);
+* {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    border: 0 none;
 }
-input[type=range]::-moz-range-track {
-    background: rgb(205, 198, 195);
+
+/*
+*, *:before, *:after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
-input[type=range]::-ms-track {
-    background:rgb(205, 198, 195);
+*, ::after, ::before {
+    box-sizing: border-box;
+}*/
+
+user agent stylesheet
+a:-webkit-any-link {
+    color: -webkit-link;
+    cursor: pointer;
+    text-decoration: underline;
 }
+
+user agent stylesheet
+li {
+    text-align: -webkit-match-parent;
+}
+
+/* BOOSTRAP STYLES*/
+
+.toast{
+	background-color: rgb(123, 36, 36) !important;
+	color: var(--color-text)
+}
+
+.toast-header{
+	background-color: rgba(142, 44, 44, 0.8) !important;
+	color: var(--color-text)
+}
+
+.btn-danger-custom{
+	border-color: var(--color-text);
+	color: var(--color-text);
+}
+
+.btn-danger-custom:hover{
+	background-color: var(--color-header);
+	color: rgb(68, 14, 14);
+}
+
+.dropdown-menu {
+	--bs-dropdown-link-active-bg: rgb(226, 147, 3);
+}
+
+.form-check-input {
+    margin-top: 0.72em;
+}
+
+.form-select:focus{
+    border-color:rgba(255, 255, 255, 0.4);
+    box-shadow:0 0 0 .25rem rgba(255, 255, 255, 0.2);
+}
+
+.form-select:hover{
+    cursor: pointer;
+    border-color:rgba(255, 255, 255, 0.4);
+    box-shadow:0 0 0 .08rem rgba(255, 255, 255, 1);
+}
+
+/*select.decorated option:hover {
+    background-color: #000000 inset;
+}*/
+select option:hover {
+    background-color: rgb(226, 147, 3);
+}
+
+.form-range::-webkit-slider-thumb{background-color:#fff}
+.form-range::-webkit-slider-thumb:active{background-color:rgb(205, 198, 195);}
+.form-range::-webkit-slider-runnable-track{background-color: rgb(205, 198, 195)}
+
+.form-range:focus::-webkit-slider-thumb{box-shadow:0 0 0 1px #fff,0 0 0 .25rem rgba(255, 255, 255, 0.25)}
+
+.form-range:focus::-moz-range-thumb{box-shadow:0 0 0 1px #fff,0 0 0 .25rem rgba(205, 198, 195, 0.25)}
+.form-range::-moz-range-thumb{background-color:#fff}
+.form-range::-moz-range-thumb:active{background-color:rgb(205, 198, 195)}
+
+.form-check-input:focus{border-color:#ffffff; box-shadow:0 0 0 .25rem rgba(255, 255, 255, 0.25)}
+.form-check-input:checked{background-color:rgb(226, 147, 3);border-color:rgb(226, 147, 3)}
 
 /* USER STYLES */
 
@@ -89,4 +163,13 @@ input[type=range]::-ms-track {
 .accent {
 	color: var(--accent);
 	font-weight: bold;
+}
+
+.mainBg{
+	color: rgb(205, 198, 195);
+	background-image: url(../images/background.jpg);
+}
+
+.whitespaces-pre {
+	white-space: pre;
 }

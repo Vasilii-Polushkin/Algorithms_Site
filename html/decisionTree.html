@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	
+	<!-- default -->
+	<meta charset="utf-8">
+
+	<title>Decision Tree</title>
+	<meta name="description" content="Decision Tree">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<link rel="icon" href="../images/favicon.png">
+	<meta property="og:image" content="../images/preview.jpg">
+
+	<link rel="stylesheet" href="../libs/bootstrap/new css/bootstrap.min.css">
+
+	<link rel="stylesheet" href="../css/main.css">
+	<link rel="stylesheet" href="../css/media.css">
+
+	<script src="../libs/jquery/jquery-3.6.0.min.js" defer></script>
+
+	<script src="../libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+	<link rel="stylesheet" href="../node_modules/bootstrap-icons/font/bootstrap-icons.min.css">
+	<!-- default -->
+
+	<link rel="stylesheet" href="../css/UploadFile.css">
+	<link rel="stylesheet" href="../css/decisionTree.css">
+	
+	<script type = "module" src="../js/decisionTree/ts/decisionTree/mainModule.js" defer></script>
+	
+</head>
+
+<body>
+
+	<!-- header -->
+	<header class="p-2 text-bg-dark">
+		<div class = "container">
+			<div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+				<ul class="nav col-7 col-lg-auto me-lg-auto justify-content-center mb-md-0">
+					<li><a href="../index.html" class="nav-link px-2 text-secondary">Home</a></li>
+					<li><a href="../html/Astar.html" class="nav-link px-2 text-white-50">A* algorithm</a></li>
+					<li><a href="#" class="nav-link px-2 text-white-50">Clusterization</a></li>
+					<li><a href="#" class="nav-link px-2 text-white-50">Genetic tree</a></li>
+					<li><a href="#" class="nav-link px-2 text-white-50">Neural network</a></li>
+					<li><a href="../html/decisionTree.html" class="nav-link px-2 text-white-50">Decision tree</a></li>
+					<li><a href="#" class="nav-link px-2 text-white-50">Ant colony</a></li>
+				</ul>
+
+				<ul class="nav col-1 col-lg-auto me-lg-5 justify-content-end mb-md-0">
+					<a class="navbar-brand" href="https://github.com/Vasilii-Polushkin/Algorithms_Site">
+							<i class="bi bi-github" style="font-size: 1.6rem; color: rgba(213, 204, 204, 0.85);"></i>
+					</a>
+				</ul>
+			</div>
+		</div>
+	</header>
+
+	<!-- TOASTS -->
+
+	<div class="toast-container position-fixed bottom-0 end-0 p-3">
+
+		<!-- TRAINING FILE -->
+		<div id="noTrainingFileToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+		  <div class="toast-header">
+			<i class="bi-exclamation-triangle"></i>
+			<strong class="me-auto whitespaces-pre">   No File Selected!</strong>
+			<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+		  </div>
+		  <div class="toast-body">
+			Select Training File
+		  </div>
+		</div>
+
+		<!-- CLASSIFICATION FILE -->
+		<div id="noClassifyFileToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+			<div class="toast-header">
+				<i class="bi-exclamation-triangle"></i>
+				<strong class="me-auto whitespaces-pre">   No File Selected!</strong>
+				<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+			</div>
+			<div class="toast-body">
+				Select Classification File
+			</div>
+		</div>
+
+		<!-- FILE VALIDATION -->
+		<div id="notValidFileToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+			<div class="toast-header">
+				<i class="bi-exclamation-triangle"></i>
+				<strong class="me-auto whitespaces-pre">   File Is Not Valid!</strong>
+				<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+			</div>
+			<div class="toast-body">
+				<output id = "fileValidationOutput"></output>
+				<div class = "grid padding-top">
+					<button type="button" class="btn btn-outline-light btn-danger-custom" data-bs-dismiss="toast" aria-label="Close" id = "validateRequest">
+						<output id = "validationRequestOutput"></output>
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- FILE VALIDATION WITH NO VALIDATE BUTTON-->
+		<div id="notValidFileToastWithNoValidateBtn" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+			<div class="toast-header">
+				<i class="bi-exclamation-triangle"></i>
+				<strong class="me-auto whitespaces-pre">   File Is Not Valid!</strong>
+				<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+			</div>
+			<div class="toast-body">
+				<output id = "fileValidationOutputWithNoValidateBtn"></output>
+			</div>
+		</div>
+	</div>
+
+	<!-- MAIN -->
+	
+	<div class="offcanvas offcanvas-end mainBg" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+		<div class="offcanvas-header">
+			<h5 class="offcanvas-title" id="offcanvasRightLabel">Create New Tree</h5>
+		</div>
+
+		<div class="offcanvas-body">
+
+			<div class="form-check">
+				<input class="form-check-input" type="radio" name="CreateTreeRadio" id="CreateTreeRadioNewCSV">
+				<!-- file uppload -->
+				<div class="file-upload" id = "file-upload-train">
+					<div class="file-select">
+						<div class="file-select-button" id="chooseTrainingFileBtn">Choose File</div>
+						<div class="file-select-name" id="noTrainigFile">No file chosen...</div> 
+						<input type="file" name="chooseTrainingFile" id="chooseTrainingFile">
+					</div>
+				</div>
+			</div>
+
+			<div class="form-check">
+				<input class="form-check-input" type="radio" name="CreateTreeRadio" id="CreateTreeRadioBuilInCSV" checked>
+				<label for = "city-select">Or Choose Built-in Dataset Selector</label>
+				<select class = "form-select" id = "BuiltInDatasetSelector">
+					<option value="0" selected>HeartAttacks</option>
+					<option value="1">Iris</option>
+				</select>
+			</div>
+
+			<!-- max depth range form --><br>
+			<label for="MaxDepthRange" class="form-label">Tree Max Depth: <output id="MaxDepthOutput"></output> </label>
+			<input type="range" class="form-range" min="1" max="100" step="1" id="MaxDepthRange" value="10">
+
+			<!-- min knowledge range form --><br>
+			<label for="MinKnowledgeRange" class="form-label">Min Knowledge Gain: <output id="MinKnowledgeOutput"></output> </label>
+			<input type="range" class="form-range" min="0" max="100" step="1" id="MinKnowledgeRange" value="15">
+
+			<!-- create tree button --><br><br>
+			<button type="button" class="btn btn-outline-light" id = "CreateTreeBtn">Create Tree</button><br><br>
+
+		</div>
+
+
+		<div class="offcanvas-header">
+			<h5 class="offcanvas-title" id="offcanvasRightLabel">Select Classification Dataset</h5>
+		</div>
+
+		<div class="offcanvas-body">
+
+			<div class="form-check">
+				<input class="form-check-input" type="radio" name="ClassificationRadio" id="ClassifyRadioNewCSV">
+				<!-- file uppload -->
+				<div class="file-upload" id = "file-upload-classify">
+					<div class="file-select">
+						<div class="file-select-button" id="chooseClassificationFileBtn">Choose File</div>
+						<div class="file-select-name" id="noClassificationFile">No file chosen...</div> 
+						<input type="file" name="chooseClassificationFile" id="chooseClassificationFile">
+					</div>
+				</div>
+			</div>
+			<div class="form-check">
+				<input class="form-check-input" type="radio" name="ClassificationRadio" id="ClassifyRadioThisCSV" checked>
+				<!-- percent to classify range form -->
+				<label for="PercentToClassifyRange" class="form-label">Or Classify From Training Dataset: <output id="PercentToClassifyOutput"></output>%</label>
+				<input type="range" class="form-range" min="0" max="100" step="1" id="PercentToClassifyRange" value="30">
+			</div>
+		</div>
+	</div>
+	<div class = "row g-0 text-center padding">
+		<div class="col-sm-3 col-md-3">
+			<button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+				Tree Settings
+			</button>
+		</div>
+
+			<!-- statictics -->
+		<div class="col-sm-3 col-md-3">
+			Classified: <output id="Classified">0</output>/<output id="TotalToClassify">0</output><br>
+			Classified Wrong: <output id="WrongClassified">0</output>
+		</div>
+
+			<!-- iterations delay range form -->
+		<div class="col-sm-3 col-md-3">
+			<label for="IterationsDelayRange" class="form-label">Iterations Delay: <output id="IterationsDelayOutput"></output> ms</label>
+			<input type="range" class="form-range" min="5" max="1000" step="5" id="IterationsDelayRange" value="200">
+		</div>
+			<!-- classify btn -->
+		<div class="col-sm-3 col-md-3">
+			<button type="button" class="btn btn-outline-light" id = "ClassifyBtn">Classify</button>
+		</div>
+	</div>
+	<div class = "container-fluid">
+		<div class = "window" id = "movable">
+			<!-- tree -->
+			<div class = "center">
+				<div class="node" id = "tree">
+					<ul id = "placeHolder" style="height: 0px; padding-top: 0px;">
+				
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>
