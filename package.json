@@ -12,9 +12,10 @@
   },
   "private": true,
   "dependencies": {
-    "mnist": "^1.1.0",
     "bootstrap-icons": "^1.11.3",
-    "lodash-es": "^4.17.21"
+    "d3": "^7.9.0",
+    "lodash-es": "^4.17.21",
+    "mnist": "^1.1.0"
   },
   "type": "module"
 }

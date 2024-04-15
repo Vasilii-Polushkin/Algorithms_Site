@@ -1,4 +1,4 @@
-import { heartAttackDataTable, dataTablesArray } from "../../../../csvs/BuiltInCsvs.js";
+import { heartAttackDataTable, dataTablesArray } from "./utilities/BuiltInCsvs.js";
 import { tree } from "./mainModule.js";
 
 export let newTrainingDataTable,
@@ -272,7 +272,7 @@ export function handleClassifyFileValidation()
       SetNoClassificationFile();
     }
     else
-    {
+    { 
       switch (errStrings.btnString)
       {
         case "Filter file by row length":

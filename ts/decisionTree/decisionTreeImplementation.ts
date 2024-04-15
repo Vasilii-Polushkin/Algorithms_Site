@@ -5,7 +5,6 @@ import { iterationsDelay,SetClassifiedAmount,SetClassifiedWrong,SetTotalToClassi
 //обрабатываем каждый столбец(атрибут) поочередно
 //сначала определяем тип атрибута
 //потом преобразуем столб в сет и находим всевозможные условия, которые могут быть в узлах дерева
-
 export class TreeNode
 {
     parent: TreeNode;
@@ -19,7 +18,7 @@ export class TreeNode
     entropy: number = 0;
     samplesAmount: number = 0;
     samplesIDs: number[] = [];
-
+ 
     ownerTree: DecisionTree;
 
     constructor(ownerTree: DecisionTree, parent: TreeNode)
