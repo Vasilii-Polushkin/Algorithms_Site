@@ -133,10 +133,6 @@
   transition: all ease .1s;
 }
 
-.padding{
-  padding: .5%;
-}
-
 .node li a:hover+ul li::after, 
 .node li a:hover+ul li::before, 
 .node li a:hover+ul::before, 

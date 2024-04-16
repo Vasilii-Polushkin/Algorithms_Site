@@ -1,8 +1,5 @@
-const populationSize = 99;
-//const initialTemp = 100000;
-//const tempMultiplier = 0.9;
-//const tempTreshold = 1000;
-let generationsAmount = 100000;
+/*const populationSize = 90;
+let generationsAmount = 500;
 const percentToMutate = 30;
 const percentToCross = 40;
 // кол-во городов
@@ -142,7 +139,7 @@ function getRandomCreatureID(): number
     return Math.floor(Math.random() * populationSize);
 }
 
-function modifyGeneration(): void
+function modifyPopulationOnce(): void
 {
     const creature1 = currPopulation[getRandomCreatureID()];
     const creature2 = currPopulation[getRandomCreatureID()];
@@ -161,29 +158,46 @@ function modifyGeneration(): void
     currPopulation.push(newCreature2);
 }
 
+function modifyPopulation(): void
+{
+    for (let i = 0; i < populationSize * percentToCross / 100; ++i)
+        modifyPopulationOnce();
+}
+
 function selectGeneration():void
 {
     currPopulation.sort((crt1, crt2) => crt1.fitting - crt2.fitting);
     currPopulation.length = populationSize;
 }
 
-
-
 function generatePoints(): void
 {
     for (let i = 0; i < genotypeSize; ++i)
-    {
         points[i] = new Point(Math.random()*100, Math.random()*100);
-    }
 }
+
 
 // algorithm itself
 generatePoints();
 fillInitualPopulation();
-while (generationsAmount--)
+
+let generationsWithoutChanges = 0;
+let prevBestFitting: number;
+
+while (generationsWithoutChanges < 150)
 {
+    if (prevBestFitting == currPopulation[0].fitting)
+    {
+        generationsWithoutChanges++;
+    }
+    else
+    {
+        prevBestFitting = currPopulation[0].fitting;
+        generationsWithoutChanges = 0;
+    }
+
     selectGeneration();
     //visualize(currPopulation[0]);
     console.log(currPopulation[0].fitting);
-    modifyGeneration();
-}
+    modifyPopulation();
+}*/

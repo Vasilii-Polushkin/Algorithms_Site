@@ -27,11 +27,17 @@
 	<!-- default -->
 
 	<link rel="stylesheet" href="../css/genetic.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
 	<script type = "module" src="../js-compiled/ts/genetic/genetic.js" defer></script>
+	<script type = "module" src="../js-compiled/ts/genetic/visualisation.js" defer></script>
 	
 </head>
 
 <body>
+	
+	<!-- CANVAS -->
+	<canvas id="c"></canvas>
+
 	<!-- header -->
 	<header class="p-2 text-bg-dark">
 		<div class = "container">
@@ -55,7 +61,114 @@
 		</div>
 	</header>
 
+	<!-- TOASTS -->
+
+	<div class="toast-container position-fixed bottom-0 end-0 p-3">
+
+		<!-- TRAINING FILE -->
+		<div id="noTrainingFileToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+		  <div class="toast-header">
+			<i class="bi-exclamation-triangle"></i>
+			<strong class="me-auto whitespaces-pre">   No File Selected!</strong>
+			<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+		  </div>
+		  <div class="toast-body">
+			Select Training File
+		  </div>
+		</div>
+
+		<!-- CLASSIFICATION FILE -->
+		<div id="noClassifyFileToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+			<div class="toast-header">
+				<i class="bi-exclamation-triangle"></i>
+				<strong class="me-auto whitespaces-pre">   No File Selected!</strong>
+				<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+			</div>
+			<div class="toast-body">
+				Select Classification File
+			</div>
+		</div>
+
+		<!-- FILE VALIDATION -->
+		<div id="notValidFileToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+			<div class="toast-header">
+				<i class="bi-exclamation-triangle"></i>
+				<strong class="me-auto whitespaces-pre">   File Is Not Valid!</strong>
+				<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+			</div>
+			<div class="toast-body">
+				<output id = "fileValidationOutput"></output>
+				<div class = "grid padding-top">
+					<button type="button" class="btn btn-outline-light btn-danger-custom" data-bs-dismiss="toast" aria-label="Close" id = "validateRequest">
+						<output id = "validationRequestOutput"></output>
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- FILE VALIDATION WITH NO VALIDATE BUTTON-->
+		<div id="notValidFileToastWithNoValidateBtn" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+			<div class="toast-header">
+				<i class="bi-exclamation-triangle"></i>
+				<strong class="me-auto whitespaces-pre">   File Is Not Valid!</strong>
+				<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+			</div>
+			<div class="toast-body">
+				<output id = "fileValidationOutputWithNoValidateBtn"></output>
+			</div>
+		</div>
+	</div>
+
+	<!-- MAIN -->
 	
+	<div class="offcanvas offcanvas-end mainBg" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+
+		<div class="offcanvas-header">
+			<h5 class="offcanvas-title" id="offcanvasRightLabel">Set up constants</h5>
+		</div>
+
+		<div class="offcanvas-body">
+			<!-- max depth range form --><br>
+			<label for="PopulationSizeRange" class="form-label">Population Size: <output id="PopulationSizeOutput"></output></label>
+			<input type="range" class="form-range" min="1" max="300" step="1" id="PopulationSizeRange" value="90">
+
+			<!-- percent to mutate range form --><br>
+			<label for="PercentToMutateRange" class="form-label">Probability To Mutate: <output id="PercentToMutateOutput"></output>%</label>
+			<input type="range" class="form-range" min="0" max="100" step="1" id="PercentToMutateRange" value="30">
+
+			<!-- percent to cross range form --><br>
+			<label for="PercentToCrossRange" class="form-label">Probability To Cross: <output id="PercentToCrossOutput"></output>%</label>
+			<input type="range" class="form-range" min="0" max="100" step="1" id="PercentToCrossRange" value="40">
+
+			<!-- generations without changes range form --><br>
+			<label for="GenerationsWithoutChangesRange" class="form-label">Generations Without Changes: <output id="GenerationsWithoutChangesOutput"></output></label>
+			<input type="range" class="form-range" min="1" max="500" step="1" id="GenerationsWithoutChangesRange" value="150">
+		</div>
+	</div>
+
+	<div class = "row g-0 text-center padding">
+		<div class="col-sm-3 col-md-3">
+			<button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+				Settings
+			</button>
+		</div>
+
+			<!-- statictics -->
+		<div class="col-sm-3 col-md-3">
+			Generations without changes: <output id="PathLengthOutput">0</output><br>
+			Path length: <output id="PathLengthOutput">0</output>
+		</div>
+
+			<!-- Generations range form -->
+		<div class="col-sm-3 col-md-3">
+			<label for="GenerationsRange" class="form-label">Generation: <output id="CurrGenerationOutput">0</output>/<output id="TotalGenerationsOutput">0</output></label>
+			<input type="range" class="form-range" min="0" max="0" step="1" id="GenerationsRange" value="0">
+		</div>
+			<!-- run btn -->
+		<div class="col-sm-3 col-md-3">
+			<button type="button" class="btn btn-outline-light" id = "RunBtn">Run algorithm</button>
+		</div>
+	</div>
 </body>
 
 </html>
