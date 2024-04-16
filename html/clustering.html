@@ -61,23 +61,23 @@
     <div id="items">
         <div>
             <div class="item">
-                <h5>K-means</h5>
+                <h5 id="K-means_caption">K-means</h5>
                 <canvas width="350" height="350" id="K-means"></canvas>
             </div>
 
             <div class="item">
-                <h5>C-means</h5>
+                <h5 id="C-means_caption">C-means</h5>
                 <canvas width="350" height="350" id="C-means"></canvas>
             </div>
         </div>
         <div>
             <div class="item">
-                <h5>Hierarchical clustering</h5>
+                <h5 id="Hierarchical_caption">Hierarchical clustering</h5>
                 <canvas width="350" height="350" id="HierarchicalClustering"></canvas>
             </div>
 
             <div class="item">
-                <h5>DBSCAN</h5>
+                <h5 id="DBSCAN_caption">DBSCAN</h5>
                 <canvas width="350" height="350" id="DBSCAN"></canvas>
             </div>
         </div>
@@ -85,7 +85,6 @@
 
 
     <div id="menu">
-        <canvas width="300" height="300" id="main"></canvas>
         <div class="mb-3">
             <label for="numberOfClusters" class="form-label"></label>
             <input type="number" class="form-control" id="numberOfClusters" placeholder="Enter the number of clusters" step="1" min="1">

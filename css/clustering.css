@@ -31,6 +31,10 @@ canvas {
 .mb-3 {
 }
 
+#alert {
+
+}
+
 body, html {
     height: 98.5%;
     display:flex;
