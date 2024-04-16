@@ -1,4 +1,4 @@
-//import {canvas_K_means, K_means, ctx, Point} from "./main.js";
+//import {canvas_K_means, K_means, ctx_K_means, Point} from "./main.js";
 
 //import {control} from "control.js";
 
@@ -8,9 +8,11 @@ let numberOfClusters;
 
 const MAX = 10000;
 const canvas_K_means = document.querySelector('#K-means');
+const canvas_C_means = document.querySelector('#C-means');
 let w = canvas_K_means.width;
 let h = canvas_K_means.height;
-const ctx = canvas_K_means.getContext('2d');
+const ctx_K_means = canvas_K_means.getContext('2d');
+const ctx_C_means = canvas_C_means.getContext('2d');
 
 
 export class Point {
@@ -39,7 +41,7 @@ function getRandomColor() {
 }
 
 function K_means() {
-    ctx.clearRect(0, 0, w, h);
+    ctx_K_means.clearRect(0, 0, w, h);
 
     // choose centres of clusters using k-means++ algorithm
     let clusters = [];
@@ -132,6 +134,18 @@ function K_means() {
     control.draw_K_means(clusters);
 }
 
+function C_means() {
+    ctx_C_means.clearRect(0, 0, w, h);
+
+
+
+    let probabilityMatrix = new Array(numberOfClusters);
+    for(let i = 0; i < probabilityMatrix.length; i++) {
+        probabilityMatrix[i] = new Array(control.points.length);
+
+    }
+}
+
 function AgglomerativeHierarchicalClustering () {
 
 }
@@ -152,31 +166,31 @@ class Control {
         let point = new Point(e.pageX - canvas_K_means.getBoundingClientRect().left, e.pageY - canvas_K_means.getBoundingClientRect().top);
         if(!this.isPointAlreadyExist(point)) {
             this.points.push(point);
-            ctx.beginPath();
-            ctx.arc(point.x, point.y, 2, 0, Math.PI * 2);
-            ctx.fillStyle = '#fff';
-            ctx.fill();
-            ctx.closePath();
+            ctx_K_means.beginPath();
+            ctx_K_means.arc(point.x, point.y, 2, 0, Math.PI * 2);
+            ctx_K_means.fillStyle = '#fff';
+            ctx_K_means.fill();
+            ctx_K_means.closePath();
         }
     }
 
     draw_K_means = (clusters) => {
-        ctx.clearRect(0, 0, ctx.width, ctx.height);
+        ctx_K_means.clearRect(0, 0, w, h);
         for (let i = 0; i < clusters.length; i++) {
             for (let j = 0; j < clusters[i].points.length; j++) {
-                ctx.beginPath();
-                ctx.arc(clusters[i].points[j].x, clusters[i].points[j].y, 2, 0, Math.PI * 2);
-                ctx.fillStyle = clusters[i].color;
-                ctx.fill();
-                ctx.closePath();
+                ctx_K_means.beginPath();
+                ctx_K_means.arc(clusters[i].points[j].x, clusters[i].points[j].y, 2, 0, Math.PI * 2);
+                ctx_K_means.fillStyle = clusters[i].color;
+                ctx_K_means.fill();
+                ctx_K_means.closePath();
 
-                ctx.beginPath();
-                ctx.moveTo(clusters[i].centre.x, clusters[i].centre.y);
-                ctx.lineTo(clusters[i].points[j].x, clusters[i].points[j].y);
-                ctx.strokeStyle = clusters[i].color;
-                ctx.lineWidth = "1";
-                ctx.stroke();
-                ctx.closePath();
+                ctx_K_means.beginPath();
+                ctx_K_means.moveTo(clusters[i].centre.x, clusters[i].centre.y);
+                ctx_K_means.lineTo(clusters[i].points[j].x, clusters[i].points[j].y);
+                ctx_K_means.strokeStyle = clusters[i].color;
+                ctx_K_means.lineWidth = "1";
+                ctx_K_means.stroke();
+                ctx_K_means.closePath();
             }
         }
     }
@@ -191,10 +205,25 @@ class Control {
 }
 
 function restart () {
-    ctx.clearRect(0, 0, w, h);
+    ctx_K_means.clearRect(0, 0, w, h);
+    ctx_C_means.clearRect(0, 0, w, h);
 
     control.points = [];
 }
+
+
+/*const alertPlaceholder = document.getElementById('alert')
+const appendAlert = (message, type) => {
+    const wrapper = document.createElement('div')
+    wrapper.innerHTML = [
+        <div class="alert alert-${type} alert-dismissible alert-light" role="alert">,
+            <div>${message}</div>,
+            '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+            '</div>'
+    ].join('')
+
+    alertPlaceholder.append(wrapper);
+}*/
 
 function runAlgorithm () {
     numberOfClusters = parseInt(inputNumberOfClusters.value);
@@ -204,6 +233,7 @@ function runAlgorithm () {
     }
 
     K_means();
+    C_means();
     AgglomerativeHierarchicalClustering();
     DBSCAN();
 }
