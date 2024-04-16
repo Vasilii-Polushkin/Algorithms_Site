@@ -1,0 +1,39 @@
+section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 20px;
+}
+
+#menu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+canvas {
+    outline: #ffffff 1px solid;
+    border-radius: 3px;
+}
+
+#items {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.item {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.mb-3 {
+}
+
+body, html {
+    height: 98.5%;
+    display:flex;
+    flex-direction: column;
+    justify-content: space-between;
+}

@@ -2,7 +2,10 @@
 
 //import {control} from "control.js";
 
-let numberOfClusters = 3;
+let inputNumberOfClusters = document.getElementById('numberOfClusters');
+let numberOfClusters;
+
+
 const MAX = 10000;
 const canvas_K_means = document.querySelector('#K-means');
 let w = canvas_K_means.width;
@@ -35,7 +38,7 @@ function getRandomColor() {
     return color;
 }
 
-export function K_means() {
+function K_means() {
     ctx.clearRect(0, 0, w, h);
 
     // choose centres of clusters using k-means++ algorithm
@@ -126,16 +129,14 @@ export function K_means() {
         }
     } while (numberOfMatches !== clusters.length)
 
-    console.log(clusters);
-
     control.draw_K_means(clusters);
 }
 
-class AgglomerativeHierarchicalClustering {
+function AgglomerativeHierarchicalClustering () {
 
 }
 
-class DBSCAN {
+function DBSCAN () {
 
 }
 
@@ -148,7 +149,7 @@ class Control {
     }
 
     newPoint = (e) => {
-        let point = new Point(e.clientX - canvas_K_means.offsetLeft, e.clientY - canvas_K_means.offsetTop);
+        let point = new Point(e.pageX - canvas_K_means.getBoundingClientRect().left, e.pageY - canvas_K_means.getBoundingClientRect().top);
         if(!this.isPointAlreadyExist(point)) {
             this.points.push(point);
             ctx.beginPath();
@@ -195,9 +196,21 @@ function restart () {
     control.points = [];
 }
 
+function runAlgorithm () {
+    numberOfClusters = parseInt(inputNumberOfClusters.value);
+    if(numberOfClusters < 1 || inputNumberOfClusters.valueAsNumber !== Math.floor(numberOfClusters) || numberOfClusters > control.points.length) {
+
+        return;
+    }
+
+    K_means();
+    AgglomerativeHierarchicalClustering();
+    DBSCAN();
+}
+
 let control = new Control();
 let runBtn = document.getElementById('run');
 let restartBtn = document.getElementById('clear');
 
-runBtn.addEventListener('click', K_means);
+runBtn.addEventListener('click', runAlgorithm);
 restartBtn.addEventListener('click', restart);

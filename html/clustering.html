@@ -26,6 +26,7 @@
     <!-- default -->
 
     <script type = "module" src="../js/clustering/control.js" defer></script>
+    <link rel="stylesheet" href="../css/clustering.css">
 
 </head>
 <body>
@@ -55,9 +56,50 @@
 
 
 <!-- main -->
-<canvas width="500" height="500" id="K-means"></canvas>
-<button id="run" class="btn btn-outline-light w-100" type="button">Run algorithm</button>
-<button id="clear" class="btn btn-outline-light w-100" type="button">Restart</button>
+<section>
+
+    <div id="items">
+        <div>
+            <div class="item">
+                <h5>K-means</h5>
+                <canvas width="350" height="350" id="K-means"></canvas>
+            </div>
+
+            <div class="item">
+                <h5>C-means</h5>
+                <canvas width="350" height="350" id="C-means"></canvas>
+            </div>
+        </div>
+        <div>
+            <div class="item">
+                <h5>Hierarchical clustering</h5>
+                <canvas width="350" height="350" id="HierarchicalClustering"></canvas>
+            </div>
+
+            <div class="item">
+                <h5>DBSCAN</h5>
+                <canvas width="350" height="350" id="DBSCAN"></canvas>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="menu">
+        <canvas width="300" height="300" id="main"></canvas>
+        <div class="mb-3">
+            <label for="numberOfClusters" class="form-label"></label>
+            <input type="number" class="form-control" id="numberOfClusters" placeholder="Enter the number of clusters" step="1" min="1">
+        </div>
+        <button id="run" class="btn btn-outline-light w-100" type="button">Cluster</button>
+        <button id="clear" class="btn btn-outline-light w-100" type="button">Restart</button>
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            Invalid number of clusters
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+
+</section>
+
 <!-- main -->
 
 </body>
