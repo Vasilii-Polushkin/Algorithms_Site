@@ -140,120 +140,132 @@ class City {
     _draw(context) {
         let gradientient, radius;
         context.save();
-        gradientient = context.createRadialGradient(this.x, this.y, this.radius, this.x, this.y, this.radius * 5);
-        gradientient.addColorStop(0, 'rgba(0, 0, 0, 0.1)');
-        gradientient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-        context.beginPath();
-        context.arc(this.x, this.y, this.radius * 5, 0, Math.PI * 2, false);
-        context.fillStyle = gradientient;
-        context.fill();
+        /*
+                gradientient = context.createRadialGradient(this.x, this.y, this.radius, this.x, this.y, this.radius * 5);
+                gradientient.addColorStop(0, 'rgba(0, 0, 0, 0.1)');
+                gradientient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                context.beginPath();
+                context.arc(this.x, this.y, this.radius * 5, 0, Math.PI * 2, false);
+                context.fillStyle = gradientient;
+                context.fill();
+        */
         radius = Math.random() * this.currentRadius * 0.7 + this.currentRadius * 0.3;
-        gradientient = context.createRadialGradient(this.x, this.y, radius, this.x, this.y, this.currentRadius);
+        /*gradientient = context.createRadialGradient(this.x, this.y, radius, this.x, this.y, this.currentRadius);
         gradientient.addColorStop(0, 'rgba(0, 0, 0, 1)');
-        gradientient.addColorStop(1, Math.random() < 0.2 ? 'rgba(255, 196, 0, 0.15)' : 'rgba(103, 181, 191, 0.75)');
+        gradientient.addColorStop(1, Math.random() < 0.2 ? 'rgba(255, 196, 0, 0.15)' : 'rgba(103, 181, 191, 0.75)');*/
         context.beginPath();
         context.arc(this.x, this.y, this.currentRadius, 0, Math.PI * 2, false);
-        context.fillStyle = gradientient;
+        //context.fillStyle = gradientient;
         context.fill();
         context.restore();
     }
 }
 ;
 // Initialize
-(function () {
-    // Configs
-    const BACKGROUND_COLOR = 'rgba(11, 51, 56, 1)', CITY_RADIUS = 10;
-    // lets
-    let canvas, context, bufferCanvas, bufferContext, screenWidth, screenHeight, mouse = new Vector(), cities = [], gradient;
-    // Event Listeners
-    function resize() {
-        screenWidth = canvas.width = window.innerWidth;
-        screenHeight = canvas.height = window.innerHeight;
-        bufferCanvas.width = screenWidth;
-        bufferCanvas.height = screenHeight;
-        context = canvas.getContext('2d');
-        bufferContext = bufferCanvas.getContext('2d');
-        let cx = canvas.width * 0.5, cy = canvas.height * 0.5;
-        gradient = context.createRadialGradient(cx, cy, 0, cx, cy, Math.sqrt(cx * cx + cy * cy));
-        gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0.35)');
+// Configs
+const BACKGROUND_COLOR = 'rgba(11, 51, 56, 1)', CITY_RADIUS = 10;
+// lets
+let canvas, context, bufferCanvas, bufferContext, screenWidth, screenHeight, mouse = new Vector(), cities = [], gradient;
+// Event Listeners
+function resize() {
+    screenWidth = canvas.width = window.innerWidth;
+    screenHeight = canvas.height = window.innerHeight;
+    bufferCanvas.width = screenWidth;
+    bufferCanvas.height = screenHeight;
+    context = canvas.getContext('2d');
+    bufferContext = bufferCanvas.getContext('2d');
+    let cx = canvas.width * 0.5, cy = canvas.height * 0.5;
+    gradient = context.createRadialGradient(cx, cy, 0, cx, cy, Math.sqrt(cx * cx + cy * cy));
+    gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 0.35)');
+}
+function mouseMove(e) {
+    mouse.set(e.clientX, e.clientY);
+    let i, city, hit = false;
+    for (i = cities.length - 1; i >= 0; i--) {
+        city = cities[i];
+        if ((!hit && city.hitTest(mouse)) || city.dragging)
+            city.isMouseOver = hit = true;
+        else
+            city.isMouseOver = false;
     }
-    function mouseMove(e) {
-        mouse.set(e.clientX, e.clientY);
-        let i, city, hit = false;
-        for (i = cities.length - 1; i >= 0; i--) {
-            city = cities[i];
-            if ((!hit && city.hitTest(mouse)) || city.dragging)
-                city.isMouseOver = hit = true;
-            else
-                city.isMouseOver = false;
-        }
-        canvas.style.cursor = hit ? 'pointer' : 'default';
-    }
-    function mouseDown(e) {
-        for (let i = cities.length - 1; i >= 0; i--) {
-            if (cities[i].isMouseOver) {
-                cities[i].startDrag(mouse);
-                return;
-            }
-        }
-        cities.push(new City(e.clientX, e.clientY, CITY_RADIUS, {
-            cities: cities
-        }));
-    }
-    function mouseUp() {
-        for (let i = 0, length = cities.length; i < length; i++) {
-            if (cities[i].dragging) {
-                cities[i].endDrag();
-                break;
-            }
+    canvas.style.cursor = hit ? 'pointer' : 'default';
+}
+function mouseDown(e) {
+    for (let i = cities.length - 1; i >= 0; i--) {
+        if (cities[i].isMouseOver) {
+            cities[i].startDrag(mouse);
+            return;
         }
     }
-    function doubleClick() {
-        for (let i = cities.length - 1; i >= 0; i--) {
-            if (cities[i].isMouseOver) {
-                cities[i].collapse();
-                break;
-            }
+    cities.push(new City(e.clientX, e.clientY, CITY_RADIUS, {
+        cities: cities
+    }));
+}
+function mouseUp() {
+    for (let i = 0, length = cities.length; i < length; i++) {
+        if (cities[i].dragging) {
+            cities[i].endDrag();
+            break;
         }
     }
-    // Init
-    canvas = document.getElementById('c');
-    bufferCanvas = document.createElement('canvas');
-    window.addEventListener('resize', resize, false);
-    resize(null);
-    canvas.addEventListener('mousemove', mouseMove, false);
-    canvas.addEventListener('mousedown', mouseDown, false);
-    canvas.addEventListener('mouseup', mouseUp, false);
-    canvas.addEventListener('dblclick', doubleClick, false);
-    // Start Update
-    let loop = function () {
-        let i, length, city;
-        context.save();
-        context.fillStyle = BACKGROUND_COLOR;
-        context.fillRect(0, 0, screenWidth, screenHeight);
-        context.fillStyle = gradient;
-        context.fillRect(0, 0, screenWidth, screenHeight);
-        context.restore();
-        for (i = 0, length = cities.length; i < length; i++) {
-            city = cities[i];
-            if (city.dragging)
-                city.drag(mouse);
-            city.render(context);
-            if (city.destroyed) {
-                cities.splice(i, 1);
-                length--;
-                i--;
-            }
+}
+function doubleClick() {
+    for (let i = cities.length - 1; i >= 0; i--) {
+        if (cities[i].isMouseOver) {
+            cities[i].collapse();
+            break;
         }
-        bufferContext.save();
-        bufferContext.globalCompositeOperation = 'destination-out';
-        bufferContext.globalAlpha = 0.35;
-        bufferContext.fillRect(0, 0, screenWidth, screenHeight);
-        bufferContext.restore();
-        context.drawImage(bufferCanvas, 0, 0);
-        requestAnimationFrame(loop);
-    };
-    loop();
-})();
+    }
+}
+// Init
+canvas = document.getElementById('c');
+bufferCanvas = document.createElement('canvas');
+window.addEventListener('resize', resize, false);
+resize(null);
+canvas.addEventListener('mousemove', mouseMove, false);
+canvas.addEventListener('mousedown', mouseDown, false);
+canvas.addEventListener('mouseup', mouseUp, false);
+canvas.addEventListener('dblclick', doubleClick, false);
+export function drawLines(nodesOrder) {
+    context.save();
+    context.beginPath();
+    if (nodesOrder.length != 0)
+        context.moveTo(nodesOrder.at(-1).x, nodesOrder.at(-1).y);
+    for (let i = 0, length = nodesOrder.length; i < length; ++i) {
+        context.lineWidth = 3;
+        context.lineTo(nodesOrder[i].x, nodesOrder[i].y);
+        context.stroke();
+    }
+    context.restore();
+}
+// Start Update
+let loop = function () {
+    let i, length, city;
+    context.save();
+    context.fillStyle = BACKGROUND_COLOR;
+    context.fillRect(0, 0, screenWidth, screenHeight);
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, screenWidth, screenHeight);
+    context.restore();
+    for (i = 0, length = cities.length; i < length; i++) {
+        city = cities[i];
+        if (city.dragging)
+            city.drag(mouse);
+        city.render(context);
+        if (city.destroyed) {
+            cities.splice(i, 1);
+            length--;
+            i--;
+        }
+    }
+    bufferContext.save();
+    bufferContext.globalCompositeOperation = 'destination-out';
+    bufferContext.globalAlpha = 0.35;
+    bufferContext.fillRect(0, 0, screenWidth, screenHeight);
+    bufferContext.restore();
+    context.drawImage(bufferCanvas, 0, 0);
+    requestAnimationFrame(loop);
+};
+loop();
 //# sourceMappingURL=visualisation.js.map

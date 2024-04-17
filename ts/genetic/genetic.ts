@@ -1,5 +1,7 @@
-/*const populationSize = 90;
-let generationsAmount = 500;
+import { setGenerationsWithoutChanges, setPathLength, setTotalGenerations } from "./bindings.js";
+import { drawLines } from "./visualisation.js";
+
+const populationSize = 90;
 const percentToMutate = 30;
 const percentToCross = 40;
 // кол-во городов
@@ -176,16 +178,19 @@ function generatePoints(): void
         points[i] = new Point(Math.random()*100, Math.random()*100);
 }
 
-
 // algorithm itself
 generatePoints();
 fillInitualPopulation();
 
 let generationsWithoutChanges = 0;
 let prevBestFitting: number;
+let currGeneration = 0;
 
 while (generationsWithoutChanges < 150)
 {
+    setGenerationsWithoutChanges(generationsWithoutChanges);
+    setTotalGenerations(currGeneration);
+
     if (prevBestFitting == currPopulation[0].fitting)
     {
         generationsWithoutChanges++;
@@ -197,7 +202,15 @@ while (generationsWithoutChanges < 150)
     }
 
     selectGeneration();
-    //visualize(currPopulation[0]);
+    visualize(currPopulation[0]);
     console.log(currPopulation[0].fitting);
     modifyPopulation();
-}*/
+
+    currGeneration++;
+}
+
+function visualize(creature: Creature)
+{
+    setPathLength(creature.fitting);
+    drawLines(creature.genotype);
+}

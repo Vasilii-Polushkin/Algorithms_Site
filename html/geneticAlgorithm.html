@@ -27,8 +27,9 @@
 	<!-- default -->
 
 	<link rel="stylesheet" href="../css/genetic.css">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+
 	<script type = "module" src="../js-compiled/ts/genetic/genetic.js" defer></script>
+	<script type = "module" src="../js-compiled/ts/genetic/bindings.js" defer></script>
 	<script type = "module" src="../js-compiled/ts/genetic/visualisation.js" defer></script>
 	
 </head>
@@ -141,8 +142,8 @@
 			<input type="range" class="form-range" min="0" max="100" step="1" id="PercentToCrossRange" value="40">
 
 			<!-- generations without changes range form --><br>
-			<label for="GenerationsWithoutChangesRange" class="form-label">Generations Without Changes: <output id="GenerationsWithoutChangesOutput"></output></label>
-			<input type="range" class="form-range" min="1" max="500" step="1" id="GenerationsWithoutChangesRange" value="150">
+			<label for="MaxGenerationsWithoutChangesRange" class="form-label">Generations Without Changes: <output id="MaxGenerationsWithoutChangesOutput"></output></label>
+			<input type="range" class="form-range" min="1" max="500" step="1" id="MaxGenerationsWithoutChangesRange" value="150">
 		</div>
 	</div>
 
@@ -155,14 +156,14 @@
 
 			<!-- statictics -->
 		<div class="col-sm-3 col-md-3">
-			Generations without changes: <output id="PathLengthOutput">0</output><br>
+			Generations without changes: <output id="GenerationsWithoutChangesOutput">0</output><br>
 			Path length: <output id="PathLengthOutput">0</output>
 		</div>
 
 			<!-- Generations range form -->
 		<div class="col-sm-3 col-md-3">
-			<label for="GenerationsRange" class="form-label">Generation: <output id="CurrGenerationOutput">0</output>/<output id="TotalGenerationsOutput">0</output></label>
-			<input type="range" class="form-range" min="0" max="0" step="1" id="GenerationsRange" value="0">
+			<label for="CurrGenerationsRange" class="form-label">Generation: <output id="CurrGenerationOutput">0</output>/<output id="TotalGenerationOutput">0</output></label>
+			<input type="range" class="form-range" min="0" max="0" step="1" id="CurrGenerationRange" value="0">
 		</div>
 			<!-- run btn -->
 		<div class="col-sm-3 col-md-3">

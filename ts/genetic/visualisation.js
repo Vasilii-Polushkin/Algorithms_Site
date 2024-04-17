@@ -186,7 +186,7 @@ class City
           let gradientient, radius;
   
           context.save();
-  
+  /*
           gradientient = context.createRadialGradient(this.x, this.y, this.radius, this.x, this.y, this.radius * 5);
           gradientient.addColorStop(0, 'rgba(0, 0, 0, 0.1)');
           gradientient.addColorStop(1, 'rgba(0, 0, 0, 0)');
@@ -194,14 +194,14 @@ class City
           context.arc(this.x, this.y, this.radius * 5, 0, Math.PI * 2, false);
           context.fillStyle = gradientient;
           context.fill();
-  
+  */
           radius = Math.random() * this.currentRadius * 0.7 + this.currentRadius * 0.3;
-          gradientient = context.createRadialGradient(this.x, this.y, radius, this.x, this.y, this.currentRadius);
+          /*gradientient = context.createRadialGradient(this.x, this.y, radius, this.x, this.y, this.currentRadius);
           gradientient.addColorStop(0, 'rgba(0, 0, 0, 1)');
-          gradientient.addColorStop(1, Math.random() < 0.2 ? 'rgba(255, 196, 0, 0.15)' : 'rgba(103, 181, 191, 0.75)');
+          gradientient.addColorStop(1, Math.random() < 0.2 ? 'rgba(255, 196, 0, 0.15)' : 'rgba(103, 181, 191, 0.75)');*/
           context.beginPath();
           context.arc(this.x, this.y, this.currentRadius, 0, Math.PI * 2, false);
-          context.fillStyle = gradientient;
+          //context.fillStyle = gradientient;
           context.fill();
           context.restore();
       }
@@ -209,8 +209,6 @@ class City
   
   
   // Initialize
-  
-  (function() {
   
       // Configs
   
@@ -309,10 +307,26 @@ class City
       canvas.addEventListener('mouseup', mouseUp, false);
       canvas.addEventListener('dblclick', doubleClick, false);
   
-  
+      export function drawLines(nodesOrder)
+      {
+        context.save();
+        context.beginPath()
+    
+        if (nodesOrder.length != 0)
+            context.moveTo(nodesOrder.at(-1).x, nodesOrder.at(-1).y);
+    
+        for (let i = 0, length = nodesOrder.length; i < length; ++i)
+        {
+            context.lineWidth = 3;
+            context.lineTo(nodesOrder[i].x, nodesOrder[i].y);
+            context.stroke();
+        }
+        
+        context.restore();
+        }
   
       // Start Update
-  
+
       let loop = function() {
           let i, length, city;
   
@@ -345,5 +359,3 @@ class City
           requestAnimationFrame(loop);
       };
       loop();
-  
-  })();
