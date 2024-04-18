@@ -1,22 +1,18 @@
-//import {canvas_K_means, K_means, ctx_K_means, Point} from "./main.js";
-
-//import {control} from "control.js";
-
-let inputNumberOfClusters = document.getElementById('numberOfClusters');
-let numberOfClusters;
+import {runAlgorithm, Point} from "./algorithms.js";
 
 
-const MAX = 10000;
 const canvas_K_means = document.querySelector('#K-means');
 const canvas_C_means = document.querySelector('#C-means');
 const canvas_Hierarchical = document.querySelector('#HierarchicalClustering');
 const canvas_DBSCAN = document.querySelector('#DBSCAN');
-let w = canvas_K_means.width;
-let h = canvas_K_means.height;
-const ctx_K_means = canvas_K_means.getContext('2d');
-const ctx_C_means = canvas_C_means.getContext('2d');
-const ctx_Hierarchical = canvas_Hierarchical.getContext('2d');
-const ctx_DBSCAN = canvas_DBSCAN.getContext('2d');
+
+export let ctx_K_means = canvas_K_means.getContext('2d');
+export let ctx_C_means = canvas_C_means.getContext('2d');
+export let ctx_Hierarchical = canvas_Hierarchical.getContext('2d');
+export let ctx_DBSCAN = canvas_DBSCAN.getContext('2d');
+
+export let w = canvas_K_means.width;
+export let h = canvas_K_means.height;
 
 let K_means_caption = document.getElementById('K-means_caption');
 let C_means_caption = document.getElementById('C-means_caption');
@@ -25,144 +21,7 @@ let DBSCAN_caption = document.getElementById('DBSCAN_caption');
 
 let color = document.getElementById('K-means_caption').style.color;
 
-export class Point {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-}
 
-class Cluster {
-    color = getRandomColor();
-    points = [];
-
-    constructor(point) {
-        this.centre = point;
-    }
-}
-
-function getRandomColor() {
-    let letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-}
-
-function K_means() {
-    ctx_K_means.clearRect(0, 0, w, h);
-
-    // choose centres of clusters using k-means++ algorithm
-    let clusters = [];
-    let temp = Math.floor(Math.random() * control.points.length) % control.points.length;
-    let cluster = new Cluster(control.points[temp]);
-    cluster.points.push(cluster.centre);
-    clusters.push(cluster);
-
-
-    while (clusters.length !== numberOfClusters) {
-        let probabilities = new Array(control.points.length);
-        let sum = 0;
-
-        let distances = new Array(control.points.length);
-        distances.fill(MAX);
-
-        for (let i = 0; i < distances.length; i++) {
-            for (let j = 0; j < clusters.length; j++) {
-                let x = control.points[i].x - clusters[j].centre.x;
-                let y = control.points[i].y - clusters[j].centre.y;
-
-                x *= x;
-                y *= y;
-
-                distances[i] = Math.min(distances[i], x + y);
-            }
-            sum += distances[i];
-        }
-
-        probabilities[0] = distances[0] / sum;
-        for (let i = 1; i < probabilities.length; i++) {
-            probabilities[i] = distances[i] / sum + probabilities[i - 1];
-        }
-
-        temp = Math.random();
-        let next = 0;
-        for (let i = 1; i < probabilities.length; i++) {
-            if (temp > probabilities[i - 1] && temp < probabilities[i]) {
-                next = i;
-                break;
-            }
-        }
-
-        cluster = new Cluster(control.points[next]);
-        cluster.points.push(cluster.centre);
-        clusters.push(cluster);
-    }
-
-
-    let numberOfMatches;
-
-    // main k-means algorithm
-    do {
-        numberOfMatches = 0;
-        for (let i = 0; i < control.points.length; i++) {
-            // отнести точку к кластеру, к центру которого она оказалась ближе
-            let minDistance = MAX;
-            let clusterIndex;
-            for (let j = 0; j < clusters.length; j++) {
-                let distance = Math.sqrt((clusters[j].centre.x - control.points[i].x) ** 2 + (clusters[j].centre.y - control.points[i].y) ** 2);
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    clusterIndex = j;
-                }
-            }
-            clusters[clusterIndex].points.push(control.points[i]);
-        }
-
-        for (let i = 0; i < clusters.length; i++) {
-            let sumX = 0;
-            let sumY = 0;
-            for (let j = 0; j < clusters[i].points.length; j++) {
-                sumX += clusters[i].points[j].x;
-                sumY += clusters[i].points[j].y;
-            }
-
-            let newCentre = new Point(Math.floor(sumX / clusters[i].points.length), Math.floor(sumY / clusters[i].points.length));
-            if (clusters[i].centre.x === newCentre.x && clusters[i].centre.y === newCentre.y) {
-                numberOfMatches++;
-            }
-            clusters[i].centre = newCentre;
-        }
-
-        if(numberOfMatches !== clusters.length) {
-            for (let i = 0; i < clusters.length; i++)
-                clusters[i].points = [];
-        }
-    } while (numberOfMatches !== clusters.length)
-
-    control.draw_K_means(clusters);
-}
-
-function C_means() {
-    ctx_C_means.clearRect(0, 0, w, h);
-
-
-
-    let probabilityMatrix = new Array(numberOfClusters);
-    for(let i = 0; i < probabilityMatrix.length; i++) {
-        probabilityMatrix[i] = new Array(control.points.length);
-
-    }
-}
-
-function AgglomerativeHierarchicalClustering () {
-
-}
-
-function DBSCAN () {
-
-}
 
 
 class Control {
@@ -181,6 +40,21 @@ class Control {
 
         canvas_DBSCAN.addEventListener('mouseover', this.highlight.bind(null, canvas_DBSCAN.id, DBSCAN_caption.id), false);
         canvas_DBSCAN.addEventListener('mouseout', this.notHighlight.bind(null, canvas_DBSCAN.id, DBSCAN_caption.id), false);
+
+        this.alertPlaceholder = document.getElementById('alert')
+
+    }
+
+    appendAlert = (message) => {
+        const wrapper = document.createElement('div')
+        wrapper.innerHTML = '<div class="alert alert-warning alert-dismissible alert-light" role="alert">' +
+            '<div>{message}!</div><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'.replace('{message}', message);
+
+        this.alertPlaceholder.append(wrapper);
+    }
+
+    isValid (point) {
+        return (point.x >= 0 && point.y >= 0 && point.x < w && point.y < h);
     }
 
     newPoint = (e) => {
@@ -189,7 +63,7 @@ class Control {
         let point_Hierarchical = new Point(e.pageX - canvas_Hierarchical.getBoundingClientRect().left, e.pageY - canvas_Hierarchical.getBoundingClientRect().top);
         let point_DBSCAN = new Point(e.pageX - canvas_DBSCAN.getBoundingClientRect().left, e.pageY - canvas_DBSCAN.getBoundingClientRect().top);
 
-        if(point_K_means !== undefined && !this.isPointAlreadyExist(point_K_means)) {
+        if(this.isValid(point_K_means) && !this.isPointAlreadyExist(point_K_means)) {
             this.points.push(point_K_means);
             this.drawPoint(ctx_K_means, point_K_means);
             this.drawPoint(ctx_C_means, point_K_means);
@@ -197,7 +71,7 @@ class Control {
             this.drawPoint(ctx_DBSCAN, point_K_means);
         }
 
-        if(point_C_means !== undefined && !this.isPointAlreadyExist(point_C_means)) {
+        if(this.isValid(point_C_means) && !this.isPointAlreadyExist(point_C_means)) {
             this.points.push(point_C_means);
             this.drawPoint(ctx_K_means, point_C_means);
             this.drawPoint(ctx_C_means, point_C_means);
@@ -205,7 +79,7 @@ class Control {
             this.drawPoint(ctx_DBSCAN, point_C_means);
         }
 
-        if(point_Hierarchical !== undefined && !this.isPointAlreadyExist(point_Hierarchical)) {
+        if(this.isValid(point_Hierarchical) && !this.isPointAlreadyExist(point_Hierarchical)) {
             this.points.push(point_Hierarchical);
             this.drawPoint(ctx_K_means, point_Hierarchical);
             this.drawPoint(ctx_C_means, point_Hierarchical);
@@ -213,7 +87,7 @@ class Control {
             this.drawPoint(ctx_DBSCAN, point_Hierarchical);
         }
 
-        if(point_DBSCAN !== undefined && !this.isPointAlreadyExist(point_DBSCAN)) {
+        if(this.isValid(point_DBSCAN) && !this.isPointAlreadyExist(point_DBSCAN)) {
             this.points.push(point_DBSCAN);
             this.drawPoint(ctx_K_means, point_DBSCAN);
             this.drawPoint(ctx_C_means, point_DBSCAN);
@@ -230,23 +104,23 @@ class Control {
         ctx.closePath();
     }
 
-    draw_K_means = (clusters) => {
-        ctx_K_means.clearRect(0, 0, w, h);
+    draw = (clusters, ctx) => {
+        ctx.clearRect(0, 0, w, h);
         for (let i = 0; i < clusters.length; i++) {
             for (let j = 0; j < clusters[i].points.length; j++) {
-                ctx_K_means.beginPath();
-                ctx_K_means.arc(clusters[i].points[j].x, clusters[i].points[j].y, 2, 0, Math.PI * 2);
-                ctx_K_means.fillStyle = clusters[i].color;
-                ctx_K_means.fill();
-                ctx_K_means.closePath();
+                ctx.beginPath();
+                ctx.arc(clusters[i].points[j].x, clusters[i].points[j].y, 2, 0, Math.PI * 2);
+                ctx.fillStyle = clusters[i].color;
+                ctx.fill();
+                ctx.closePath();
 
-                ctx_K_means.beginPath();
-                ctx_K_means.moveTo(clusters[i].centre.x, clusters[i].centre.y);
-                ctx_K_means.lineTo(clusters[i].points[j].x, clusters[i].points[j].y);
-                ctx_K_means.strokeStyle = clusters[i].color;
-                ctx_K_means.lineWidth = "1";
-                ctx_K_means.stroke();
-                ctx_K_means.closePath();
+                ctx.beginPath();
+                ctx.moveTo(clusters[i].centre.x, clusters[i].centre.y);
+                ctx.lineTo(clusters[i].points[j].x, clusters[i].points[j].y);
+                ctx.strokeStyle = clusters[i].color;
+                ctx.lineWidth = "1";
+                ctx.stroke();
+                ctx.closePath();
             }
         }
     }
@@ -267,7 +141,6 @@ class Control {
     notHighlight (id, id_caption) {
         document.getElementById(id).style.outline = "#ffffff 1px solid";
         document.getElementById(id_caption).style.color = color;
-        console.log(document.getElementById('C-means_caption').style.color);
     }
 }
 
@@ -281,29 +154,8 @@ function restart () {
 }
 
 
-const alertPlaceholder = document.getElementById('alert')
-const appendAlert = (message) => {
-    const wrapper = document.createElement('div')
-    wrapper.innerHTML = '<div class="alert alert-warning alert-dismissible alert-light" role="alert">' +
-        '<div>{message}!</div><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'.replace('{message}', message);
 
-    alertPlaceholder.append(wrapper);
-}
-
-function runAlgorithm () {
-    numberOfClusters = parseInt(inputNumberOfClusters.value);
-    if(numberOfClusters < 1 || inputNumberOfClusters.valueAsNumber !== Math.floor(numberOfClusters) || numberOfClusters > control.points.length) {
-        appendAlert('Invalid number of clusters');
-        return;
-    }
-
-    K_means();
-    C_means();
-    AgglomerativeHierarchicalClustering();
-    DBSCAN();
-}
-
-let control = new Control();
+export let control = new Control();
 let runBtn = document.getElementById('run');
 let restartBtn = document.getElementById('clear');
 
