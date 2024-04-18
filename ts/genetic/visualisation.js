@@ -311,7 +311,7 @@ class City
       canvas.addEventListener('mouseup', mouseUp, false);
       canvas.addEventListener('dblclick', doubleClick, false);
 
-      function stopAnimating()
+      export function stopAnimating()
       {
         isAnimating = false;
 
@@ -344,9 +344,6 @@ class City
 
       export function drawLines(nodesOrder)
       {
-        stopAnimating();
-
-        //requestAnimationFrame(()=>{
             context.save();
             loop();
             context.beginPath()
@@ -362,7 +359,6 @@ class City
             }
         
             context.restore();
-        })
       }
   
       // Start Update

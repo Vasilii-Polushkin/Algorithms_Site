@@ -3,8 +3,14 @@ import { setGenerationsWithoutChanges, setPathLength, setTotalGenerations,
     } from "./bindings.js";
 import { drawLines, cities } from "./visualisation.js";
 
-export function algorithmRunner()
+export class algorithmRunner
 {
+isRunning = true;
+constructor()
+{
+
+this.isRunning = true;
+
 if (cities.length == 0)
     return;
 class Point
@@ -210,8 +216,8 @@ let currGeneration = 0;
 
 function mainLoop()
 {
-if (generationsWithoutChanges > MaxGenerationsWithoutChanges)
-    return;
+    if (generationsWithoutChanges > MaxGenerationsWithoutChanges || this.isRunning == false)
+        return;
 
     setGenerationsWithoutChanges(generationsWithoutChanges);
     setTotalGenerations(currGeneration);
@@ -247,7 +253,7 @@ if (generationsWithoutChanges > MaxGenerationsWithoutChanges)
     currGeneration++;
     setTimeout(mainLoop, 0);
 }
-mainLoop();
+setTimeout(mainLoop, 1000/60);
 
 drawLines(currPopulation[0].genotype);
 
@@ -257,4 +263,5 @@ function visualize(creature: Creature)
     drawLines(creature.genotype);
 }
 
+}
 }

@@ -1,5 +1,5 @@
 import { algorithmRunner } from "./genetic.js";
-import { setRandomSities, clearSities, startAnimating } from "./visualisation.js";
+import { setRandomSities, clearSities, startAnimating, stopAnimating } from "./visualisation.js";
 
 // main page
 export let currGenerationInput = 0;
@@ -19,7 +19,10 @@ let runner;
 
 const RunBtn = document.getElementById("RunBtn");
 RunBtn.addEventListener('click', () => {
-    runner = algorithmRunner();
+    stopAnimating();
+    if (runner != undefined)
+        runner.isRunning = false;
+    runner = new algorithmRunner();
 })
 
 const RandomizeCitiesBtn = document.getElementById("RandomizeCitiesBtn");

@@ -231,7 +231,7 @@ canvas.addEventListener('mousemove', mouseMove, false);
 canvas.addEventListener('mousedown', mouseDown, false);
 canvas.addEventListener('mouseup', mouseUp, false);
 canvas.addEventListener('dblclick', doubleClick, false);
-function stopAnimating() {
+export function stopAnimating() {
     isAnimating = false;
     window.removeEventListener('resize', resize, false);
     canvas.removeEventListener('mousemove', mouseMove, false);
@@ -254,8 +254,6 @@ export function startAnimating() {
     loop();
 }
 export function drawLines(nodesOrder) {
-    stopAnimating();
-    //requestAnimationFrame(()=>{
     context.save();
     loop();
     context.beginPath();
