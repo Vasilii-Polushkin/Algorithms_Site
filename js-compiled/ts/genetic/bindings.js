@@ -1,4 +1,5 @@
 import { algorithmRunner } from "./genetic.js";
+import { setRandomSities, clearSities, startAnimating } from "./visualisation.js";
 // main page
 export let currGenerationInput = 0;
 // offcanvas
@@ -11,9 +12,19 @@ let runner;
 /**
  * ----------------------- MAIN PAGE ------------------------
  */
-export const RunBtn = document.getElementById("RunBtn");
+const RunBtn = document.getElementById("RunBtn");
 RunBtn.addEventListener('click', () => {
-    runner = new algorithmRunner();
+    runner = algorithmRunner();
+});
+const RandomizeCitiesBtn = document.getElementById("RandomizeCitiesBtn");
+RandomizeCitiesBtn.addEventListener('click', () => {
+    setRandomSities();
+    startAnimating();
+});
+const ClearCitiesBtn = document.getElementById("ClearCitiesBtn");
+ClearCitiesBtn.addEventListener('click', () => {
+    clearSities();
+    startAnimating();
 });
 const GenerationsWithoutChangesOutput = document.getElementById("GenerationsWithoutChangesOutput");
 export function setGenerationsWithoutChanges(number) {

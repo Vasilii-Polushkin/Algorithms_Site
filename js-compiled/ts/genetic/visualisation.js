@@ -6,7 +6,7 @@ window.requestAnimationFrame = (function () {
         window.oRequestAnimationFrame ||
         window.msRequestAnimationFrame ||
         function (callback) {
-            window.setTimeout(callback, 1000 / 60);
+            window.setTimeout(callback, 1000 / 30);
         };
 })();
 class Vector {
@@ -52,16 +52,8 @@ class Vector {
     }
 }
 ;
-function addVectors(a, b) {
-    return new Vector(a.x + b.x, a.y + b.y);
-}
-;
 function substractVectors(a, b) {
     return new Vector(a.x - b.x, a.y - b.y);
-}
-;
-function randomVector() {
-    return new Vector(Math.random() * 2 - 1, Math.random() * 2 - 1);
 }
 ;
 const RADIUS_LIMIT = 65;
@@ -162,6 +154,16 @@ class City {
     }
 }
 ;
+export function setRandomSities(amount = 10) {
+    while (amount--) {
+        cities.push(new City(Math.random() * window.innerWidth, Math.random() * (window.innerHeight - 120) + 120, CITY_RADIUS, {
+            cities: cities
+        }));
+    }
+}
+export function clearSities() {
+    cities.length = 0;
+}
 // Initialize
 // Configs
 const BACKGROUND_COLOR = 'rgba(11, 51, 56, 1)', CITY_RADIUS = 10;
@@ -229,25 +231,47 @@ canvas.addEventListener('mousemove', mouseMove, false);
 canvas.addEventListener('mousedown', mouseDown, false);
 canvas.addEventListener('mouseup', mouseUp, false);
 canvas.addEventListener('dblclick', doubleClick, false);
-export function drawLines(nodesOrder) {
+function stopAnimating() {
     isAnimating = false;
-    requestAnimationFrame(() => {
-        context.save();
-        loop();
-        context.beginPath();
-        if (nodesOrder.length != 0)
-            context.moveTo(cities[nodesOrder.at(-1)].x, cities[nodesOrder.at(-1)].y);
-        for (let i = 0, length = nodesOrder.length; i < length; ++i) {
-            context.lineWidth = 3;
-            //console.log(cities[nodesOrder[i]].x, cities[nodesOrder[i]].y);
-            context.lineTo(cities[nodesOrder[i]].x, cities[nodesOrder[i]].y);
-            context.stroke();
-        }
-        context.restore();
-    });
+    window.removeEventListener('resize', resize, false);
+    canvas.removeEventListener('mousemove', mouseMove, false);
+    canvas.removeEventListener('mousedown', mouseDown, false);
+    canvas.removeEventListener('mouseup', mouseUp, false);
+    canvas.removeEventListener('dblclick', doubleClick, false);
+    canvas.addEventListener('click', startAnimating);
+}
+export function startAnimating() {
+    if (isAnimating)
+        return;
+    isAnimating = true;
+    window.addEventListener('resize', resize, false);
+    resize(null);
+    canvas.addEventListener('mousemove', mouseMove, false);
+    canvas.addEventListener('mousedown', mouseDown, false);
+    canvas.addEventListener('mouseup', mouseUp, false);
+    canvas.addEventListener('dblclick', doubleClick, false);
+    canvas.removeEventListener('click', startAnimating);
+    loop();
+}
+export function drawLines(nodesOrder) {
+    stopAnimating();
+    //requestAnimationFrame(()=>{
+    context.save();
+    loop();
+    context.beginPath();
+    if (nodesOrder.length != 0)
+        context.moveTo(cities[nodesOrder.at(-1)].x, cities[nodesOrder.at(-1)].y);
+    for (let i = 0, length = nodesOrder.length; i < length; ++i) {
+        context.lineWidth = 3;
+        context.lineTo(cities[nodesOrder[i]].x, cities[nodesOrder[i]].y);
+        context.stroke();
+    }
+    context.restore();
 }
 // Start Update
-let loop = function () {
+let loop = function (shouldCheck = false) {
+    if (shouldCheck && !isAnimating)
+        return;
     let i, length, city;
     context.save();
     context.fillStyle = BACKGROUND_COLOR;
@@ -259,7 +283,7 @@ let loop = function () {
         city = cities[i];
         if (city.dragging)
             city.drag(mouse);
-        city._draw(context);
+        city.render(context);
         if (city.destroyed) {
             cities.splice(i, 1);
             length--;
@@ -268,12 +292,12 @@ let loop = function () {
     }
     bufferContext.save();
     bufferContext.globalCompositeOperation = 'destination-out';
-    bufferContext.globalAlpha = 0.35;
+    bufferContext.globalAlpha = 0.15;
     bufferContext.fillRect(0, 0, screenWidth, screenHeight);
     bufferContext.restore();
     context.drawImage(bufferCanvas, 0, 0);
     if (isAnimating)
-        requestAnimationFrame(loop);
+        requestAnimationFrame(loop, true);
 };
 loop();
 //# sourceMappingURL=visualisation.js.map

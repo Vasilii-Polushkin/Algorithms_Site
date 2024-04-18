@@ -3,11 +3,10 @@ import { setGenerationsWithoutChanges, setPathLength, setTotalGenerations,
     } from "./bindings.js";
 import { drawLines, cities } from "./visualisation.js";
 
-export class algorithmRunner
+export function algorithmRunner()
 {
-constructor()
-{
-
+if (cities.length == 0)
+    return;
 class Point
 {
     x:number;
@@ -43,7 +42,7 @@ const MaxGenerationsWithoutChanges = maxGenerationsWithoutChangesInput;
 const genotypeSize = newPoints.length;
 const points: Point[] = newPoints;
 
-const currPopulation: Creature[] = new Array(populationSize);
+let currPopulation: Creature[] = new Array(populationSize);
 
 function distance(p1: Point, p2: Point): number
 {
@@ -175,15 +174,31 @@ function modifyPopulation(): void
 
 function selectGeneration():void
 {
-    currPopulation.splice(populationSize / 2, populationSize / 2);
-    currPopulation.sort((crt1, crt2) => crt1.fitting - crt2.fitting);
-    currPopulation.length = populationSize;
-}
+    let indexesToDelete = new Object;
+    let totalFitting = 0;
 
-function generatePoints(): void
-{
-    for (let i = 0; i < genotypeSize; ++i)
-        points[i] = new Point(Math.random()*100, Math.random()*100);
+    for (let i = 1; i < populationSize; ++i)
+        totalFitting += currPopulation[i].fitting;
+
+    for (let i = 1; i < populationSize; ++i)
+        if (decide(currPopulation[i].fitting/totalFitting))
+            indexesToDelete[i] = true;
+
+    let newPopulation: Creature[] = [];
+
+    for (let i = 0; i < currPopulation.length; ++i)
+        if (indexesToDelete[i] != true)
+            newPopulation.push(currPopulation[i]);
+
+    newPopulation.sort((crt1, crt2) => crt1.fitting - crt2.fitting);
+
+    while (newPopulation.length < populationSize)
+    {
+        newPopulation.push(getRandomCreature());
+    }
+    newPopulation.length = populationSize;
+
+    currPopulation = newPopulation;
 }
 
 // algorithm itself
@@ -193,8 +208,11 @@ let generationsWithoutChanges = 0;
 let prevBestFitting: number;
 let currGeneration = 0;
 
-while (generationsWithoutChanges < MaxGenerationsWithoutChanges)
+function mainLoop()
 {
+if (generationsWithoutChanges > MaxGenerationsWithoutChanges)
+    return;
+
     setGenerationsWithoutChanges(generationsWithoutChanges);
     setTotalGenerations(currGeneration);
 
@@ -209,11 +227,29 @@ while (generationsWithoutChanges < MaxGenerationsWithoutChanges)
     }
 
     visualize(currPopulation[0]);
+
+    /*
+    const canvas = document.getElementById('c');
+    const context = canvas.getContext('2d');
+    context.save();
+    context.beginPath()
+    context.moveTo(cities[currPopulation[0].genotype.at(-1)].x, cities[currPopulation[0].genotype.at(-1)].y);
+    for (let i = 0, length = currPopulation[0].genotype.length; i < length; ++i)
+    {
+        context.lineWidth = 3;
+        context.lineTo(cities[currPopulation[0].genotype[i]].x, cities[currPopulation[0].genotype[i]].y);
+        context.stroke();
+    }*/
+
     modifyPopulation();
     selectGeneration();
 
     currGeneration++;
+    setTimeout(mainLoop, 0);
 }
+mainLoop();
+
+drawLines(currPopulation[0].genotype);
 
 function visualize(creature: Creature)
 {
@@ -221,5 +257,4 @@ function visualize(creature: Creature)
     drawLines(creature.genotype);
 }
 
-}
 }
