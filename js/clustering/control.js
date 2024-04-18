@@ -22,8 +22,6 @@ let DBSCAN_caption = document.getElementById('DBSCAN_caption');
 let color = document.getElementById('K-means_caption').style.color;
 
 
-
-
 class Control {
     constructor() {
         this.points = [];
@@ -42,7 +40,6 @@ class Control {
         canvas_DBSCAN.addEventListener('mouseout', this.notHighlight.bind(null, canvas_DBSCAN.id, DBSCAN_caption.id), false);
 
         this.alertPlaceholder = document.getElementById('alert')
-
     }
 
     appendAlert = (message) => {
@@ -53,7 +50,7 @@ class Control {
         this.alertPlaceholder.append(wrapper);
     }
 
-    isValid (point) {
+    isValid(point) {
         return (point.x >= 0 && point.y >= 0 && point.x < w && point.y < h);
     }
 
@@ -63,7 +60,7 @@ class Control {
         let point_Hierarchical = new Point(e.pageX - canvas_Hierarchical.getBoundingClientRect().left, e.pageY - canvas_Hierarchical.getBoundingClientRect().top);
         let point_DBSCAN = new Point(e.pageX - canvas_DBSCAN.getBoundingClientRect().left, e.pageY - canvas_DBSCAN.getBoundingClientRect().top);
 
-        if(this.isValid(point_K_means) && !this.isPointAlreadyExist(point_K_means)) {
+        if (this.isValid(point_K_means) && !this.isPointAlreadyExist(point_K_means)) {
             this.points.push(point_K_means);
             this.drawPoint(ctx_K_means, point_K_means);
             this.drawPoint(ctx_C_means, point_K_means);
@@ -71,7 +68,7 @@ class Control {
             this.drawPoint(ctx_DBSCAN, point_K_means);
         }
 
-        if(this.isValid(point_C_means) && !this.isPointAlreadyExist(point_C_means)) {
+        if (this.isValid(point_C_means) && !this.isPointAlreadyExist(point_C_means)) {
             this.points.push(point_C_means);
             this.drawPoint(ctx_K_means, point_C_means);
             this.drawPoint(ctx_C_means, point_C_means);
@@ -79,7 +76,7 @@ class Control {
             this.drawPoint(ctx_DBSCAN, point_C_means);
         }
 
-        if(this.isValid(point_Hierarchical) && !this.isPointAlreadyExist(point_Hierarchical)) {
+        if (this.isValid(point_Hierarchical) && !this.isPointAlreadyExist(point_Hierarchical)) {
             this.points.push(point_Hierarchical);
             this.drawPoint(ctx_K_means, point_Hierarchical);
             this.drawPoint(ctx_C_means, point_Hierarchical);
@@ -87,7 +84,7 @@ class Control {
             this.drawPoint(ctx_DBSCAN, point_Hierarchical);
         }
 
-        if(this.isValid(point_DBSCAN) && !this.isPointAlreadyExist(point_DBSCAN)) {
+        if (this.isValid(point_DBSCAN) && !this.isPointAlreadyExist(point_DBSCAN)) {
             this.points.push(point_DBSCAN);
             this.drawPoint(ctx_K_means, point_DBSCAN);
             this.drawPoint(ctx_C_means, point_DBSCAN);
@@ -107,6 +104,12 @@ class Control {
     draw = (clusters, ctx) => {
         ctx.clearRect(0, 0, w, h);
         for (let i = 0; i < clusters.length; i++) {
+            ctx.fillStyle = clusters[i].color;
+            ctx.beginPath();
+            ctx.arc(clusters[i].centre.x, clusters[i].centre.y, 3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.closePath();
+
             for (let j = 0; j < clusters[i].points.length; j++) {
                 ctx.beginPath();
                 ctx.arc(clusters[i].points[j].x, clusters[i].points[j].y, 2, 0, Math.PI * 2);
@@ -126,25 +129,25 @@ class Control {
     }
 
     isPointAlreadyExist = (point) => {
-        for(let i = 0; i < this.points.length; i++) {
-            if(point.x === this.points[i].x && point.y === this.points[i].y)
+        for (let i = 0; i < this.points.length; i++) {
+            if (point.x === this.points[i].x && point.y === this.points[i].y)
                 return true;
         }
         return false;
     }
 
-    highlight (id, id_caption) {
+    highlight(id, id_caption) {
         document.getElementById(id).style.outline = "rgba(226, 147, 3, 0.9) 1px solid";
         document.getElementById(id_caption).style.color = 'rgba(226, 147, 3, 0.9)';
     }
 
-    notHighlight (id, id_caption) {
+    notHighlight(id, id_caption) {
         document.getElementById(id).style.outline = "#ffffff 1px solid";
         document.getElementById(id_caption).style.color = color;
     }
 }
 
-function restart () {
+function restart() {
     ctx_K_means.clearRect(0, 0, w, h);
     ctx_C_means.clearRect(0, 0, w, h);
     ctx_Hierarchical.clearRect(0, 0, w, h);
@@ -152,7 +155,6 @@ function restart () {
 
     control.points = [];
 }
-
 
 
 export let control = new Control();

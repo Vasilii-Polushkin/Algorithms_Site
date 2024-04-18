@@ -18,6 +18,15 @@ canvas {
     border-radius: 3px;
 }
 
+/*canvas:hover {
+    outline: rgba(226, 147, 3, 0.9) 1px solid;
+    border-radius: 3px;
+}
+
+canvas:hover h5 {
+    color: rgba(226, 147, 3, 0.9);
+}*/
+
 #items {
     display: flex;
     flex-wrap: wrap;
@@ -28,11 +37,13 @@ canvas {
     padding-right: 20px;
 }
 
-.mb-3 {
+.btn {
+    margin: 10px;
 }
 
 #alert {
-
+    position: fixed;
+    bottom: 200px;
 }
 
 body, html {

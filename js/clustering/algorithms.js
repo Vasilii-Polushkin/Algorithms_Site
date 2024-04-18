@@ -1,8 +1,8 @@
-import {control, w, h, ctx_K_means, ctx_C_means, ctx_Hierarchical, ctx_DBSCAN} from "./control.js";
+import {control, ctx_C_means, ctx_Hierarchical, ctx_K_means} from "./control.js";
 
 const MAX = 10000;
 const fuzzinessParam = 2;
-const toleranceValue = 0.000001;
+const toleranceValue = 0.01;
 let inputNumberOfClusters = document.getElementById('numberOfClusters');
 let numberOfClusters;
 
@@ -16,6 +16,12 @@ function getRandomColor() {
     return color;
 }
 
+class Pair {
+    constructor(distance, ind) {
+        this.distance = distance;
+        this.ind = ind;
+    }
+}
 
 export class Point {
     constructor(x, y) {
@@ -33,7 +39,6 @@ class Cluster {
         this.centre = point;
     }
 }
-
 
 function K_means() {
 
@@ -132,6 +137,14 @@ function C_means() {
 
     let clusters = new Array(numberOfClusters);
 
+    if(control.points.length === 1) {
+        let cluster = new Cluster(control.points[0]);
+        cluster.points.push(control.points[0]);
+        clusters[0] = cluster;
+        control.draw(clusters, ctx_C_means);
+        return;
+    }
+
     let sum = new Array(control.points.length);
     sum.fill(0);
 
@@ -149,11 +162,8 @@ function C_means() {
             probabilityMatrix[i][j] /= sum[j];
 
 
-    let numberOfConverged;
     let BREAK = false;
     do {
-        let numberOfConverged = 0;
-
         // calculating centroids
         for (let i = 0; i < clusters.length; i++) {
             let x = 0;
@@ -164,7 +174,6 @@ function C_means() {
                 x += (probabilityMatrix[i][j] ** fuzzinessParam) * control.points[j].x;
                 y += (probabilityMatrix[i][j] ** fuzzinessParam) * control.points[j].y;
             }
-            //TODO Z??
             let centre = new Point(x / sum, y / sum);
             clusters[i] = new Cluster(centre);
         }
@@ -184,17 +193,17 @@ function C_means() {
             for (let j = 0; j < distances[i].length; j++) {
                 let newProbability = (((distances[i][j] ** 2) * sum) ** (1 / (fuzzinessParam - 1))) ** (-1);
                 if (Math.abs(newProbability - probabilityMatrix[j][i]) < toleranceValue) {
-                    //numberOfConverged++;
                     BREAK = true;
                 }
                 probabilityMatrix[j][i] = newProbability;
             }
         }
-    } while (/*numberOfConverged !== clusters.length * control.points.length*/!BREAK)
+
+    } while (!BREAK)
 
 
     // group by clusters
-    for(let j = 0; j < probabilityMatrix[0].length; j++) {
+    for (let j = 0; j < probabilityMatrix[0].length; j++) {
         if (!control.points[j].used) {
             let max = 0;
             let ind;
@@ -209,38 +218,94 @@ function C_means() {
         }
     }
 
-    /*for(let i = 1; i < probabilityMatrix.length; i++)
-        for(let j = 0; j < probabilityMatrix[i].length; j++)
-            probabilityMatrix[i][j] = probabilityMatrix[i][j] + probabilityMatrix[i - 1][j];
-
-
-    let temp = new Array(control.points.length);
-    for(let j = 0; j < temp.length; j++)
-        temp[j] = Math.random();
-
-    for(let j = 0; j < probabilityMatrix[0].length; j++) {
-        if(probabilityMatrix[0][j] >= temp[j]) {
-            clusters[0].points.push(control.points[j]);
-            control.points[j].used = true;
-        }
-    }
-
-    for(let j = 0; j < probabilityMatrix[0].length; j++) {
-        for (let i = 1; i < probabilityMatrix.length; i++) {
-            if(probabilityMatrix[i - 1][j] < temp[j] && probabilityMatrix[i][j] > temp[j] && !control.points[j].used){
-                clusters[i].points.push(control.points[j]);
-                control.points[j].used = true;
-            }
-        }
-    }*/
-
-    for(let i = 0; i < control.points.length; i++)
+    for (let i = 0; i < control.points.length; i++)
         control.points[i].used = false;
 
     control.draw(clusters, ctx_C_means);
 }
 
 function AgglomerativeHierarchicalClustering() {
+
+    let clusters = new Array(control.points.length);
+    for (let i = 0; i < clusters.length; i++) {
+        let point = new Point(control.points[i].x, control.points[i].y);
+        clusters[i] = new Cluster(point);
+        clusters[i].points.push(point);
+    }
+
+    while (clusters.length !== numberOfClusters) {
+        let distances = new Array(clusters.length);
+        for (let i = 0; i < distances.length; i++) {
+            distances[i] = new Array(clusters.length);
+            for (let j = 0; j < distances[i].length; j++) {
+                let pair = new Pair(Math.sqrt((clusters[i].centre.x - clusters[j].centre.x) ** 2 + (clusters[i].centre.y - clusters[j].centre.y) ** 2), j);
+                distances[i][j] = pair;
+            }
+        }
+
+        for (let i = 0; i < distances.length; i++) {
+            distances[i].sort(function (a, b) {
+                return (b.distance < a.distance) - (a.distance < b.distance);
+            });
+        }
+
+        /*distances.sort(function (a, b){
+            return (b[1].distance < a[1].distance) - (a[1].distance < b[1].distance);
+        });
+        console.log(distances)*/
+
+        let newClusters = [];
+        let BREAK = false;
+
+        let priority = 1;
+        let count = distances.length;
+
+
+        while (!BREAK && count > 1) {
+            count = 0;
+            for (let i = 0; i < distances.length; i++) {
+                if (BREAK) break;
+
+                for (let j = 1; j < distances[i].length; j++) {
+                    if (!clusters[i].centre.used && !clusters[distances[i][j].ind].centre.used && distances[i][j].distance === distances[distances[i][j].ind][priority].distance) {
+                        count++;
+
+                        clusters[distances[i][j].ind].centre.used = true;
+
+                        for (let k = 0; k < clusters[distances[i][j].ind].points.length; k++)
+                            clusters[i].points.push(clusters[distances[i][j].ind].points[k]);
+
+                        let x = 0;
+                        let y = 0;
+                        for (let k = 0; k < clusters[i].points.length; k++) {
+                            x += clusters[i].points[k].x;
+                            y += clusters[i].points[k].y;
+                        }
+                        clusters[i].centre = new Point(x / clusters[i].points.length, y / clusters[i].points.length);
+                        clusters[i].centre.used = true;
+
+                        newClusters.push(clusters[i]);
+                    }
+
+                    if (clusters.length - newClusters.length === numberOfClusters) {
+                        BREAK = true;
+                        break;
+                    }
+                }
+            }
+            priority++;
+        }
+
+        for (let k = 0; k < clusters.length; k++)
+            if (!clusters[k].centre.used) newClusters.push(clusters[k]);
+
+        for (let i = 0; i < newClusters.length; i++)
+            newClusters[i].centre.used = false;
+
+        clusters = newClusters;
+    }
+
+    control.draw(clusters, ctx_Hierarchical);
 }
 
 function DBSCAN() {
