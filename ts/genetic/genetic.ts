@@ -1,14 +1,12 @@
-import { setGenerationsWithoutChanges, setPathLength, setTotalGenerations } from "./bindings.js";
-import { drawLines } from "./visualisation.js";
+import { setGenerationsWithoutChanges, setPathLength, setTotalGenerations,
+    populationSizeInput,percentToCrossInput,percentToMutateInput,maxGenerationsWithoutChangesInput
+    } from "./bindings.js";
+import { drawLines, cities } from "./visualisation.js";
 
-const populationSize = 90;
-const percentToMutate = 30;
-const percentToCross = 40;
-// кол-во городов
-const genotypeSize = 40;
-
-const points: Point[] = new Array(genotypeSize);
-const currPopulation: Creature[] = new Array(populationSize);
+export class algorithmRunner
+{
+constructor()
+{
 
 class Point
 {
@@ -20,7 +18,6 @@ class Point
         this.y = y;
     }
 }
-
 class Creature
 {
     genotype: number[];
@@ -32,6 +29,21 @@ class Creature
         this.fitting = calcFittingFunction(genotype);
     }
 }
+
+const newPoints: Point[] = [];
+cities.forEach((city) => {
+    newPoints.push(new Point(city.x, city.y));
+})
+
+const populationSize = populationSizeInput;
+const percentToMutate = percentToMutateInput;
+const percentToCross = percentToCrossInput;
+const MaxGenerationsWithoutChanges = maxGenerationsWithoutChangesInput;
+// кол-во городов
+const genotypeSize = newPoints.length;
+const points: Point[] = newPoints;
+
+const currPopulation: Creature[] = new Array(populationSize);
 
 function distance(p1: Point, p2: Point): number
 {
@@ -83,22 +95,16 @@ function fillInitualPopulation(): void
 {
     for (let i = 0; i < populationSize; ++i)
         currPopulation[i] = getRandomCreature();
+    currPopulation.sort((crt1, crt2) => crt1.fitting - crt2.fitting);
 }
 
 function mutateOnce(creature: Creature): void
 {
-    const pos1 = getRandomGeneID();
-    const pos2 = getRandomGeneID();
+    let pos1 = getRandomGeneID();
+    let pos2 = getRandomGeneID();
 
-    const temp = creature.genotype[pos1];
-    creature.genotype[pos1] = creature.genotype[pos2];
-    creature.genotype[pos2] = temp;
-}
-
-function mutateNth(creature: Creature, n: number): void
-{
-    for (let i = 0; i < n; ++i)
-        mutateOnce(creature);
+    if (pos1 > pos2) [pos1, pos2] = [pos2, pos1];
+    creature.genotype = creature.genotype.slice(0, pos1).concat(creature.genotype.slice(pos1, pos2).reverse(), creature.genotype.slice(pos2));
 }
 
 function getCrossedCreature(creature1: Creature, creature2: Creature, pivotIndex: number): Creature
@@ -138,7 +144,8 @@ function getCrossedCreature(creature1: Creature, creature2: Creature, pivotIndex
 
 function getRandomCreatureID(): number
 {
-    return Math.floor(Math.random() * populationSize);
+    let id = Math.floor(Math.random() * populationSize);
+    return id;
 }
 
 function modifyPopulationOnce(): void
@@ -168,6 +175,7 @@ function modifyPopulation(): void
 
 function selectGeneration():void
 {
+    currPopulation.splice(populationSize / 2, populationSize / 2);
     currPopulation.sort((crt1, crt2) => crt1.fitting - crt2.fitting);
     currPopulation.length = populationSize;
 }
@@ -179,14 +187,13 @@ function generatePoints(): void
 }
 
 // algorithm itself
-generatePoints();
 fillInitualPopulation();
 
 let generationsWithoutChanges = 0;
 let prevBestFitting: number;
 let currGeneration = 0;
 
-while (generationsWithoutChanges < 150)
+while (generationsWithoutChanges < MaxGenerationsWithoutChanges)
 {
     setGenerationsWithoutChanges(generationsWithoutChanges);
     setTotalGenerations(currGeneration);
@@ -201,10 +208,9 @@ while (generationsWithoutChanges < 150)
         generationsWithoutChanges = 0;
     }
 
-    selectGeneration();
     visualize(currPopulation[0]);
-    console.log(currPopulation[0].fitting);
     modifyPopulation();
+    selectGeneration();
 
     currGeneration++;
 }
@@ -213,4 +219,7 @@ function visualize(creature: Creature)
 {
     setPathLength(creature.fitting);
     drawLines(creature.genotype);
+}
+
+}
 }

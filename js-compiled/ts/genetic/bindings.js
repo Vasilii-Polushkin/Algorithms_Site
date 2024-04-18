@@ -1,3 +1,4 @@
+import { algorithmRunner } from "./genetic.js";
 // main page
 export let currGenerationInput = 0;
 // offcanvas
@@ -5,12 +6,14 @@ export let populationSizeInput = 90;
 export let percentToMutateInput = 30;
 export let percentToCrossInput = 40;
 export let maxGenerationsWithoutChangesInput = 30;
+// runner
+let runner;
 /**
  * ----------------------- MAIN PAGE ------------------------
  */
 export const RunBtn = document.getElementById("RunBtn");
 RunBtn.addEventListener('click', () => {
-    //
+    runner = new algorithmRunner();
 });
 const GenerationsWithoutChangesOutput = document.getElementById("GenerationsWithoutChangesOutput");
 export function setGenerationsWithoutChanges(number) {
@@ -18,7 +21,7 @@ export function setGenerationsWithoutChanges(number) {
 }
 const PathLengthOutput = document.getElementById("PathLengthOutput");
 export function setPathLength(number) {
-    PathLengthOutput.value = number.to;
+    PathLengthOutput.value = number.toFixed(3);
 }
 // Generations range form
 const TotalGenerationOutput = document.getElementById("TotalGenerationOutput");

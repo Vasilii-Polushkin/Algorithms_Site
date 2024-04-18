@@ -1,3 +1,5 @@
+let isAnimating = true;
+
 window.requestAnimationFrame = (function(){
       return  window.requestAnimationFrame       ||
               window.webkitRequestAnimationFrame ||
@@ -8,7 +10,7 @@ window.requestAnimationFrame = (function(){
                   window.setTimeout(callback, 1000 / 60);
               };
   })();
-  
+
 class Vector{
       constructor(x, y)
       {
@@ -218,12 +220,13 @@ class City
   
       // lets
   
-      let canvas, context,
+    let canvas, context,
           bufferCanvas, bufferContext,
           screenWidth, screenHeight,
           mouse = new Vector(),
-          cities = [],
-          gradient
+          gradient;
+
+    export let cities = [];
   
   
       // Event Listeners
@@ -306,28 +309,35 @@ class City
       canvas.addEventListener('mousedown', mouseDown, false);
       canvas.addEventListener('mouseup', mouseUp, false);
       canvas.addEventListener('dblclick', doubleClick, false);
-  
+
       export function drawLines(nodesOrder)
       {
-        context.save();
-        context.beginPath()
+        isAnimating = false;
+
+        requestAnimationFrame(()=>{
+            context.save();
+            loop();
+            context.beginPath()
     
-        if (nodesOrder.length != 0)
-            context.moveTo(nodesOrder.at(-1).x, nodesOrder.at(-1).y);
+            if (nodesOrder.length != 0)
+                context.moveTo(cities[nodesOrder.at(-1)].x, cities[nodesOrder.at(-1)].y);
     
-        for (let i = 0, length = nodesOrder.length; i < length; ++i)
-        {
-            context.lineWidth = 3;
-            context.lineTo(nodesOrder[i].x, nodesOrder[i].y);
-            context.stroke();
-        }
+            for (let i = 0, length = nodesOrder.length; i < length; ++i)
+            {
+                context.lineWidth = 3;
+                //console.log(cities[nodesOrder[i]].x, cities[nodesOrder[i]].y);
+                context.lineTo(cities[nodesOrder[i]].x, cities[nodesOrder[i]].y);
+                context.stroke();
+            }
         
-        context.restore();
-        }
+            context.restore();
+        })
+      }
   
       // Start Update
 
-      let loop = function() {
+      let loop = function()
+      {
           let i, length, city;
   
           context.save();
@@ -340,7 +350,7 @@ class City
           for (i = 0, length = cities.length; i < length; i++) {
               city = cities[i];
               if (city.dragging) city.drag(mouse);
-              city.render(context);
+              city._draw(context);
               if (city.destroyed) {
                   cities.splice(i, 1);
                   length--;
@@ -355,7 +365,8 @@ class City
           bufferContext.restore();
 
           context.drawImage(bufferCanvas, 0, 0);
-  
-          requestAnimationFrame(loop);
+
+          if (isAnimating)
+            requestAnimationFrame(loop);
       };
       loop();
