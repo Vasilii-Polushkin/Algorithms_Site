@@ -150,6 +150,9 @@ function resize() {
     screenWidth = canvas.width = window.innerWidth;
     screenHeight = canvas.height = window.innerHeight;
     context = canvas.getContext('2d');
+    context.lineJoin = 'round';
+    context.lineCap = 'round';
+    context.lineWidth = 2;
 }
 function mouseMove(event) {
     mouse.set(event.clientX, event.clientY);
@@ -240,10 +243,7 @@ export function drawLines(nodesOrder, strokeColor = BONE_COLOR) {
     if (nodesOrder.length != 0)
         context.moveTo(cities[nodesOrder.at(-1)].x, cities[nodesOrder.at(-1)].y);
     for (let i = 0, length = nodesOrder.length; i < length; ++i) {
-        context.lineWidth = 2;
         context.lineTo(cities[nodesOrder[i]].x, cities[nodesOrder[i]].y);
-        context.lineJoin = 'round';
-        context.lineCap = 'round';
         context.stroke();
     }
     drawCities();
