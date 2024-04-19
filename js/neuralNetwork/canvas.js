@@ -101,8 +101,8 @@ let coord = {x: 0, y: 0};
 let paint = false;
 
 function getPosition(event) {
-    coord.x = event.clientX - canvas.offsetLeft;
-    coord.y = event.clientY - canvas.offsetTop - 150;
+    coord.x = event.pageX - canvas.getBoundingClientRect().left;
+    coord.y = event.pageY - canvas.getBoundingClientRect().top;
 
     let dx = w / squareWidth;
     let dy = h / squareHeight;
