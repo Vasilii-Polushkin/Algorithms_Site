@@ -23,6 +23,14 @@ class Pair {
     }
 }
 
+class PairOfClusters {
+    constructor(first, second, distance) {
+        this.first = first;
+        this.second = second;
+        this.distance = distance;
+    }
+}
+
 export class Point {
     constructor(x, y) {
         this.x = x;
@@ -137,7 +145,7 @@ function C_means() {
 
     let clusters = new Array(numberOfClusters);
 
-    if(control.points.length === 1) {
+    if (control.points.length === 1) {
         let cluster = new Cluster(control.points[0]);
         cluster.points.push(control.points[0]);
         clusters[0] = cluster;
@@ -249,58 +257,72 @@ function AgglomerativeHierarchicalClustering() {
             });
         }
 
-        /*distances.sort(function (a, b){
-            return (b[1].distance < a[1].distance) - (a[1].distance < b[1].distance);
-        });
-        console.log(distances)*/
-
         let newClusters = [];
-        let BREAK = false;
 
         let priority = 1;
         let count = distances.length;
 
+        let pairs = [];
 
-        while (!BREAK && count > 1) {
+        while (count > 1) {
             count = 0;
             for (let i = 0; i < distances.length; i++) {
-                if (BREAK) break;
 
                 for (let j = 1; j < distances[i].length; j++) {
                     if (!clusters[i].centre.used && !clusters[distances[i][j].ind].centre.used && distances[i][j].distance === distances[distances[i][j].ind][priority].distance) {
                         count++;
 
+                        clusters[i].centre.used = true;
                         clusters[distances[i][j].ind].centre.used = true;
 
-                        for (let k = 0; k < clusters[distances[i][j].ind].points.length; k++)
-                            clusters[i].points.push(clusters[distances[i][j].ind].points[k]);
-
-                        let x = 0;
-                        let y = 0;
-                        for (let k = 0; k < clusters[i].points.length; k++) {
-                            x += clusters[i].points[k].x;
-                            y += clusters[i].points[k].y;
-                        }
-                        clusters[i].centre = new Point(x / clusters[i].points.length, y / clusters[i].points.length);
-                        clusters[i].centre.used = true;
-
-                        newClusters.push(clusters[i]);
-                    }
-
-                    if (clusters.length - newClusters.length === numberOfClusters) {
-                        BREAK = true;
-                        break;
+                        let pair = new PairOfClusters(i, distances[i][j].ind, distances[i][j].distance);
+                        pairs.push(pair);
                     }
                 }
             }
             priority++;
         }
 
+        pairs.sort(function (a, b) {
+            return (b.distance < a.distance) - (a.distance < b.distance);
+        });
+
+
+        for (let i = 0; i < pairs.length; i++) {
+
+            let first = pairs[i].first;
+            let second = pairs[i].second;
+
+            if (clusters.length - newClusters.length === numberOfClusters) {
+                clusters[first].centre.used = false;
+                clusters[second].centre.used = false;
+            }
+
+            else {
+                for (let k = 0; k < clusters[second].points.length; k++)
+                    clusters[first].points.push(clusters[second].points[k]);
+
+                let x = 0;
+                let y = 0;
+                for (let k = 0; k < clusters[first].points.length; k++) {
+                    x += clusters[first].points[k].x;
+                    y += clusters[first].points[k].y;
+                }
+                clusters[first].centre = new Point(x / clusters[first].points.length, y / clusters[first].points.length);
+                clusters[first].centre.used = true;
+
+                newClusters.push(clusters[first]);
+            }
+        }
+
+
         for (let k = 0; k < clusters.length; k++)
-            if (!clusters[k].centre.used) newClusters.push(clusters[k]);
+            if (!clusters[k].centre.used)
+                newClusters.push(clusters[k]);
 
         for (let i = 0; i < newClusters.length; i++)
             newClusters[i].centre.used = false;
+
 
         clusters = newClusters;
     }
