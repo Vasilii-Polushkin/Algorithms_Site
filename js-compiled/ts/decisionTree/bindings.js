@@ -135,7 +135,7 @@ function parseCSV(text) {
 }
 const TrainingCSVPathElement = document.getElementById('chooseTrainingFile');
 TrainingCSVPathElement.addEventListener('change', () => {
-    if (TrainingCSVPathElement.files[0] == undefined)
+    if (TrainingCSVPathElement.files[0] === undefined)
         return;
     const newCSVFilename = TrainingCSVPathElement.files[0].name;
     readTrainFile(TrainingCSVPathElement.files[0]);
@@ -188,9 +188,9 @@ function readClassifyFile(filename) {
 /* ---------------- ФУНКИИ, ПОЛНОСТЬ ОТВЕЧАЮЩИЕ ЗА ВАЛИДАЦИЮ ПРИ ВЫБОРЕ ФАЙЛА И ЕГО ИСПОЛЬЗОВАНИИ  -------------------- */
 export function handleTrainFileValidation() {
     const errStrings = getTrainingTableErrStrings();
-    if (errStrings == undefined)
+    if (errStrings === undefined)
         return true;
-    if (errStrings.btnString == undefined) {
+    if (errStrings.btnString === undefined) {
         makeFileNotValidErrorWithNoValidateBtn(errStrings.errString);
         SetNoTrainingFile();
     }
@@ -202,9 +202,9 @@ export function handleTrainFileValidation() {
 }
 export function handleClassifyFileValidation() {
     const errStrings = getClassifyTableErrStrings();
-    if (errStrings == undefined)
+    if (errStrings === undefined)
         return true;
-    if (errStrings.btnString == undefined) {
+    if (errStrings.btnString === undefined) {
         makeFileNotValidErrorWithNoValidateBtn(errStrings.errString);
         SetNoClassificationFile();
     }
@@ -266,7 +266,7 @@ function getClassifyTableCategoricalValsErrorInfo() {
             let val = parseFloat(newClassifyDataTable[i][columID]);
             if (isNaN(val))
                 val = newClassifyDataTable[i][columID];
-            if (categoricalList[id].values.includes(val) == false)
+            if (categoricalList[id].values.includes(val) === false)
                 return { columID: columID + 1, invalidValue: val, rowID: i + 1 };
         }
     }
@@ -311,12 +311,12 @@ function filterClassifyTableByCategoricalVals() {
     for (const id in categoricalList) {
         const columID = categoricalList[id].GlobalID;
         for (let i = 1; i < newClassifyDataTable.length; ++i) {
-            if (newClassifyDataTable[i] == undefined)
+            if (newClassifyDataTable[i] === undefined)
                 continue;
             let val = parseFloat(newClassifyDataTable[i][columID]);
             if (isNaN(val))
                 val = newClassifyDataTable[i][columID];
-            if (categoricalList[id].values.includes(val) == false) {
+            if (categoricalList[id].values.includes(val) === false) {
                 delete newClassifyDataTable[i];
             }
         }
@@ -328,7 +328,7 @@ function filterClassifyTableByIntervalVals() {
     for (const id in intervalList) {
         const columID = intervalList[id].GlobalID;
         for (let i = 1; i < newClassifyDataTable.length; ++i) {
-            if (newClassifyDataTable[i] == undefined)
+            if (newClassifyDataTable[i] === undefined)
                 continue;
             let val = newClassifyDataTable[i][columID];
             if (isNaN(parseFloat(val))) {

@@ -4,3 +4,7 @@
 /**/debug.log
 /vscode
 /idea
+/tsconfig.json
+/package.json
+/package-lock.json
+/jsconfig.json

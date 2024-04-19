@@ -29,7 +29,7 @@ export class TreeNode
 
     isLeaf():boolean
     {
-        return (this.attributeID == null);
+        return (this.attributeID === null);
     }
 
     mostPopularClassName(dataTable: string[][]): string
@@ -59,7 +59,7 @@ export class TreeNode
         usedCategiralIDs: boolean[],
         usedIntervalIDsValues: boolean[][]):number
     {
-        if (this.entropy == 0)
+        if (this.entropy === 0)
             return undefined;
         
         // interval
@@ -94,7 +94,7 @@ export class TreeNode
                     if (parseFloat(this.ownerTree.dataTable[id][attribute.GlobalID]) <= breakpointValue)
                     {
                         leftIDs.push(id);
-                        if (leftSamplesClasses[currClassName] == undefined)
+                        if (leftSamplesClasses[currClassName] === undefined)
                             leftSamplesClasses[currClassName] = 0;
                         leftSamplesClasses[currClassName]++;
                         leftTotal++;
@@ -102,7 +102,7 @@ export class TreeNode
                     else
                     {
                         rightIDs.push(id);
-                        if (rightSamplesClasses[currClassName] == undefined)
+                        if (rightSamplesClasses[currClassName] === undefined)
                             rightSamplesClasses[currClassName] = 0;
                         rightSamplesClasses[currClassName]++;
                         rightTotal++;
@@ -202,7 +202,7 @@ export class TreeNode
 
         if (this.ownerTree.minKnowledge != undefined && 
             this.entropy - Math.min(currMinIntervalEntrophy, currMinCategoricalEntrophy) < this.ownerTree.minKnowledge
-            || currMinIntervalEntrophy == maxEnthropy && currMinCategoricalEntrophy == maxEnthropy)
+            || currMinIntervalEntrophy === maxEnthropy && currMinCategoricalEntrophy === maxEnthropy)
             return undefined;
 
         if (currMinIntervalEntrophy < currMinCategoricalEntrophy)
@@ -250,12 +250,12 @@ export class TreeNode
 
     isLeftChild():boolean
     {
-        return this.parent.children[0] == this;
+        return this.parent.children[0] === this;
     }
 
     getAttributeName(): string
     {
-        if (this.parent.attributeType == attributeTypes.INTERVAL)
+        if (this.parent.attributeType === attributeTypes.INTERVAL)
             return this.ownerTree.dataTable[0][this.ownerTree.intervalAttributesList[this.parent.attributeID].GlobalID];
 
         else
@@ -264,7 +264,7 @@ export class TreeNode
 
     getAttributeCondition():string
     {
-        if (this.parent.attributeType == attributeTypes.CATEGORICAL)
+        if (this.parent.attributeType === attributeTypes.CATEGORICAL)
             return  " == " + 
                 this.ownerTree.categoricalAttributesList[this.parent.attributeID].values[this.categoricalID];
 
@@ -275,7 +275,7 @@ export class TreeNode
     getVisualContent(): string
     {
         // root
-        if (this.parent == null)
+        if (this.parent === null)
             return `root node`
 
         return this.getAttributeName() + this.getAttributeCondition();
@@ -331,16 +331,16 @@ export class DecisionTree
     
     buildTreeDFS(currNode: TreeNode, usedCategiralIDs: boolean[], usedIntervalIDsValues:boolean[][], currDepth: number): void
     {
-        if (this.maxDepth != undefined && currDepth == this.maxDepth - 1)
+        if (this.maxDepth != undefined && currDepth === this.maxDepth - 1)
             return;
 
         let intervalValueID = currNode.addConditionAndChildren(
             usedCategiralIDs, usedIntervalIDsValues);
 
-        if (currNode.attributeType == undefined)
+        if (currNode.attributeType === undefined || currNode.attributeType === null)
             return;
 
-        if (currNode.attributeType == attributeTypes.CATEGORICAL)
+        if (currNode.attributeType === attributeTypes.CATEGORICAL)
         {
             usedCategiralIDs[currNode.attributeID] = true;
             currNode.children.forEach((childNode: TreeNode) => {
@@ -391,7 +391,7 @@ export class DecisionTree
                 }
 
             // решаем куда идет атрибут
-            if (attribuleType == attributeTypes.CATEGORICAL)
+            if (attribuleType === attributeTypes.CATEGORICAL)
             {
                 this.categoricalAttributesList.push(new attribute
                     (this.categoricalAttributesList.length, colum, columID)
@@ -423,7 +423,7 @@ export class DecisionTree
             // go to ul
             nextElement = currElement.lastElementChild;
 
-            if (currNode.attributeType == attributeTypes.INTERVAL)
+            if (currNode.attributeType === attributeTypes.INTERVAL)
             {
                 if(parseFloat(inputAttributes[this.intervalAttributesList[currNode.attributeID].GlobalID]) <=
                     Number(currNode.conditionValue))
@@ -443,7 +443,7 @@ export class DecisionTree
 
                 for (let i = 0; i < this.categoricalAttributesList[currNode.attributeID].values.length; ++i)
                 {
-                    if (inputAttributes[this.categoricalAttributesList[currNode.attributeID].GlobalID] ==
+                    if (inputAttributes[this.categoricalAttributesList[currNode.attributeID].GlobalID] ===
                         this.categoricalAttributesList[currNode.attributeID].values[i])
                     {
                         currNode = currNode.children[i];
@@ -465,7 +465,7 @@ export class DecisionTree
 
         const res = currNode.mostPopularClassName(this.dataTable);
 
-        if (res == inputAttributes.at(-1))
+        if (res === inputAttributes.at(-1))
         {
             currA().classList.add("success");
             setTimeout(function() {
@@ -507,7 +507,7 @@ export class DecisionTree
         let classifiedWrong = 0;
         const amountToClasify = Math.floor(dataTable.length * precentageToClassify / 100);
 
-        SetTotalToClassify(amountToClasify - 1);
+        SetTotalToClassify(Math.max(0, amountToClasify - 1));
 
         for (let i = 1; i < amountToClasify; ++i)
         {
@@ -541,7 +541,7 @@ export class DecisionTree
             const samplesClasses = {};
             
             this.rootNode.samplesIDs.forEach((id) => {
-                if (samplesClasses[this.dataTable[id][this.dataTable[0].length - 1]] == undefined)
+                if (samplesClasses[this.dataTable[id][this.dataTable[0].length - 1]] === undefined)
                     samplesClasses[this.dataTable[id][this.dataTable[0].length - 1]] = 0;
                 samplesClasses[this.dataTable[id][this.dataTable[0].length - 1]] ++;
             });

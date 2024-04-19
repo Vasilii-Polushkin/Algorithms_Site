@@ -14,7 +14,7 @@ CreateTreeBtn.addEventListener("click", async ()=>{
 
     CreateTreeBtn.setAttribute("disabled","true");
 
-    if (createTreeMethod == NewCSV)
+    if (createTreeMethod === NewCSV)
     {
         if (newTrainingDataTable != undefined)
         {
@@ -36,18 +36,18 @@ CreateTreeBtn.addEventListener("click", async ()=>{
 ClassifyBtn.addEventListener("click", ()=>{
     tree.stopClassifying();
     
-    if (tree.dataTable == undefined)
+    if (tree.dataTable === undefined)
     {
         makeNoTrainingFileSelectedError();
         return;
     }
 
-    if (classifyMethod == ThisCSV)
+    if (classifyMethod === ThisCSV)
         tree.classifyDataTable(percentToClassify);
 
     else
     {
-        if (newClassifyDataTable == undefined)
+        if (newClassifyDataTable === undefined)
         {
             makeNoClassifyFileSelectedError();
             return;

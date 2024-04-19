@@ -35,7 +35,7 @@ export function adjustMedians(arr: any){
 
 export function incrementedValue(x: undefined | number): number
 {
-    if (x == undefined)
+    if (x === undefined)
         x = 0;
     x++;
     return x;

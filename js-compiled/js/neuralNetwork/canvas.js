@@ -1,56 +1,41 @@
-import {Matrix, feedForward, Network} from "./nn.js";
-import network from "./trainedNetwork.json" assert {type: "json"}
-
+import { Matrix, feedForward, Network } from "./nn.js";
+import network from "./trainedNetwork.json" assert { type: "json" };
 window.addEventListener('load', () => {
     resize();
     document.addEventListener('mousedown', startPainting);
     document.addEventListener('mouseup', stopPainting);
     document.addEventListener('mousemove', sketch);
 });
-
 const canvas = document.querySelector('#canvas');
 const ctx = canvas.getContext('2d');
-
 let squareWidth = 56;
 let squareHeight = 56;
 let w = ctx.canvas.width;
 let h = ctx.canvas.height;
-
 let input = new Array(squareHeight).fill(0).map(() => new Array(squareWidth).fill(0));
-
 const answerDigit = document.getElementById('answerDigit');
 answerDigit.innerHTML = '?';
-
 const clearButton = document.getElementById('clear');
 clearButton.addEventListener('click', function () {
-    let canvas = document.getElementById('canvas'),
-        ctx = canvas.getContext("2d");
+    let canvas = document.getElementById('canvas'), ctx = canvas.getContext("2d");
     input = new Array(squareHeight).fill(0).map(() => new Array(squareWidth).fill(0));
     answerDigit.innerHTML = '?';
 });
-
 const answerButton = document.getElementById('answer');
 answerButton.addEventListener('click', function () {
-    let canvas = document.getElementById('canvas'),
-        ctx = canvas.getContext("2d", {willReadFrequently: true});
-
+    let canvas = document.getElementById('canvas'), ctx = canvas.getContext("2d", { willReadFrequently: true });
     const imageData = ctx.getImageData(0, 0, w, h);
     let pixels = imageData.data;
-
     mosaic(pixels);
     let param = squareHeight / 2;
-
     let activations = new Array(network.sizes.length);
     for (let i = 0; i < activations.length; i++)
         activations[i] = new Matrix(network.sizes[i], 1);
-
     for (let i = 0; i < h; i += h / param)
         for (let j = 0; j < w * 4; j += w * 4 / param)
             activations[0].data[(i / (h / param)) * param + j / (w / param * 4)][0] = (pixels[i * w * 4 + j] / 255 +
                 pixels[i * w * 4 + j + 1] / 255 + pixels[i * w * 4 + j + 2] / 255) / 3;
-
     activations = feedForward(network, activations);
-
     let answer = 0;
     let mx = 0;
     for (let i = 0; i < 10; i++) {
@@ -59,12 +44,9 @@ answerButton.addEventListener('click', function () {
             answer = i;
         }
     }
-
     answerDigit.innerHTML = answer;
 });
-
 function mosaic(pixels) {
-
     for (let i = 0; i < pixels.length; i += 2) {
         if (Math.floor(i / squareHeight) % 2 === 0) {
             let sum = (pixels[i] + pixels[i + squareWidth] + pixels[i + 1] + pixels[i + squareWidth + 1]) / 4;
@@ -75,35 +57,28 @@ function mosaic(pixels) {
         }
     }
 }
-
 function loop() {
     requestAnimationFrame(loop);
-    ctx.clearRect(0, 0, w, h)
+    ctx.clearRect(0, 0, w, h);
     let dx = w / squareWidth;
     let dy = h / squareHeight;
-
     for (let i = 0; i < squareWidth; i++) {
         for (let j = 0; j < squareHeight; j++) {
             let temp = input[i][j] * 255;
-
             ctx.fillStyle = 'rgb(' + temp + "," + temp + "," + temp + ")";
             ctx.fillRect(dx * j, dy * i, dx, dy);
         }
     }
 }
-
 function resize() {
     ctx.canvas.width = 560;
     ctx.canvas.height = 560;
 }
-
-let coord = {x: 0, y: 0};
+let coord = { x: 0, y: 0 };
 let paint = false;
-
 function getPosition(event) {
     coord.x = event.pageX - canvas.getBoundingClientRect().left;
     coord.y = event.pageY - canvas.getBoundingClientRect().top;
-
     let dx = w / squareWidth;
     let dy = h / squareHeight;
     if (event.buttons === 1) {
@@ -113,7 +88,6 @@ function getPosition(event) {
                 let ex = dx * i + dx;
                 let sy = dy * j;
                 let ey = dy * j + dy;
-
                 if (sx < coord.x && ex > coord.x && sy < coord.y && ey > coord.y) {
                     input[j][i] = Math.min(input[j][i] + 0.2, 1);
                 }
@@ -133,7 +107,6 @@ function getPosition(event) {
                 let ex = dx * i + dx;
                 let sy = dy * j;
                 let ey = dy * j + dy;
-
                 if (sx < coord.x && ex > coord.x && sy < coord.y && ey > coord.y) {
                     input[j][i] = Math.max(input[j][i] - 0.2, 0);
                 }
@@ -147,29 +120,24 @@ function getPosition(event) {
         }
     }
 }
-
 function startPainting(event) {
     paint = true;
     getPosition(event);
 }
-
 function stopPainting() {
     paint = false;
 }
-
 function sketch(event) {
-    if (!paint) return;
+    if (!paint)
+        return;
     ctx.beginPath();
-
     ctx.lineWidth = 10;
-
     ctx.lineCap = 'round';
     ctx.strokeStyle = '#ffffff';
-
     ctx.moveTo(coord.x, coord.y);
     getPosition(event);
     ctx.lineTo(coord.x, coord.y);
     ctx.stroke();
 }
-
 requestAnimationFrame(loop);
+//# sourceMappingURL=canvas.js.map

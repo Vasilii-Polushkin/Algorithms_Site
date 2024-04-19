@@ -26,7 +26,7 @@ export function adjustMedians(arr) {
     return res;
 }
 export function incrementedValue(x) {
-    if (x == undefined)
+    if (x === undefined)
         x = 0;
     x++;
     return x;
