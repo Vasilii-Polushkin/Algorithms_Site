@@ -46,11 +46,70 @@
     </div>
 </header>
 
+<script type="module" src='../js/antColony/control.js'></script>
 <script type="module" src='../js/antColony/labyrinth.js'></script>
-<script type="module" src='../js/antColony/draw.js'></script>
+<script type="module" src='../js/antColony/model.js'></script>
+<script type="module" src='../js/antColony/objects.js'></script>
+<script type="module" src='../js/antColony/view.js'></script>
 
 <div>
-    <canvas width="500" height="300" id="canvas"></canvas>
+    <section>
+        <div id="layers">
+            <canvas id="layer1"></canvas>
+            <canvas id="layer2"></canvas>
+            <canvas id="extraLayer1"></canvas>
+            <canvas id="layer3"></canvas>
+        </div>
+
+        <div class='col-xs'>
+
+            <!-- brush size range form -->
+            <label for="brushSizeRange" class="form-label">Size of the brush:
+                <output id="brushSize"></output>
+            </label>
+            <input type="range" class="form-range" min="20" max="100" step="20" id="brushSizeRange" value="1">
+
+            <!-- cell type radio form --><br><br>
+            <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                <input type="radio" class="btn-check" name="btnradio" id="ERASEbtn" autocomplete="off" checked>
+                <label class="btn btn-outline-light" for="ERASEbtn">ERASER</label>
+
+                <input type="radio" class="btn-check" name="btnradio" id="WALLbtn" autocomplete="off">
+                <label class="btn btn-outline-light" for="WALLbtn">WALL</label>
+
+                <input type="radio" class="btn-check" name="btnradio" id="COLONYbtn" autocomplete="off">
+                <label class="btn btn-outline-light" for="COLONYbtn">COLONY</label>
+
+                <input type="radio" class="btn-check" name="btnradio" id="FOODbtn" autocomplete="off">
+                <label class="btn btn-outline-light" for="FOODbtn">FOOD</label>
+            </div>
+
+            <!-- number of ants range form --><br><br>
+            <label for="antsNumber" class="form-label">Number of ants:
+                <output id="antsNumber"></output>
+            </label>
+            <input type="range" class="form-range" min="10" max="400" step="10" id="antsNumberRange" value="100">
+
+            <!-- ants speed range form --><br><br>
+            <label for="antsSpeed" class="form-label">Ants speed:
+                <output id="antsSpeed"></output>
+            </label>
+            <input type="range" class="form-range" min="40" max="300" step="20" id="antsSpeedRange" value="40">
+
+            <!-- generate labyrinth button --><br><br>
+            <button type="button" class="btn btn-outline-light" id="CreateLabyrinth">Generate labyrinth</button>
+
+            <!-- restart button -->
+            <button type="button" class="btn btn-outline-light" id="RestartBtn">Restart</button>
+
+            <!-- pause button -->
+            <button type="button" class="btn btn-outline-light" id="PauseBtn"></button>
+
+            <!-- alert -->
+            <div id="liveAlertPlaceholder"></div>
+        </div>
+    </section>
+
 </div>
 
 

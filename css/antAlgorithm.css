@@ -1,0 +1,20 @@
+section {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+body, html {
+    height: 95%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+canvas {
+    border-radius: 6px;
+}
+
+#layer2, #layer3, #extraLayer1 {
+    display: none;
+}
