@@ -11,8 +11,8 @@ window.addEventListener('load', () => {
 const canvas = document.querySelector('#canvas');
 const ctx = canvas.getContext('2d');
 
-let squareWidth = 28;
-let squareHeight = 28;
+let squareWidth = 56;
+let squareHeight = 56;
 let w = ctx.canvas.width;
 let h = ctx.canvas.height;
 
@@ -32,26 +32,29 @@ clearButton.addEventListener('click', function () {
 const answerButton = document.getElementById('answer');
 answerButton.addEventListener('click', function () {
     let canvas = document.getElementById('canvas'),
-        ctx = canvas.getContext("2d", { willReadFrequently: true });
+        ctx = canvas.getContext("2d", {willReadFrequently: true});
 
     const imageData = ctx.getImageData(0, 0, w, h);
     let pixels = imageData.data;
+
+    mosaic(pixels);
+    let param = squareHeight / 2;
 
     let activations = new Array(network.sizes.length);
     for (let i = 0; i < activations.length; i++)
         activations[i] = new Matrix(network.sizes[i], 1);
 
-    for (let i = 0; i < h; i += h / squareHeight)
-        for (let j = 0; j < w * 4; j += w * 4 / squareWidth)
-            activations[0].data[(i / (h / squareHeight)) * squareWidth + j / (w / squareWidth * 4)][0] = (pixels[i * w * 4 + j] / 255 +
+    for (let i = 0; i < h; i += h / param)
+        for (let j = 0; j < w * 4; j += w * 4 / param)
+            activations[0].data[(i / (h / param)) * param + j / (w / param * 4)][0] = (pixels[i * w * 4 + j] / 255 +
                 pixels[i * w * 4 + j + 1] / 255 + pixels[i * w * 4 + j + 2] / 255) / 3;
 
     activations = feedForward(network, activations);
 
     let answer = 0;
     let mx = 0;
-    for(let i = 0; i < 10; i++){
-        if(activations[2].data[i][0] > mx){
+    for (let i = 0; i < 10; i++) {
+        if (activations[2].data[i][0] > mx) {
             mx = activations[2].data[i][0];
             answer = i;
         }
@@ -59,6 +62,19 @@ answerButton.addEventListener('click', function () {
 
     answerDigit.innerHTML = answer;
 });
+
+function mosaic(pixels) {
+
+    for (let i = 0; i < pixels.length; i += 2) {
+        if (Math.floor(i / squareHeight) % 2 === 0) {
+            let sum = (pixels[i] + pixels[i + squareWidth] + pixels[i + 1] + pixels[i + squareWidth + 1]) / 4;
+            pixels[i] = sum;
+            pixels[i + squareWidth] = sum;
+            pixels[i + 1] = sum;
+            pixels[i + squareWidth + 1] = sum;
+        }
+    }
+}
 
 function loop() {
     requestAnimationFrame(loop);

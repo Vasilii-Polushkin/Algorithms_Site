@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Neural network</title>
+    <title>Ant colony</title>
 
     <!-- default -->
     <meta charset="utf-8">
@@ -20,7 +20,7 @@
 
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/media.css">
-    <link rel="stylesheet" href="../css/neuralNetwork.css">
+    <link rel="stylesheet" href="../css/antAlgorithm.css">
 
     <script src="../libs/jquery/jquery-3.6.0.min.js" defer></script>
     <script src="../js/common.js" defer></script>
@@ -43,35 +43,21 @@
 
             <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                 <li><a href="../index.html" class="nav-link px-2 text-secondary">Home</a></li>
-                <li><a href="../html/Astar.html" class="nav-link px-2 text-white-50">A* algorithm</a></li>
+                <li><a href="Astar.html" class="nav-link px-2 text-white-50">A* algorithm</a></li>
                 <li><a href="#" class="nav-link px-2 text-white-50">Clusterization</a></li>
                 <li><a href="#" class="nav-link px-2 text-white-50">Genetic tree</a></li>
+                <li><a href="neuralNetwork.html" class="nav-link px-2 text-white-50">Neural network</a></li>
                 <li><a href="#" class="nav-link px-2 text-white-50">Decision tree</a></li>
-                <li><a href="antColony.html" class="nav-link px-2 text-white-50">Ant colony</a></li>
             </ul>
         </div>
     </div>
 </header>
 
-<script type="module" src='../js/neuralNetwork/nn.js'></script>
-<script type="module" src='../js/neuralNetwork/canvas.js'></script>
+<script type="module" src='../js/antColony/labyrinth.js'></script>
+<script type="module" src='../js/antColony/draw.js'></script>
 
-<div class="box">
-    <section>
-        <canvas width="560" height="560" id="canvas"></canvas>
-        <div id="menu" class="grid gap-3">
-            <div class="p-2 g-col-6">
-                <button id="answer" class="btn btn-outline-light w-100" type="button">Get answer</button>
-            </div>
-            <div class="p-2 g-col-6">
-                <button id="clear" class="btn btn-outline-light w-100" type="button">Clear</button>
-            </div>
-            <div class="p-2 g-col-6">
-                <h5> Answer is </h5>
-                <h5 id="answerDigit"></h5>
-            </div>
-        </div>
-    </section>
+<div>
+    <canvas width="500" height="300" id="canvas"></canvas>
 </div>
 
 
