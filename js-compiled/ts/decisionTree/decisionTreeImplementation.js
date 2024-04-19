@@ -10,7 +10,7 @@ export class TreeNode {
     categoricalID = null;
     attributeType = null;
     attributeID = null;
-    conditionValue = null; // string некруто
+    conditionValue = null;
     entropy = 0;
     samplesAmount = 0;
     samplesIDs = [];

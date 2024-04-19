@@ -1,4 +1,7 @@
 import { abortPathFinding } from "./genetic.js";
+/* --------------------------------------------------------------------------------- *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ UTILS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+ * --------------------------------------------------------------------------------- */
 window.requestAnimationFrame = (function () {
     return window.requestAnimationFrame ||
         window.webkitRequestAnimationFrame ||
@@ -140,32 +143,16 @@ class City {
     }
 }
 ;
-export function setRandomSities(amount = 10) {
-    while (amount--) {
-        cities.push(new City(Math.random() * window.innerWidth, Math.random() * (window.innerHeight - 120) + 120, CITY_RADIUS, {
-            cities: cities
-        }));
-    }
-}
-export function clearSities() {
-    cities.length = 0;
-}
-//const BACKGROUND_COLOR = 'rgba(11, 51, 56, 1)';
-let isAnimating = true;
-const RADIUS_LIMIT = 65;
-const CITY_RADIUS = 10;
-let canvas, context;
-let screenWidth, screenHeight;
-let mouse = new Vector();
-export let cities = [];
-/* -------------------------- EVENT LISTENERS -------------------------- */
+/* --------------------------------------------------------------------------------- *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ EVENT LISTENERS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+ * --------------------------------------------------------------------------------- */
 function resize() {
     screenWidth = canvas.width = window.innerWidth;
     screenHeight = canvas.height = window.innerHeight;
     context = canvas.getContext('2d');
 }
-function mouseMove(e) {
-    mouse.set(e.clientX, e.clientY);
+function mouseMove(event) {
+    mouse.set(event.clientX, event.clientY);
     let city, hit = false;
     for (let i = cities.length - 1; i >= 0; i--) {
         city = cities[i];
@@ -176,14 +163,14 @@ function mouseMove(e) {
     }
     canvas.style.cursor = hit ? 'pointer' : 'default';
 }
-function mouseDown(e) {
+function mouseDown(event) {
     for (let i = cities.length - 1; i >= 0; i--) {
         if (cities[i].isMouseOver) {
             cities[i].startDrag(mouse);
             return;
         }
     }
-    cities.push(new City(e.clientX, e.clientY, CITY_RADIUS, { cities: cities }));
+    cities.push(new City(event.clientX, event.clientY, CITY_RADIUS, { cities: cities }));
 }
 function mouseUp() {
     for (let i = 0, length = cities.length; i < length; i++) {
@@ -201,7 +188,27 @@ function doubleClick() {
         }
     }
 }
-/* ------------------------------- INIT ------------------------------- */
+/* --------------------------------------------------------------------------------- *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ INIT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+ * --------------------------------------------------------------------------------- */
+let isAnimating = true;
+const RADIUS_LIMIT = 65;
+const CITY_RADIUS = 10;
+let canvas, context;
+let screenWidth, screenHeight;
+let mouse = new Vector();
+export let cities = [];
+const BONE_COLOR = "rgb(205, 198, 195)";
+canvas = document.getElementById('c');
+window.addEventListener('resize', resize, false);
+resize();
+canvas.addEventListener('mousemove', mouseMove, false);
+canvas.addEventListener('mousedown', mouseDown, false);
+canvas.addEventListener('mouseup', mouseUp, false);
+canvas.addEventListener('dblclick', doubleClick, false);
+/* --------------------------------------------------------------------------------- *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LOGIC ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+ * --------------------------------------------------------------------------------- */
 export function stopAnimating() {
     isAnimating = false;
     window.removeEventListener('resize', resize, false);
@@ -223,10 +230,10 @@ export function startAnimating() {
     canvas.addEventListener('mouseup', mouseUp, false);
     canvas.addEventListener('dblclick', doubleClick, false);
     canvas.removeEventListener('click', startAnimating);
-    loop();
+    animationLoop();
 }
-export function drawLines(nodesOrder, strokeColor = "rgb(205, 198, 195)") {
-    loop();
+export function drawLines(nodesOrder, strokeColor = BONE_COLOR) {
+    animationLoop();
     context.save();
     context.strokeStyle = strokeColor;
     context.beginPath();
@@ -242,21 +249,15 @@ export function drawLines(nodesOrder, strokeColor = "rgb(205, 198, 195)") {
     drawCities();
     context.restore();
 }
-let loop = function (shouldCheck = false) {
+let animationLoop = function (shouldCheck = false) {
     if (shouldCheck && !isAnimating)
         return;
     context.save();
-    /*
-    context.fillStyle = BACKGROUND_COLOR;
-    context.fillRect(0, 0, screenWidth, screenHeight);
-    context.fillStyle = gradient;
-    context.fillRect(0, 0, screenWidth, screenHeight);
-    */
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.restore();
     drawCities();
     if (isAnimating)
-        requestAnimationFrame(loop, true);
+        requestAnimationFrame(animationLoop, true);
 };
 function drawCities() {
     for (let i = 0, length = cities.length; i < length; i++) {
@@ -271,12 +272,18 @@ function drawCities() {
         }
     }
 }
-canvas = document.getElementById('c');
-window.addEventListener('resize', resize, false);
-resize();
-canvas.addEventListener('mousemove', mouseMove, false);
-canvas.addEventListener('mousedown', mouseDown, false);
-canvas.addEventListener('mouseup', mouseUp, false);
-canvas.addEventListener('dblclick', doubleClick, false);
-loop();
+export function setRandomSities(amount = 10) {
+    while (amount--) {
+        cities.push(new City(Math.random() * window.innerWidth, Math.random() * (window.innerHeight - 120) + 120, CITY_RADIUS, {
+            cities: cities
+        }));
+    }
+}
+export function clearSities() {
+    cities.length = 0;
+}
+/* --------------------------------------------------------------------------------- *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ START VISUALIZE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+ * --------------------------------------------------------------------------------- */
+animationLoop();
 //# sourceMappingURL=visualisation.js.map

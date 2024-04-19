@@ -13,7 +13,7 @@ export class TreeNode
     categoricalID: number | null = null;
     attributeType: attributeTypes | null = null;
     attributeID: number | null = null;
-    conditionValue: number | string | null = null; // string некруто
+    conditionValue: number | string | null = null;
 
     entropy: number = 0;
     samplesAmount: number = 0;

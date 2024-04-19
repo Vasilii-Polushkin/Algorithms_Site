@@ -1,5 +1,9 @@
 import { abortPathFinding } from "./genetic.js";
 
+/* --------------------------------------------------------------------------------- *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ UTILS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+ * --------------------------------------------------------------------------------- */
+
 window.requestAnimationFrame = (function(){
     return  window.requestAnimationFrame       ||
             window.webkitRequestAnimationFrame ||
@@ -10,7 +14,6 @@ window.requestAnimationFrame = (function(){
                 window.setTimeout(callback, 1000 / 30);
             };
 })();
-
 class Vector
 {
     x;y;
@@ -63,7 +66,6 @@ class Vector
         return '(x:' + this.x + ', y:' + this.y + ')';
     }
 };
-
 function substractVectors(a, b)
 {
     return new Vector(a.x - b.x, a.y - b.y);
@@ -168,32 +170,10 @@ class City
         context.restore();
     }
 };
-  
-export function setRandomSities(amount = 10)
-{
-    while (amount--)
-    {
-        cities.push(new City(Math.random() * window.innerWidth, Math.random() * (window.innerHeight - 120) + 120, CITY_RADIUS, {
-            cities: cities
-        }));
-    }
-}
 
-export function clearSities()
-{
-    cities.length = 0;
-}
-
-//const BACKGROUND_COLOR = 'rgba(11, 51, 56, 1)';
-let isAnimating = true;
-const RADIUS_LIMIT = 65;
-const CITY_RADIUS = 10;
-let canvas, context;
-let screenWidth, screenHeight;
-let mouse = new Vector();
-export let cities = [];
-
-/* -------------------------- EVENT LISTENERS -------------------------- */
+/* --------------------------------------------------------------------------------- *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ EVENT LISTENERS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+ * --------------------------------------------------------------------------------- */
 
 function resize()
 {
@@ -201,9 +181,9 @@ function resize()
     screenHeight = canvas.height = window.innerHeight;
     context = canvas.getContext('2d');
 }
-function mouseMove(e)
+function mouseMove(event)
 {
-    mouse.set(e.clientX, e.clientY);
+    mouse.set(event.clientX, event.clientY);
     let city, hit = false;
     for (let i = cities.length - 1; i >= 0; i--) {
         city = cities[i];
@@ -214,7 +194,7 @@ function mouseMove(e)
     }  
     canvas.style.cursor = hit ? 'pointer' : 'default';
 }
-function mouseDown(e)
+function mouseDown(event)
 {
     for (let i = cities.length - 1; i >= 0; i--) {
         if (cities[i].isMouseOver)
@@ -223,7 +203,7 @@ function mouseDown(e)
             return;
         }
     }
-    cities.push(new City(e.clientX, e.clientY, CITY_RADIUS, {cities: cities}));
+    cities.push(new City(event.clientX, event.clientY, CITY_RADIUS, {cities: cities}));
 }
 function mouseUp()
 {
@@ -246,7 +226,29 @@ function doubleClick()
     }
 }
 
-/* ------------------------------- INIT ------------------------------- */
+/* --------------------------------------------------------------------------------- *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ INIT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+ * --------------------------------------------------------------------------------- */
+let isAnimating = true;
+const RADIUS_LIMIT = 65;
+const CITY_RADIUS = 10;
+let canvas, context;
+let screenWidth, screenHeight;
+let mouse = new Vector();
+export let cities = [];
+const BONE_COLOR = "rgb(205, 198, 195)";
+
+canvas = document.getElementById('c');
+window.addEventListener('resize', resize, false);
+resize();
+canvas.addEventListener('mousemove', mouseMove, false);
+canvas.addEventListener('mousedown', mouseDown, false);
+canvas.addEventListener('mouseup', mouseUp, false);
+canvas.addEventListener('dblclick', doubleClick, false);
+
+/* --------------------------------------------------------------------------------- *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LOGIC ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+ * --------------------------------------------------------------------------------- */
 
 export function stopAnimating()
 {
@@ -276,11 +278,11 @@ export function startAnimating()
     canvas.addEventListener('dblclick', doubleClick, false);
     canvas.removeEventListener('click', startAnimating);
 
-    loop();
+    animationLoop();
 }
-export function drawLines(nodesOrder, strokeColor = "rgb(205, 198, 195)")
+export function drawLines(nodesOrder, strokeColor = BONE_COLOR)
 {
-    loop();
+    animationLoop();
 
     context.save();
 
@@ -302,25 +304,19 @@ export function drawLines(nodesOrder, strokeColor = "rgb(205, 198, 195)")
 
     context.restore();
 }
-let loop = function(shouldCheck = false)
+let animationLoop = function(shouldCheck = false)
 {
     if(shouldCheck && !isAnimating)
         return;
 
     context.save();
-    /*
-    context.fillStyle = BACKGROUND_COLOR;
-    context.fillRect(0, 0, screenWidth, screenHeight);
-    context.fillStyle = gradient;
-    context.fillRect(0, 0, screenWidth, screenHeight);
-    */
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.restore();
   
     drawCities();
           
     if (isAnimating)
-        requestAnimationFrame(loop, true);
+        requestAnimationFrame(animationLoop, true);
 };
 function drawCities()
 {
@@ -338,12 +334,22 @@ function drawCities()
         }
     }
 }
+export function setRandomSities(amount = 10)
+{
+    while (amount--)
+    {
+        cities.push(new City(Math.random() * window.innerWidth, Math.random() * (window.innerHeight - 120) + 120, CITY_RADIUS, {
+            cities: cities
+        }));
+    }
+}
+export function clearSities()
+{
+    cities.length = 0;
+}
 
-canvas = document.getElementById('c');
-window.addEventListener('resize', resize, false);
-resize();
-canvas.addEventListener('mousemove', mouseMove, false);
-canvas.addEventListener('mousedown', mouseDown, false);
-canvas.addEventListener('mouseup', mouseUp, false);
-canvas.addEventListener('dblclick', doubleClick, false);
-loop();
+/* --------------------------------------------------------------------------------- *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ START VISUALIZE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+ * --------------------------------------------------------------------------------- */
+
+animationLoop();

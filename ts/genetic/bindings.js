@@ -1,31 +1,31 @@
 import { startPathFinding, abortPathFinding } from "./genetic.js";
 import { setRandomSities, clearSities, startAnimating, stopAnimating } from "./visualisation.js";
 
-// main page
-export let currGenerationInput = 0;
+/* --------------------------------------------------------------------------------- *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ EXPORT VARIABLES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+ * --------------------------------------------------------------------------------- */
 
-// offcanvas
-export let populationSizeInput = 90;
-export let percentToMutateInput = 30;
-export let percentToCrossInput = 40;
-export let maxGenerationsWithoutChangesInput = 30;
+// Main page
+export let currGenerationInput;
 
-/**
- * ----------------------- MAIN PAGE ------------------------
- */
+// Offcanvas
+export let populationSizeInput;
+export let percentToMutateInput;
+export let percentToCrossInput;
+export let maxGenerationsWithoutChangesInput;
 
+/* --------------------------------------------------------------------------------- *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ MAIN PAGE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+ * --------------------------------------------------------------------------------- */
+
+// Run button
 const RunBtn = document.getElementById("RunBtn");
 RunBtn.addEventListener('click', () => {
     stopAnimating();
     startPathFinding();
 })
 
-const Toast = bootstrap.Toast.getOrCreateInstance(document.getElementById('toast'));
-export function showToast()
-{
-    Toast.show();
-}
-
+// Randomize cities button
 const RandomizeCitiesBtn = document.getElementById("RandomizeCitiesBtn");
 RandomizeCitiesBtn.addEventListener('click', () => {
     abortPathFinding();
@@ -33,6 +33,7 @@ RandomizeCitiesBtn.addEventListener('click', () => {
     startAnimating();
 })
 
+// Clear cities button
 const ClearCitiesBtn = document.getElementById("ClearCitiesBtn");
 ClearCitiesBtn.addEventListener('click', () => {
     abortPathFinding();
@@ -40,38 +41,43 @@ ClearCitiesBtn.addEventListener('click', () => {
     startAnimating();
 })
 
+// Generations without changes output
 const GenerationsWithoutChangesOutput = document.getElementById("GenerationsWithoutChangesOutput");
 export function setGenerationsWithoutChanges(number)
 {
     GenerationsWithoutChangesOutput.value = number;
 }
+
+// Path length output
 const PathLengthOutput = document.getElementById("PathLengthOutput");
 export function setPathLength(number)
 {
     PathLengthOutput.value = number.toFixed(3);
 }
 
-// Generations range form
+// Total generations output
 const TotalGenerationOutput = document.getElementById("TotalGenerationOutput");
 export function setTotalGenerations(number)
 {
     TotalGenerationOutput.value = number;
 }
+
+// Generations range form
 const CurrGenerationOutput = document.getElementById("CurrGenerationOutput");
 const CurrGenerationInput = document.getElementById("CurrGenerationRange");
-currGenerationInput = CurrGenerationInput.value;
+currGenerationInput = parseInt(CurrGenerationInput.value);
 CurrGenerationOutput.textContent = currGenerationInput;
 
 CurrGenerationInput.addEventListener("input", () => {
-    currGenerationInput = CurrGenerationInput.value;
+    currGenerationInput = parseInt(CurrGenerationInput.value);
     CurrGenerationOutput.textContent = currGenerationInput;
 });
 
-/**
- * ----------------------- OFFCANVAS ------------------------
- */
+/* --------------------------------------------------------------------------------- *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ OFFCANVAS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+ * --------------------------------------------------------------------------------- */
 
-// Generations range form
+// Population size range form
 const PopulationSizeOutput = document.getElementById("PopulationSizeOutput");
 const PopulationSizeInput = document.getElementById("PopulationSizeRange");
 populationSizeInput = parseInt(PopulationSizeInput.value);

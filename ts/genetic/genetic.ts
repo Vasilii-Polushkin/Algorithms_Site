@@ -3,7 +3,11 @@ import { setGenerationsWithoutChanges, setPathLength, setTotalGenerations,
     } from "./bindings.js";
 import { drawLines, cities } from "./visualisation.js";
 
+/* --------------------------------------------------------------------------------- *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ UTILS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+ * --------------------------------------------------------------------------------- */
 
+const FINAL_PATH_ORANGE = "rgb(226, 147, 3)";
 function distance(p1: Point, p2: Point): number
 {
     return Math.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2) - p1.radius - p2.radius + 14;
@@ -55,6 +59,11 @@ class Creature
         this.fitting = calcFittingFunction(genotype, points);
     }
 }
+
+/* --------------------------------------------------------------------------------- *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~ ALGORITHM IMPLEMENTATION ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+ * --------------------------------------------------------------------------------- */
+
 class algorithmRunner
 {
     populationSize: number;
@@ -179,36 +188,6 @@ class algorithmRunner
     }
     selectGeneration():void
     {
-        /*
-        let indexesToDelete = new Object;
-        let totalFitting = 0;
-
-        for (let i = 1; i < populationSize; ++i)
-            totalFitting += currPopulation[i].fitting;
-
-        for (let i = 1; i < populationSize; ++i)
-            if (decide(currPopulation[i].fitting/totalFitting * 100))
-                indexesToDelete[i] = true;
-
-        let newPopulation: Creature[] = [];
-
-        for (let i = 0; i < currPopulation.length; ++i)
-            if (indexesToDelete[i] != true)
-                newPopulation.push(currPopulation[i]);
-
-        newPopulation.sort((crt1, crt2) => crt1.fitting - crt2.fitting);
-
-        while (newPopulation.length < populationSize)
-        {
-            newPopulation.push(getRandomCreature());
-            console.log("Better Set More Cross Percenage")
-        }
-        newPopulation.length = populationSize;
-        currPopulation = newPopulation;*/
-
-        
-        //simpler selector
-        
         this.currPopulation.sort((crt1, crt2) => crt1.fitting - crt2.fitting);
         this.currPopulation.length = this.populationSize;
     }
@@ -220,18 +199,17 @@ class algorithmRunner
         newPopulation.sort((crt1, crt2) => crt1.fitting - crt2.fitting);
         return newPopulation;
     }
-    
     RunAlgorithm()
     {
         let generationsWithoutChanges:number = 0;
         let prevBestFitting:number = 0;
         let currGeneration:number = 0;
 
-        const mainLoop = function(owner: algorithmRunner)
+        const algorithmLoop = function(owner: algorithmRunner)
         {
             if (generationsWithoutChanges > owner.MaxGenerationsWithoutChanges)
             {
-                drawLines(owner.currPopulation[0].genotype, "rgb(226, 147, 3)");
+                drawLines(owner.currPopulation[0].genotype, FINAL_PATH_ORANGE);
                 return;
             }
 
@@ -257,11 +235,15 @@ class algorithmRunner
             owner.selectGeneration();
 
             currGeneration++;
-            setTimeout(mainLoop, 0, owner);
+            setTimeout(algorithmLoop, 0, owner);
         }
-        mainLoop(this);
+        algorithmLoop(this);
     }
 }
+
+/* --------------------------------------------------------------------------------- *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ALGORITHM RUNNER ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+ * --------------------------------------------------------------------------------- */
 
 let runner: algorithmRunner;
 export function startPathFinding()
