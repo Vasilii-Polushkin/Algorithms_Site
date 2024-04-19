@@ -45,8 +45,8 @@ export class View {
         }
 
         if (control.mouseState === 'FOOD' && control.setFood) {
-            for (let i = 0; i < brushSize; i += square * 2) {
-                for (let j = 0; j < brushSize; j += square * 2) {
+            for (let i = 0; i < brushSize; i += square) {
+                for (let j = 0; j < brushSize; j += square) {
                     let _x = (x - brushSize / 2 + j) / square;
                     let _y = (y - brushSize / 2 + i) / square;
                     if (isFieldValid(_x, _y)) {
@@ -63,15 +63,15 @@ export class View {
 
         if (control.mouseState === 'WALL' && control.setWall) {
             this.ctx2.fillStyle = '#1f1f1f';
-            this.ctx2.fillRect(Math.floor(x / square / 2) * square * 2 - brushSize / 2,
-                Math.floor(y / square / 2) * square * 2 - brushSize / 2, brushSize, brushSize);
+            this.ctx2.fillRect(Math.floor(x / square) * square - brushSize / 2,
+                Math.floor(y / square) * square - brushSize / 2, brushSize, brushSize);
         }
         this.ctx1.drawImage(this.layer2, 0, 0);
 
         if (control.mouseState === 'ERASER' && control.eraserWorks) {
             this.ctx2.fillStyle = this.style;
-            this.ctx2.fillRect(Math.floor(x / square / 2) * square * 2 - brushSize / 2,
-                Math.floor(y / square / 2) * square * 2 - brushSize / 2, brushSize, brushSize);
+            this.ctx2.fillRect(Math.floor(x / square) * square - brushSize / 2,
+                Math.floor(y / square) * square - brushSize / 2, brushSize, brushSize);
         }
 
         if (control.mouseState === 'COLONY' && control.initColony) {
@@ -84,27 +84,13 @@ export class View {
                     ant.draw(this.ctx1);
                     ant.path.add({x: ant.location.x, y: ant.location.y});
                 }
-                /*for(let i = 0; i < ant.path.size; i++){
-                    let pair = this.getFromSet(i, ant.path);
-                    model.map[Math.floor(pair.y / square)][Math.floor(pair.x / square)].draw(this.ctx3, pair.x, pair.y);
-                }*/
+                for(let pair of ant.path){
+                    model.map[Math.floor(pair.y / square)][Math.floor(pair.x / square)].draw(this.ctx3, pair.x, pair.y, this.ctx1);
+                }
             }
+            this.ctx1.drawImage(this.layer3, 0, 0);
             model.colony.draw(this.ctx1);
-            //this.ctx1.drawImage(this.layer3, 0, 0);
         }
-    }
-
-    getFromSet(index, path) {
-        let i = 0;
-        let [res] = path;
-        for(let pair of path){
-            if(i === index) {
-                res = pair;
-                break;
-            }
-            i++;
-        }
-        return res;
     }
 
     onResize() {

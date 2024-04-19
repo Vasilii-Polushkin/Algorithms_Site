@@ -1,10 +1,8 @@
-import {cols, control, getNearFields, isFieldValid, rows} from "./control.js";
+import {cols, control, getNearFields, isFieldValid, rows, view} from "./control.js";
 import {Ant, Cell, Colony} from "./objects.js";
 
-export let step = 1;
 export let currFPS;
 export let square = 5;
-const CONST = 4;
 
 export class Model {
     ants = [];
@@ -17,17 +15,20 @@ export class Model {
 
         for (let i = 0; i < this.ants.length; i++) {
 
-            for (let pair of this.ants[i].path) this.map[Math.floor(pair.y / square)][Math.floor(pair.x / square)].toHome *= 0.8;
-            for (let pair of this.ants[i].path) this.map[Math.floor(pair.y / square)][Math.floor(pair.x / square)].toFood *= 0.9;
-
-            //this.ants[i].path.clear();
-
-            /*for(let j = 0; j < this.map.length; j++) {
-                for(let k = 0; k < this.map[i].length; k++){
-                    if (this.map[i][j].toHome > 0.001) this.map[i][j].toHome *= 0.8;
-                    if (this.map[i][j].toFood > 0.001) this.map[i][j].toFood *= 0.9;
+            for (let pair of this.ants[i].path) {
+                if (this.map[Math.floor(pair.y / square)][Math.floor(pair.x / square)].toHome < 0.0001) {
+                    this.map[Math.floor(pair.y / square)][Math.floor(pair.x / square)].toHome = 0.0001;
+                    this.ants[i].path.delete(pair);
                 }
-            }*/
+                else this.map[Math.floor(pair.y / square)][Math.floor(pair.x / square)].toHome *= 0.9;
+
+                if (this.map[Math.floor(pair.y / square)][Math.floor(pair.x / square)].toFood < 0.0001) {
+                    this.map[Math.floor(pair.y / square)][Math.floor(pair.x / square)].toFood = 0.0001;
+                    this.ants[i].path.delete(pair);
+                }
+                else this.map[Math.floor(pair.y / square)][Math.floor(pair.x / square)].toFood *= 0.9;
+            }
+
 
             if (!this.ants[i].dead) {
                 this.ants[i].update(getNearFields(this.ants[i], this.map));
@@ -43,7 +44,8 @@ export class Model {
 
                 switch (this.ants[i].target) {
                     case false: {
-                        this.map[y][x].toHome += this.ants[i].homePheromones;
+                        this.map[y][x].toHome += this.ants[i].homePheromones * 0.2;
+                        this.ants[i].homePheromones *= 0.8;
 
                         if (this.map[y][x].food.saturation !== 0) {
                             this.ants[i].target = true;
@@ -55,7 +57,8 @@ export class Model {
                         break;
                     }
                     case true: {
-                        this.map[y][x].toFood += this.ants[i].foodPheromones;
+                        this.map[y][x].toFood += this.ants[i].foodPheromones * 0.2;
+                        this.ants[i].foodPheromones *= 0.8;
 
                         if (x <= this.colony.x + 3 && x >= this.colony.x - 3 &&
                             y <= this.colony.y + 3 && y >= this.colony.y - 3) {
@@ -65,9 +68,6 @@ export class Model {
                         }
                     }
                 }
-
-
-
             }
         }
     }

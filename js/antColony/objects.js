@@ -1,9 +1,9 @@
 import {isFieldValid} from "./control.js";
 import {square} from "./model.js";
 
-export let vision = 35;
+export let vision = 29;
 let size = vision ** 2;
-let iterationCount = Math.floor(Math.random() * 10) + 10;
+let iterationCount = Math.floor(Math.random() * 10) + 5;
 
 export class Ant {
     constructor(direction, colony) {
@@ -149,8 +149,6 @@ export class Ant {
             this.dead = true;
             return;
         }
-        //x *= square;
-        //y *= square;
 
         ctx.save();
         ctx.fillStyle = '#000';
@@ -159,11 +157,6 @@ export class Ant {
         ctx.fill();
         ctx.closePath();
         ctx.restore();
-    }
-
-    roundCoordinates() {
-        this.location.x = Math.round(this.location.x);
-        this.location.y = Math.round(this.location.y);
     }
 }
 
@@ -203,15 +196,15 @@ class Food {
     }
 
     drawFood(ctx, x, y) {
-        x = Math.floor(x / square / 2) * square * 2;
-        y = Math.floor(y / square / 2) * square * 2;
+        /*x = Math.floor(x / square / 2) * square * 2;
+        y = Math.floor(y / square / 2) * square * 2;*/
 
         if(this.saturation === 0) {
-            ctx.clearRect(x, y, square * 2, square * 2);
+            ctx.clearRect(x, y, square, square);
             return;
         }
         ctx.beginPath();
-        ctx.arc(x + square, y + square, square, 0, Math.PI * 2);
+        ctx.arc(x + square / 2, y + square / 2, square / 2 - 0.1, 0, Math.PI * 2);
         ctx.fillStyle = this.colors[this.saturation];
         ctx.fill();
         ctx.closePath();
@@ -227,7 +220,7 @@ export class Cell {
         this.toFood = 0.0001;
     }
 
-    draw(ctx, x, y) {
+    draw(ctx, x, y, mainCtx) {
 
         if (this.toFood > 0.0001) {
             ctx.beginPath();
@@ -236,7 +229,9 @@ export class Cell {
             ctx.fill();
             ctx.closePath();
         } else {
-            ctx.clearRect(x - 0.5, y - 0.5, 1, 1);
+            /*mainCtx.fillRect(x - 0.5, y - 0.5, 1, 1);
+            ctx.clearRect(x - 0.5, y - 0.5, 1, 1);*/
+            ctx.clearRect(0, 0, 640, 640);
         }
 
         if (this.toHome > 0.0001) {
@@ -246,7 +241,9 @@ export class Cell {
             ctx.fill();
             ctx.closePath();
         } else {
-            ctx.clearRect(x - 0.5, y - 0.5, 1, 1);
+            /*mainCtx.fillRect(x - 0.5, y - 0.5, 1, 1);
+            ctx.clearRect(x - 0.5, y - 0.5, 1, 1);*/
+            ctx.clearRect(0, 0, 640, 640);
         }
     }
 }
