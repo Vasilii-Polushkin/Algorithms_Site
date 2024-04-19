@@ -170,27 +170,12 @@ class City
           this._draw(context);
       }
   
-      _draw(context)
+      _draw(context, cityColor = "#ffffff")
       {
-          let gradientient, radius;
-  
           context.save();
-  /*
-          gradientient = context.createRadialGradient(this.x, this.y, this.radius, this.x, this.y, this.radius * 5);
-          gradientient.addColorStop(0, 'rgba(0, 0, 0, 0.1)');
-          gradientient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-          context.beginPath();
-          context.arc(this.x, this.y, this.radius * 5, 0, Math.PI * 2, false);
-          context.fillStyle = gradientient;
-          context.fill();
-  */
-          radius = Math.random() * this.currentRadius * 0.7 + this.currentRadius * 0.3;
-          /*gradientient = context.createRadialGradient(this.x, this.y, radius, this.x, this.y, this.currentRadius);
-          gradientient.addColorStop(0, 'rgba(0, 0, 0, 1)');
-          gradientient.addColorStop(1, Math.random() < 0.2 ? 'rgba(255, 196, 0, 0.15)' : 'rgba(103, 181, 191, 0.75)');*/
           context.beginPath();
           context.arc(this.x, this.y, this.currentRadius, 0, Math.PI * 2, false);
-          //context.fillStyle = gradientient;
+          context.fillStyle = cityColor;
           context.fill();
           context.restore();
       }
@@ -222,7 +207,7 @@ class City
       // lets
   
     let canvas, context,
-          bufferCanvas, bufferContext,
+          bufferCanvas,
           screenWidth, screenHeight,
           mouse = new Vector(),
           gradient;
@@ -239,14 +224,13 @@ class City
           bufferCanvas.width  = screenWidth;
           bufferCanvas.height = screenHeight;
           context   = canvas.getContext('2d');
-          bufferContext = bufferCanvas.getContext('2d');
   
-          let cx = canvas.width * 0.5,
-              cy = canvas.height * 0.5;
+          //let cx = canvas.width * 0.5,
+          //    cy = canvas.height * 0.5;
   
-          gradient = context.createRadialGradient(cx, cy, 0, cx, cy, Math.sqrt(cx * cx + cy * cy));
-          gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
-          gradient.addColorStop(1, 'rgba(0, 0, 0, 0.35)');
+          //gradient = context.createRadialGradient(cx, cy, 0, cx, cy, Math.sqrt(cx * cx + cy * cy));
+          //gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+          //gradient.addColorStop(1, 'rgba(0, 0, 0, 0.35)');
       }
   
       function mouseMove(e)
@@ -342,10 +326,12 @@ class City
         loop();
       }
 
-      export function drawLines(nodesOrder)
+      export function drawLines(nodesOrder, strokeColor = "rgb(205, 198, 195)")
       {
-            context.save();
             loop();
+
+            context.save();
+            context.strokeStyle = strokeColor;
             context.beginPath()
     
             if (nodesOrder.length != 0)
@@ -353,11 +339,15 @@ class City
     
             for (let i = 0, length = nodesOrder.length; i < length; ++i)
             {
-                context.lineWidth = 3;
+                context.lineWidth = 2;
                 context.lineTo(cities[nodesOrder[i]].x, cities[nodesOrder[i]].y);
+                context.lineJoin = 'round';
+                context.lineCap = 'round';
                 context.stroke();
             }
         
+            drawCities();
+
             context.restore();
       }
   
@@ -368,35 +358,31 @@ class City
           if(shouldCheck && !isAnimating)
             return;
 
-          let i, length, city;
-  
           context.save();
+          /*
           context.fillStyle = BACKGROUND_COLOR;
           context.fillRect(0, 0, screenWidth, screenHeight);
           context.fillStyle = gradient;
-          context.fillRect(0, 0, screenWidth, screenHeight);
+          context.fillRect(0, 0, screenWidth, screenHeight);*/
+          context.clearRect(0, 0, canvas.width, canvas.height);
           context.restore();
   
-          for (i = 0, length = cities.length; i < length; i++) {
-              city = cities[i];
-              if (city.dragging) city.drag(mouse);
-              city.render(context);
-              if (city.destroyed) {
-                  cities.splice(i, 1);
-                  length--;
-                  i--;
-              }
-          }
-        
-          bufferContext.save();
-          bufferContext.globalCompositeOperation = 'destination-out';
-          bufferContext.globalAlpha = 0.15;
-          bufferContext.fillRect(0, 0, screenWidth, screenHeight);
-          bufferContext.restore();
-
-          context.drawImage(bufferCanvas, 0, 0);
-
+          drawCities();
+          
           if (isAnimating)
             requestAnimationFrame(loop, true);
       };
+      function drawCities()
+      {
+        for (let i = 0, length = cities.length; i < length; i++) {
+            let city = cities[i];
+            if (city.dragging) city.drag(mouse);
+            city.render(context);
+            if (city.destroyed) {
+                cities.splice(i, 1);
+                length--;
+                i--;
+            }
+        }
+      }
       loop();

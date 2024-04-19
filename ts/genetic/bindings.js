@@ -10,8 +10,8 @@ export let percentToMutateInput = 30;
 export let percentToCrossInput = 40;
 export let maxGenerationsWithoutChangesInput = 30;
 
-// runner
-let runner;
+// runners
+let runners = [];
 
 /**
  * ----------------------- MAIN PAGE ------------------------
@@ -20,10 +20,19 @@ let runner;
 const RunBtn = document.getElementById("RunBtn");
 RunBtn.addEventListener('click', () => {
     stopAnimating();
-    if (runner != undefined)
-        runner.isRunning = false;
-    runner = new algorithmRunner();
+    for (let i = runners.length - 1; i >= 0; i--)
+    {
+        runners[i].stopRunning();
+        runners.pop();
+    }
+    runners.push(new algorithmRunner());
 })
+
+const Toast = bootstrap.Toast.getOrCreateInstance(document.getElementById('toast'));
+export function showToast()
+{
+    Toast.show();
+}
 
 const RandomizeCitiesBtn = document.getElementById("RandomizeCitiesBtn");
 RandomizeCitiesBtn.addEventListener('click', () => {

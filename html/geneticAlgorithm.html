@@ -62,64 +62,6 @@
 		</div>
 	</header>
 
-	<!-- TOASTS -->
-
-	<div class="toast-container position-fixed bottom-0 end-0 p-3">
-
-		<!-- TRAINING FILE -->
-		<div id="noTrainingFileToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-		  <div class="toast-header">
-			<i class="bi-exclamation-triangle"></i>
-			<strong class="me-auto whitespaces-pre">   No File Selected!</strong>
-			<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-		  </div>
-		  <div class="toast-body">
-			Select Training File
-		  </div>
-		</div>
-
-		<!-- CLASSIFICATION FILE -->
-		<div id="noClassifyFileToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-			<div class="toast-header">
-				<i class="bi-exclamation-triangle"></i>
-				<strong class="me-auto whitespaces-pre">   No File Selected!</strong>
-				<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-			</div>
-			<div class="toast-body">
-				Select Classification File
-			</div>
-		</div>
-
-		<!-- FILE VALIDATION -->
-		<div id="notValidFileToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-			<div class="toast-header">
-				<i class="bi-exclamation-triangle"></i>
-				<strong class="me-auto whitespaces-pre">   File Is Not Valid!</strong>
-				<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-			</div>
-			<div class="toast-body">
-				<output id = "fileValidationOutput"></output>
-				<div class = "grid padding-top">
-					<button type="button" class="btn btn-outline-light btn-danger-custom" data-bs-dismiss="toast" aria-label="Close" id = "validateRequest">
-						<output id = "validationRequestOutput"></output>
-					</button>
-				</div>
-			</div>
-		</div>
-
-		<!-- FILE VALIDATION WITH NO VALIDATE BUTTON-->
-		<div id="notValidFileToastWithNoValidateBtn" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-			<div class="toast-header">
-				<i class="bi-exclamation-triangle"></i>
-				<strong class="me-auto whitespaces-pre">   File Is Not Valid!</strong>
-				<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-			</div>
-			<div class="toast-body">
-				<output id = "fileValidationOutputWithNoValidateBtn"></output>
-			</div>
-		</div>
-	</div>
-
 	<!-- MAIN -->
 	
 	<div class="offcanvas offcanvas-end mainBg" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
@@ -131,19 +73,19 @@
 		<div class="offcanvas-body">
 			<!-- max depth range form --><br>
 			<label for="PopulationSizeRange" class="form-label">Population Size: <output id="PopulationSizeOutput"></output></label>
-			<input type="range" class="form-range" min="1" max="10000" step="1" id="PopulationSizeRange" value="90">
+			<input type="range" class="form-range" min="1" max="1000" step="1" id="PopulationSizeRange" value="110">
 
 			<!-- percent to mutate range form --><br>
 			<label for="PercentToMutateRange" class="form-label">Probability To Mutate: <output id="PercentToMutateOutput"></output>%</label>
 			<input type="range" class="form-range" min="0" max="100" step="1" id="PercentToMutateRange" value="70">
 
 			<!-- percent to cross range form --><br>
-			<label for="PercentToCrossRange" class="form-label">New Generation Size: <output id="PercentToCrossOutput"></output>%</label>
+			<label for="PercentToCrossRange" class="form-label">Procent to cross: <output id="PercentToCrossOutput"></output>%</label>
 			<input type="range" class="form-range" min="0" max="100" step="1" id="PercentToCrossRange" value="50">
 
 			<!-- generations without changes range form --><br>
 			<label for="MaxGenerationsWithoutChangesRange" class="form-label">Generations Without Changes: <output id="MaxGenerationsWithoutChangesOutput"></output></label>
-			<input type="range" class="form-range" min="1" max="500" step="1" id="MaxGenerationsWithoutChangesRange" value="300">
+			<input type="range" class="form-range" min="1" max="500" step="1" id="MaxGenerationsWithoutChangesRange" value="140">
 		</div>
 	</div>
 

@@ -130,25 +130,11 @@ class City {
             this.collapse();
         this._draw(context);
     }
-    _draw(context) {
-        let gradientient, radius;
+    _draw(context, cityColor = "#ffffff") {
         context.save();
-        /*
-                gradientient = context.createRadialGradient(this.x, this.y, this.radius, this.x, this.y, this.radius * 5);
-                gradientient.addColorStop(0, 'rgba(0, 0, 0, 0.1)');
-                gradientient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-                context.beginPath();
-                context.arc(this.x, this.y, this.radius * 5, 0, Math.PI * 2, false);
-                context.fillStyle = gradientient;
-                context.fill();
-        */
-        radius = Math.random() * this.currentRadius * 0.7 + this.currentRadius * 0.3;
-        /*gradientient = context.createRadialGradient(this.x, this.y, radius, this.x, this.y, this.currentRadius);
-        gradientient.addColorStop(0, 'rgba(0, 0, 0, 1)');
-        gradientient.addColorStop(1, Math.random() < 0.2 ? 'rgba(255, 196, 0, 0.15)' : 'rgba(103, 181, 191, 0.75)');*/
         context.beginPath();
         context.arc(this.x, this.y, this.currentRadius, 0, Math.PI * 2, false);
-        //context.fillStyle = gradientient;
+        context.fillStyle = cityColor;
         context.fill();
         context.restore();
     }
@@ -168,7 +154,7 @@ export function clearSities() {
 // Configs
 const BACKGROUND_COLOR = 'rgba(11, 51, 56, 1)', CITY_RADIUS = 10;
 // lets
-let canvas, context, bufferCanvas, bufferContext, screenWidth, screenHeight, mouse = new Vector(), gradient;
+let canvas, context, bufferCanvas, screenWidth, screenHeight, mouse = new Vector(), gradient;
 export let cities = [];
 // Event Listeners
 function resize() {
@@ -177,11 +163,11 @@ function resize() {
     bufferCanvas.width = screenWidth;
     bufferCanvas.height = screenHeight;
     context = canvas.getContext('2d');
-    bufferContext = bufferCanvas.getContext('2d');
-    let cx = canvas.width * 0.5, cy = canvas.height * 0.5;
-    gradient = context.createRadialGradient(cx, cy, 0, cx, cy, Math.sqrt(cx * cx + cy * cy));
-    gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
-    gradient.addColorStop(1, 'rgba(0, 0, 0, 0.35)');
+    //let cx = canvas.width * 0.5,
+    //    cy = canvas.height * 0.5;
+    //gradient = context.createRadialGradient(cx, cy, 0, cx, cy, Math.sqrt(cx * cx + cy * cy));
+    //gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+    //gradient.addColorStop(1, 'rgba(0, 0, 0, 0.35)');
 }
 function mouseMove(e) {
     mouse.set(e.clientX, e.clientY);
@@ -253,32 +239,42 @@ export function startAnimating() {
     canvas.removeEventListener('click', startAnimating);
     loop();
 }
-export function drawLines(nodesOrder) {
-    context.save();
+export function drawLines(nodesOrder, strokeColor = "rgb(205, 198, 195)") {
     loop();
+    context.save();
+    context.strokeStyle = strokeColor;
     context.beginPath();
     if (nodesOrder.length != 0)
         context.moveTo(cities[nodesOrder.at(-1)].x, cities[nodesOrder.at(-1)].y);
     for (let i = 0, length = nodesOrder.length; i < length; ++i) {
-        context.lineWidth = 3;
+        context.lineWidth = 2;
         context.lineTo(cities[nodesOrder[i]].x, cities[nodesOrder[i]].y);
+        context.lineJoin = 'round';
+        context.lineCap = 'round';
         context.stroke();
     }
+    drawCities();
     context.restore();
 }
 // Start Update
 let loop = function (shouldCheck = false) {
     if (shouldCheck && !isAnimating)
         return;
-    let i, length, city;
     context.save();
+    /*
     context.fillStyle = BACKGROUND_COLOR;
     context.fillRect(0, 0, screenWidth, screenHeight);
     context.fillStyle = gradient;
-    context.fillRect(0, 0, screenWidth, screenHeight);
+    context.fillRect(0, 0, screenWidth, screenHeight);*/
+    context.clearRect(0, 0, canvas.width, canvas.height);
     context.restore();
-    for (i = 0, length = cities.length; i < length; i++) {
-        city = cities[i];
+    drawCities();
+    if (isAnimating)
+        requestAnimationFrame(loop, true);
+};
+function drawCities() {
+    for (let i = 0, length = cities.length; i < length; i++) {
+        let city = cities[i];
         if (city.dragging)
             city.drag(mouse);
         city.render(context);
@@ -288,14 +284,6 @@ let loop = function (shouldCheck = false) {
             i--;
         }
     }
-    bufferContext.save();
-    bufferContext.globalCompositeOperation = 'destination-out';
-    bufferContext.globalAlpha = 0.15;
-    bufferContext.fillRect(0, 0, screenWidth, screenHeight);
-    bufferContext.restore();
-    context.drawImage(bufferCanvas, 0, 0);
-    if (isAnimating)
-        requestAnimationFrame(loop, true);
-};
+}
 loop();
 //# sourceMappingURL=visualisation.js.map

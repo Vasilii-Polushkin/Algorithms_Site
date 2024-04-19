@@ -6,6 +6,10 @@ import { drawLines, cities } from "./visualisation.js";
 export class algorithmRunner
 {
 isRunning = true;
+stopRunning()
+{
+    this.isRunning = false;
+}
 constructor()
 {
 
@@ -17,8 +21,10 @@ class Point
 {
     x:number;
     y:number;
-    constructor(x:number, y:number)
+    radius:number;
+    constructor(x:number, y:number, radius:number)
     {
+        this.radius = radius;
         this.x = x;
         this.y = y;
     }
@@ -37,7 +43,7 @@ class Creature
 
 const newPoints: Point[] = [];
 cities.forEach((city) => {
-    newPoints.push(new Point(city.x, city.y));
+    newPoints.push(new Point(city.x, city.y, city.radius));
 })
 
 const populationSize = populationSizeInput;
@@ -52,7 +58,7 @@ let currPopulation: Creature[] = new Array(populationSize);
 
 function distance(p1: Point, p2: Point): number
 {
-    return Math.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2);
+    return Math.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2) - p1.radius - p2.radius + 14;
 }
 
 function calcFittingFunction(genotype: number[]): number
@@ -103,13 +109,13 @@ function fillInitualPopulation(): void
     currPopulation.sort((crt1, crt2) => crt1.fitting - crt2.fitting);
 }
 
-function mutateOnce(creature: Creature): void
+function getMutatedCreature(creature: Creature): Creature
 {
     let pos1 = getRandomGeneID();
     let pos2 = getRandomGeneID();
 
     if (pos1 > pos2) [pos1, pos2] = [pos2, pos1];
-    creature.genotype = creature.genotype.slice(0, pos1).concat(creature.genotype.slice(pos1, pos2).reverse(), creature.genotype.slice(pos2));
+    return new Creature(creature.genotype.slice(0, pos1).concat(creature.genotype.slice(pos1, pos2).reverse(), creature.genotype.slice(pos2)));
 }
 
 function getCrossedCreature(creature1: Creature, creature2: Creature, pivotIndex: number): Creature
@@ -163,10 +169,10 @@ function modifyPopulationOnce(): void
     let newCreature2 = getCrossedCreature(creature2, creature1, pivotIndex);
 
     if (decide(percentToMutate))
-        mutateOnce(newCreature1);
-
+        newCreature1 = getMutatedCreature(newCreature1);
+    
     if (decide(percentToMutate))
-        mutateOnce(newCreature2);
+        newCreature2 = getMutatedCreature(newCreature2);
 
     currPopulation.push(newCreature1);
     currPopulation.push(newCreature2);
@@ -180,6 +186,7 @@ function modifyPopulation(): void
 
 function selectGeneration():void
 {
+    /*
     let indexesToDelete = new Object;
     let totalFitting = 0;
 
@@ -187,7 +194,7 @@ function selectGeneration():void
         totalFitting += currPopulation[i].fitting;
 
     for (let i = 1; i < populationSize; ++i)
-        if (decide(currPopulation[i].fitting/totalFitting))
+        if (decide(currPopulation[i].fitting/totalFitting * 100))
             indexesToDelete[i] = true;
 
     let newPopulation: Creature[] = [];
@@ -201,10 +208,16 @@ function selectGeneration():void
     while (newPopulation.length < populationSize)
     {
         newPopulation.push(getRandomCreature());
+        console.log("Better Set More Cross Percenage")
     }
     newPopulation.length = populationSize;
+    currPopulation = newPopulation;*/
 
-    currPopulation = newPopulation;
+    
+    //simpler selector
+    
+    currPopulation.sort((crt1, crt2) => crt1.fitting - crt2.fitting);
+    currPopulation.length = populationSize;
 }
 
 // algorithm itself
@@ -216,7 +229,13 @@ let currGeneration = 0;
 
 function mainLoop()
 {
-    if (generationsWithoutChanges > MaxGenerationsWithoutChanges || this.isRunning == false)
+    if (generationsWithoutChanges > MaxGenerationsWithoutChanges)
+    {
+        drawLines(currPopulation[0].genotype, "rgb(226, 147, 3)");
+        return;
+    }
+
+    if (this.isRunning == false)
         return;
 
     setGenerationsWithoutChanges(generationsWithoutChanges);
@@ -234,19 +253,6 @@ function mainLoop()
 
     visualize(currPopulation[0]);
 
-    /*
-    const canvas = document.getElementById('c');
-    const context = canvas.getContext('2d');
-    context.save();
-    context.beginPath()
-    context.moveTo(cities[currPopulation[0].genotype.at(-1)].x, cities[currPopulation[0].genotype.at(-1)].y);
-    for (let i = 0, length = currPopulation[0].genotype.length; i < length; ++i)
-    {
-        context.lineWidth = 3;
-        context.lineTo(cities[currPopulation[0].genotype[i]].x, cities[currPopulation[0].genotype[i]].y);
-        context.stroke();
-    }*/
-
     modifyPopulation();
     selectGeneration();
 
@@ -254,8 +260,6 @@ function mainLoop()
     setTimeout(mainLoop, 0);
 }
 setTimeout(mainLoop, 1000/60);
-
-drawLines(currPopulation[0].genotype);
 
 function visualize(creature: Creature)
 {
