@@ -338,7 +338,7 @@ export function setRandomSities(amount = 10)
 {
     while (amount--)
     {
-        cities.push(new City(Math.random() * window.innerWidth, Math.random() * (window.innerHeight - 120) + 120, CITY_RADIUS, {
+        cities.push(new City(Math.random() * (window.innerWidth - 20) + 20, Math.random() * (window.innerHeight - 140) + 130, CITY_RADIUS, {
             cities: cities
         }));
     }

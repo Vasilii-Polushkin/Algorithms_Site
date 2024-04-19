@@ -56,6 +56,7 @@ class algorithmRunner {
     points;
     currPopulation;
     isRunning = true;
+    bestCreaturesBuffer = [];
     constructor() {
         if (cities.length === 0)
             return;
@@ -176,6 +177,7 @@ class algorithmRunner {
             owner.modifyPopulation();
             owner.selectGeneration();
             currGeneration++;
+            owner.bestCreaturesBuffer.push(structuredClone(owner.currPopulation[0]));
             setTimeout(algorithmLoop, 0, owner);
         };
         algorithmLoop(this);
@@ -194,5 +196,9 @@ export function abortPathFinding() {
     if (runner !== undefined)
         runner.stopRunning();
     runner = undefined;
+}
+export function visualizeNthGenerationBestCreature(n) {
+    if (runner !== undefined)
+        visualize(runner.bestCreaturesBuffer[n]);
 }
 //# sourceMappingURL=genetic.js.map

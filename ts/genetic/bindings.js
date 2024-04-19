@@ -1,4 +1,4 @@
-import { startPathFinding, abortPathFinding } from "./genetic.js";
+import { startPathFinding, abortPathFinding, visualizeNthGenerationBestCreature } from "./genetic.js";
 import { setRandomSities, clearSities, startAnimating, stopAnimating } from "./visualisation.js";
 
 /* --------------------------------------------------------------------------------- *
@@ -55,13 +55,6 @@ export function setPathLength(number)
     PathLengthOutput.value = number.toFixed(3);
 }
 
-// Total generations output
-const TotalGenerationOutput = document.getElementById("TotalGenerationOutput");
-export function setTotalGenerations(number)
-{
-    TotalGenerationOutput.value = number;
-}
-
 // Generations range form
 const CurrGenerationOutput = document.getElementById("CurrGenerationOutput");
 const CurrGenerationInput = document.getElementById("CurrGenerationRange");
@@ -70,8 +63,19 @@ CurrGenerationOutput.textContent = currGenerationInput;
 
 CurrGenerationInput.addEventListener("input", () => {
     currGenerationInput = parseInt(CurrGenerationInput.value);
+    visualizeNthGenerationBestCreature(currGenerationInput);
     CurrGenerationOutput.textContent = currGenerationInput;
 });
+
+// Total generations output
+const TotalGenerationOutput = document.getElementById("TotalGenerationOutput");
+export function setTotalGenerations(number)
+{
+    TotalGenerationOutput.value = number;
+    $('#CurrGenerationRange').prop('max', number);
+    $('#CurrGenerationRange').prop('value', number);
+    CurrGenerationOutput.textContent = number;
+}
 
 /* --------------------------------------------------------------------------------- *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ OFFCANVAS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *

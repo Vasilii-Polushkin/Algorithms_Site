@@ -54,9 +54,6 @@ document.querySelectorAll('.card-3d').forEach(function(item) {
 
   item.addEventListener('mouseleave', function(e) {
       let dropShadowColor = `rgba(0, 0, 0, 0.3)`
-      if(item.getAttribute('data-filter-color') !== null) {
-          dropShadowColor = item.getAttribute('data-filter-color')
-      }
       item.classList.remove('animated');
       item.querySelector('.inner-card-3d').style.transform = `rotateY(0deg) rotateX(0deg) scale(1)`;
       item.querySelector('.inner-card-3d').style.filter = `drop-shadow(0 10px 15px ${dropShadowColor})`;

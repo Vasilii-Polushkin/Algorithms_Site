@@ -48,7 +48,7 @@ body {
 
 .card-3d .inner-card-3d {
     font-size: 1.3rem;
-    color: rgb(221, 212, 212);
+    color: rgb(255, 255, 255);
     padding: 4rem 4rem;
     line-height: 3rem;
     will-change: transform, filter;
@@ -85,13 +85,13 @@ body {
     height: 100%;
     border-radius: 14px;
     z-index: 9999;
-    mix-blend-mode: hard-light;
-    background: radial-gradient(circle at 50% 50%, rgb(199 198 243), transparent);
+    mix-blend-mode:soft-light;
+    background: radial-gradient(circle at 40% 40%, rgb(199 198 243), transparent);
 }
 
 .card-3d .bottom-section {
     position: absolute;
-    top: 59%;
+    top: 60%;
     left: 0;
     width: 100%;
     height: 65%;
@@ -101,27 +101,27 @@ body {
 }
 
 .bottom-section .area {
-    font-size: 1rem;
+    font-size: 1.3rem;
     opacity: 0.4;
     display: block;
     line-height: 1rem;
 }
 
 .card-3d.Astar .inner-card-3d {
-      background-image: url('../images/preview.png');
+      background-image: url('../images/astar2.jpg');
 }
 .card-3d.Clustering .inner-card-3d {
-    background-image: url('../images/preview.png');
+    background-image: url('../images/cluster.jpg');
 }
 .card-3d.Genetic .inner-card-3d {
-    background-image: url('../images/preview.png');
+    background-image: url('../images/genetic.jpg');
 }
 .card-3d.Neural .inner-card-3d {
-    background-image: url('../images/preview.png');
+    background-image: url('../images/neuron2.jpg');
 }
 .card-3d.Decision .inner-card-3d {
-    background-image: url('../images/preview.png');
+    background-image: url('../images/tree.jpg');
 }
 .card-3d.Ants .inner-card-3d {
-    background-image: url('../images/preview.png');
+    background-image: url('../images/ants.jpg');
 }

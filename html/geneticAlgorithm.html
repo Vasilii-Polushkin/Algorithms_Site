@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 	
@@ -20,6 +20,7 @@
 	<link rel="stylesheet" href="../css/media.css">
 
 	<script src="../libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="../libs/jquery/jquery-3.6.0.min.js"></script>
 
 	<link rel="stylesheet" href="../node_modules/bootstrap-icons/font/bootstrap-icons.min.css">
 
@@ -41,7 +42,7 @@
 <header class="p-2 text-bg-dark header-box">
     <div class = "container">
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-            <ul class="nav col-7 col-lg-auto me-lg-auto justify-content-center mb-md-0">
+            <ul class="nav col-lg-auto me-lg-auto justify-content-center mb-md-0">
                 <li><a href="../index.html" class="nav-link px-2 text-secondary">Home</a></li>
                 <li><a href="../html/Astar.html" class="nav-link px-2 text-white-50">A* algorithm</a></li>
                 <li><a href="../html/clustering.html" class="nav-link px-2 text-white-50">Clustering</a></li>
@@ -77,12 +78,12 @@
 			<input type="range" class="form-range" min="0" max="100" step="1" id="PercentToMutateRange" value="70">
 
 			<!-- percent to cross range form --><br>
-			<label for="PercentToCrossRange" class="form-label">Procent to cross: <output id="PercentToCrossOutput"></output>%</label>
+			<label for="PercentToCrossRange" class="form-label">Procent To Cross: <output id="PercentToCrossOutput"></output>%</label>
 			<input type="range" class="form-range" min="0" max="100" step="1" id="PercentToCrossRange" value="50">
 
 			<!-- generations without changes range form --><br>
 			<label for="MaxGenerationsWithoutChangesRange" class="form-label">Generations Without Changes: <output id="MaxGenerationsWithoutChangesOutput"></output></label>
-			<input type="range" class="form-range" min="1" max="500" step="1" id="MaxGenerationsWithoutChangesRange" value="140">
+			<input type="range" class="form-range" min="1" max="500" step="1" id="MaxGenerationsWithoutChangesRange" value="110">
 		</div>
 	</div>
 

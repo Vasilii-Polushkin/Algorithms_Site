@@ -74,6 +74,7 @@ class algorithmRunner
     points: Point[];
     currPopulation: Creature[];
     isRunning = true;
+    bestCreaturesBuffer:Creature[] = [];
     
     constructor()
     {
@@ -235,6 +236,7 @@ class algorithmRunner
             owner.selectGeneration();
 
             currGeneration++;
+            owner.bestCreaturesBuffer.push(structuredClone(owner.currPopulation[0]));
             setTimeout(algorithmLoop, 0, owner);
         }
         algorithmLoop(this);
@@ -245,6 +247,7 @@ class algorithmRunner
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ALGORITHM RUNNER ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
  * --------------------------------------------------------------------------------- */
 
+
 let runner: algorithmRunner;
 export function startPathFinding()
 {
@@ -252,10 +255,14 @@ export function startPathFinding()
         runner.stopRunning();
     runner = new algorithmRunner();
 }
-
 export function abortPathFinding()
 {
     if (runner !== undefined)
         runner.stopRunning();
     runner = undefined;
+}
+export function visualizeNthGenerationBestCreature(n: number): void
+{
+    if (runner !== undefined)
+        visualize(runner.bestCreaturesBuffer[n]);
 }

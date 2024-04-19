@@ -2,8 +2,8 @@ import PriorityQueue from "./PriorityQueue.js";
 
 //global variables, shoud be editable only using functions
 
-let windowHeight = 660;
-let windowWidth = 660;
+let windowHeight = 640;
+let windowWidth = 640;
 
 let cellsWidth = 10;
 let cellsHeight = 10;
