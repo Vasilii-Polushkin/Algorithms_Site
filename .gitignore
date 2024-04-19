@@ -2,3 +2,9 @@
 /**/Thumbs.db
 /**/*.DS_Store
 /**/debug.log
+/vscode
+/idea
+/tsconfig.json
+/package.json
+/package-lock.json
+/jsconfig.json

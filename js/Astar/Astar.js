@@ -79,7 +79,7 @@ function remakeVisualGrid()
 
 function EnterHoverHandling(event)
 {
-  if (selectedCellType == cellsTypes.START || selectedCellType == cellsTypes.END)
+  if (selectedCellType === cellsTypes.START || selectedCellType === cellsTypes.END)
     event.target.classList.add("cell-hover");
 
   else
@@ -92,7 +92,7 @@ function EnterHoverHandling(event)
 
 function leaveHoverHandling(event)
 {
-  if (selectedCellType == cellsTypes.START || selectedCellType == cellsTypes.END)
+  if (selectedCellType === cellsTypes.START || selectedCellType === cellsTypes.END)
     event.target.classList.remove("cell-hover");
 
   else
@@ -158,10 +158,10 @@ function updateCellVisuals(event)
 {
   if (event.buttons === 1)
   {
-    if (event.target.id == startCell)
+    if (event.target.id === startCell)
       startCell = null;
 
-    if (event.target.id == endCell)
+    if (event.target.id === endCell)
       endCell = null;
 
       resetCellClasses(event.target);
@@ -426,7 +426,7 @@ async createLabyrinth()
   const wallList = new Set();
 
   await sleep(iterationsDelay);
-  if (this.isGenerating == false) return;
+  if (this.isGenerating === false) return;
   getAdjustCells(randomCellId).forEach(id => {
     wallList.add(id);
     //visited[id] = true;
@@ -453,10 +453,10 @@ async createLabyrinth()
       {
         visited[top] = true;
         if (iterationsDelay) await sleep(iterationsDelay);
-        if (this.isGenerating == false) return;
+        if (this.isGenerating === false) return;
         document.getElementById(randomWallId).style.backgroundColor = cellsTypesColours.BLANK_COLOUR;
         if (iterationsDelay) await sleep(iterationsDelay);
-        if (this.isGenerating == false) return;
+        if (this.isGenerating === false) return;
         document.getElementById(top).style.backgroundColor = cellsTypesColours.BLANK_COLOUR;
         getAdjustCells(top).forEach(id => {
           if (!visited[id])
@@ -470,10 +470,10 @@ async createLabyrinth()
       {
         visited[bottom] = true;
         if (iterationsDelay) await sleep(iterationsDelay);
-        if (this.isGenerating == false) return;
+        if (this.isGenerating === false) return;
         document.getElementById(randomWallId).style.backgroundColor = cellsTypesColours.BLANK_COLOUR;
         if (iterationsDelay) await sleep(iterationsDelay);
-        if (this.isGenerating == false) return;
+        if (this.isGenerating === false) return;
         document.getElementById(bottom).style.backgroundColor = cellsTypesColours.BLANK_COLOUR;
         getAdjustCells(bottom).forEach(id => {
           if (!visited[id])
@@ -489,10 +489,10 @@ async createLabyrinth()
       if (visited[left] && !visited[right])
       {
         if (iterationsDelay) await sleep(iterationsDelay);
-        if (this.isGenerating == false) return;
+        if (this.isGenerating === false) return;
         document.getElementById(randomWallId).style.backgroundColor = cellsTypesColours.BLANK_COLOUR;
         if (iterationsDelay) await sleep(iterationsDelay);
-        if (this.isGenerating == false) return;
+        if (this.isGenerating === false) return;
         document.getElementById(right).style.backgroundColor = cellsTypesColours.BLANK_COLOUR;
         visited[right] = true;
         getAdjustCells(right).forEach(id => {
@@ -506,10 +506,10 @@ async createLabyrinth()
       if (!visited[left] && visited[right])
       {
         if (iterationsDelay) await sleep(iterationsDelay);
-        if (this.isGenerating == false) return;
+        if (this.isGenerating === false) return;
         document.getElementById(randomWallId).style.backgroundColor = cellsTypesColours.BLANK_COLOUR;
         if (iterationsDelay) await sleep(iterationsDelay);
-        if (this.isGenerating == false) return;
+        if (this.isGenerating === false) return;
         document.getElementById(left).style.backgroundColor = cellsTypesColours.BLANK_COLOUR;
         visited[left] = true;
         getAdjustCells(left).forEach(id => {
@@ -526,7 +526,7 @@ async createLabyrinth()
   {
 
     let cell = document.getElementById(i);
-    if (cell.style.backgroundColor == cellsTypesColours.BLANK_COLOUR)
+    if (cell.style.backgroundColor === cellsTypesColours.BLANK_COLOUR)
     {
       cell.style.backgroundColor = cellsTypesColours.START_COLOUR;
         if (startCell != null)
@@ -541,7 +541,7 @@ async createLabyrinth()
   for (let i = cellsHeight * cellsWidth - 1; i >= 0; --i)
   {
     let cell = document.getElementById(i);
-    if (cell.style.backgroundColor == cellsTypesColours.BLANK_COLOUR)
+    if (cell.style.backgroundColor === cellsTypesColours.BLANK_COLOUR)
     {
       cell.style.backgroundColor = cellsTypesColours.END_COLOUR;
         if (endCell != null)
@@ -682,22 +682,22 @@ class AstarAlgorithm
         if (newI >= cellsHeight || newI < 0 ||
           newJ >= cellsWidth || newJ < 0 ||
           this.closedList.has(newI * cellsWidth + newJ) ||
-          newCell.style.backgroundColor == cellsTypesColours.WALL_COLOUR||
-          Math.abs(i) == Math.abs(j) && 
-          document.getElementById(newI * cellsWidth + startJ).style.backgroundColor == cellsTypesColours.WALL_COLOUR &&
-          document.getElementById(startI * cellsWidth + newJ).style.backgroundColor == cellsTypesColours.WALL_COLOUR)
+          newCell.style.backgroundColor === cellsTypesColours.WALL_COLOUR||
+          Math.abs(i) === Math.abs(j) && 
+          document.getElementById(newI * cellsWidth + startJ).style.backgroundColor === cellsTypesColours.WALL_COLOUR &&
+          document.getElementById(startI * cellsWidth + newJ).style.backgroundColor === cellsTypesColours.WALL_COLOUR)
           continue;
 
         let weight = this.distanceToEnd(newI, newJ) + cell[0] - this.distanceToEnd(startI, startJ);
 
-        if (newCell.style.backgroundColor == cellsTypesColours.BLANK_COLOUR)
-          weight += (Math.abs(i) == Math.abs(j)) ? Math.sqrt(2): 1;
+        if (newCell.style.backgroundColor === cellsTypesColours.BLANK_COLOUR)
+          weight += (Math.abs(i) === Math.abs(j)) ? Math.sqrt(2): 1;
 
-        else if (newCell.style.backgroundColor == cellsTypesColours.BOOST_COLOUR)
-          weight += (Math.abs(i) == Math.abs(j)) ? Math.sqrt(2) / 2: 1 / 2;
+        else if (newCell.style.backgroundColor === cellsTypesColours.BOOST_COLOUR)
+          weight += (Math.abs(i) === Math.abs(j)) ? Math.sqrt(2) / 2: 1 / 2;
 
         else //if (newCell.style.backgroundColor == cellsTypesColours.SLOW_COLOUR)
-          weight += (Math.abs(i) == Math.abs(j)) ? Math.sqrt(2) * 2: 1 * 2;
+          weight += (Math.abs(i) === Math.abs(j)) ? Math.sqrt(2) * 2: 1 * 2;
 
         result.push([weight, newI * cellsWidth + newJ]);
       }
@@ -711,7 +711,7 @@ class AstarAlgorithm
     this.weights.length = cellsWidth * cellsHeight;
     this.weights.fill(cellsWidth * cellsHeight * 2);
 
-    if (this.startCell == null || this.endCell == null)
+    if (this.startCell === null || this.endCell === null)
     {
       appendAlert('Set the starting and ending cell!', 'success');
       return;
@@ -781,17 +781,6 @@ class AstarAlgorithm
       await sleep(Math.min(100, iterationsDelay));
       if (!this.isRunning) return;
     }
-
-  /*
-  for (let i = 0; i < path.length; ++i)
-  {
-    let cell = document.getElementById(path[i]);
-    resetCellClasses(cell);
-    cell.style.backgroundColor = colorMixer([240, 157, 2],[255, 255, 255], i / path.length);
-    //await sleep(Math.min(100, iterationsDelay));
-    if (!this.isRunning) return;
-  }
-  */
     }
   }
 }
