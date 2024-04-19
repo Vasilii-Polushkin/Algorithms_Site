@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	
+	<!-- default -->
+	<meta charset="utf-8">
+
+	<title>Genetic algorithm</title>
+	<meta name="Genetic algorithm visualisation" content="Genetic algorithm">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<link rel="icon" href="../images/favicon.png">
+	<meta property="og:image" content="../images/preview.jpg">
+
+	<link rel="stylesheet" href="../libs/bootstrap/new css/bootstrap.min.css">
+
+	<link rel="stylesheet" href="../css/main.css">
+	<link rel="stylesheet" href="../css/media.css">
+
+	<script src="../libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+	<link rel="stylesheet" href="../node_modules/bootstrap-icons/font/bootstrap-icons.min.css">
+
+	<!-- custom -->
+	<link rel="stylesheet" href="../css/genetic.css">
+
+	<script type = "module" src="../js-compiled/ts/genetic/genetic.js" defer></script>
+	<script type = "module" src="../js-compiled/ts/genetic/bindings.js" defer></script>
+	<script type = "module" src="../js-compiled/ts/genetic/visualisation.js" defer></script>
+	
+</head>
+
+<body>
+	
+	<!-- CANVAS -->
+	<canvas id="c"></canvas>
+
+	<!-- HEADER -->
+	<header class="p-2 text-bg-dark">
+		<div class = "container">
+			<div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+				<ul class="nav col-7 col-lg-auto me-lg-auto justify-content-center mb-md-0">
+					<li><a href="../index.html" class="nav-link px-2 text-secondary">Home</a></li>
+					<li><a href="./Astar.html" class="nav-link px-2 text-white-50">A* algorithm</a></li>
+					<li><a href="#" class="nav-link px-2 text-white-50">Clusterization</a></li>
+					<li><a href="#" class="nav-link px-2 text-white-50">Genetic algorithm</a></li>
+					<li><a href="./neuralNetwork.html" class="nav-link px-2 text-white-50">Neural network</a></li>
+					<li><a href="./decisionTree.html" class="nav-link px-2 text-white-50">Decision tree</a></li>
+					<li><a href="#" class="nav-link px-2 text-white-50">Ants colony</a></li>
+				</ul>
+
+				<ul class="nav col-1 col-lg-auto me-lg-5 justify-content-end mb-md-0">
+					<a class="navbar-brand" href="https://github.com/Vasilii-Polushkin/Algorithms_Site">
+						<i class="bi bi-github" style="font-size: 1.6rem; color: rgba(213, 204, 204, 0.85);"></i>
+					</a>
+				</ul>
+			</div>
+		</div>
+	</header>
+
+	<!-- MAIN -->
+	<div class="offcanvas offcanvas-end mainBg" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+
+		<div class="offcanvas-header">
+			<h5 class="offcanvas-title" id="offcanvasRightLabel">Set up constants</h5>
+		</div>
+
+		<div class="offcanvas-body">
+			<!-- max depth range form --><br>
+			<label for="PopulationSizeRange" class="form-label">Population Size: <output id="PopulationSizeOutput"></output></label>
+			<input type="range" class="form-range" min="1" max="1000" step="1" id="PopulationSizeRange" value="110">
+
+			<!-- percent to mutate range form --><br>
+			<label for="PercentToMutateRange" class="form-label">Probability To Mutate: <output id="PercentToMutateOutput"></output>%</label>
+			<input type="range" class="form-range" min="0" max="100" step="1" id="PercentToMutateRange" value="70">
+
+			<!-- percent to cross range form --><br>
+			<label for="PercentToCrossRange" class="form-label">Procent to cross: <output id="PercentToCrossOutput"></output>%</label>
+			<input type="range" class="form-range" min="0" max="100" step="1" id="PercentToCrossRange" value="50">
+
+			<!-- generations without changes range form --><br>
+			<label for="MaxGenerationsWithoutChangesRange" class="form-label">Generations Without Changes: <output id="MaxGenerationsWithoutChangesOutput"></output></label>
+			<input type="range" class="form-range" min="1" max="500" step="1" id="MaxGenerationsWithoutChangesRange" value="140">
+		</div>
+	</div>
+
+	<div class = "row g-0 text-center padding">
+		<div class="col-sm-4 col-md-4">
+			<button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+				Settings
+			</button>
+
+			<button class="btn btn-outline-light" type="button" id = "RandomizeCitiesBtn">
+				Add Random Cities
+			</button>
+
+			<button class="btn btn-outline-light" type="button" id = "ClearCitiesBtn">
+				Clear Cities
+			</button>
+		</div>
+
+			<!-- statictics -->
+		<div class="col-sm-2 col-md-2">
+			Generations without changes: <output id="GenerationsWithoutChangesOutput">0</output><br>
+			Path length: <output id="PathLengthOutput">0</output>
+		</div>
+
+			<!-- Generations range form -->
+		<div class="col-sm-2 col-md-2">
+			<label for="CurrGenerationsRange" class="form-label">Generation: <output id="CurrGenerationOutput">0</output>/<output id="TotalGenerationOutput">0</output></label>
+			<input type="range" class="form-range" min="0" max="0" step="1" id="CurrGenerationRange" value="0">
+		</div>
+			<!-- run btn -->
+		<div class="col-sm-2 col-md-2">
+			<button type="button" class="btn btn-outline-light" id = "RunBtn">Find Path</button>
+		</div>
+	</div>
+</body>
+
+</html>

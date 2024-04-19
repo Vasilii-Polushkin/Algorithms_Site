@@ -5,7 +5,6 @@ import { iterationsDelay,SetClassifiedAmount,SetClassifiedWrong,SetTotalToClassi
 //обрабатываем каждый столбец(атрибут) поочередно
 //сначала определяем тип атрибута
 //потом преобразуем столб в сет и находим всевозможные условия, которые могут быть в узлах дерева
-
 export class TreeNode
 {
     parent: TreeNode;
@@ -14,12 +13,12 @@ export class TreeNode
     categoricalID: number | null = null;
     attributeType: attributeTypes | null = null;
     attributeID: number | null = null;
-    conditionValue: number | string | null = null; // string некруто
+    conditionValue: number | string | null = null;
 
     entropy: number = 0;
     samplesAmount: number = 0;
     samplesIDs: number[] = [];
-
+ 
     ownerTree: DecisionTree;
 
     constructor(ownerTree: DecisionTree, parent: TreeNode)

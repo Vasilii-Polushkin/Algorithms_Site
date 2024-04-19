@@ -14,4 +14,4 @@ export class attribute
     GlobalID: number; 
     id: number;
     values: number[] | string[];
-}
+} 

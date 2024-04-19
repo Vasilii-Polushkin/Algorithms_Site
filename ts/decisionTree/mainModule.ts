@@ -53,7 +53,7 @@ ClassifyBtn.addEventListener("click", ()=>{
             return;
         }
 
-        if (handleClassifyFileValidation())
+        if (handleClassifyFileValidation()) 
             tree.classifyDataTable(100, newClassifyDataTable)
     }
-});
+}); 

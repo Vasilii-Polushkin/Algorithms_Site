@@ -39,4 +39,4 @@ export function incrementedValue(x: undefined | number): number
         x = 0;
     x++;
     return x;
-}
+} 

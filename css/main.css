@@ -173,3 +173,7 @@ select option:hover {
 .whitespaces-pre {
 	white-space: pre;
 }
+
+.padding{
+	padding: .5%;
+}

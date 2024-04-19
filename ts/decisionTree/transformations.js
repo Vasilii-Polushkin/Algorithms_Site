@@ -12,7 +12,7 @@ function mouseDown(e) {
   // get initial mousedown coordinated
   const mouseY = e.clientY;
   const mouseX = e.clientX;
-
+  
   // get element top and left positions
   const elmY = movableDiv.offsetTop;
   const elmX = movableDiv.offsetLeft;
