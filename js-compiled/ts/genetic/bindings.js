@@ -1,4 +1,4 @@
-import { algorithmRunner } from "./genetic.js";
+import { startPathFinding, abortPathFinding } from "./genetic.js";
 import { setRandomSities, clearSities, startAnimating, stopAnimating } from "./visualisation.js";
 // main page
 export let currGenerationInput = 0;
@@ -7,19 +7,13 @@ export let populationSizeInput = 90;
 export let percentToMutateInput = 30;
 export let percentToCrossInput = 40;
 export let maxGenerationsWithoutChangesInput = 30;
-// runners
-let runners = [];
 /**
  * ----------------------- MAIN PAGE ------------------------
  */
 const RunBtn = document.getElementById("RunBtn");
 RunBtn.addEventListener('click', () => {
     stopAnimating();
-    for (let i = runners.length - 1; i >= 0; i--) {
-        runners[i].stopRunning();
-        runners.pop();
-    }
-    runners.push(new algorithmRunner());
+    startPathFinding();
 });
 const Toast = bootstrap.Toast.getOrCreateInstance(document.getElementById('toast'));
 export function showToast() {
@@ -27,11 +21,13 @@ export function showToast() {
 }
 const RandomizeCitiesBtn = document.getElementById("RandomizeCitiesBtn");
 RandomizeCitiesBtn.addEventListener('click', () => {
+    abortPathFinding();
     setRandomSities();
     startAnimating();
 });
 const ClearCitiesBtn = document.getElementById("ClearCitiesBtn");
 ClearCitiesBtn.addEventListener('click', () => {
+    abortPathFinding();
     clearSities();
     startAnimating();
 });
@@ -62,37 +58,37 @@ CurrGenerationInput.addEventListener("input", () => {
 // Generations range form
 const PopulationSizeOutput = document.getElementById("PopulationSizeOutput");
 const PopulationSizeInput = document.getElementById("PopulationSizeRange");
-populationSizeInput = PopulationSizeInput.value;
+populationSizeInput = parseInt(PopulationSizeInput.value);
 PopulationSizeOutput.textContent = populationSizeInput;
 PopulationSizeInput.addEventListener("input", () => {
-    populationSizeInput = PopulationSizeInput.value;
+    populationSizeInput = parseInt(PopulationSizeInput.value);
     PopulationSizeOutput.textContent = populationSizeInput;
 });
 // Percent to mutate range form
 const PercentToMutateOutput = document.getElementById("PercentToMutateOutput");
 const PercentToMutateInput = document.getElementById("PercentToMutateRange");
-percentToMutateInput = PercentToMutateInput.value;
+percentToMutateInput = parseInt(PercentToMutateInput.value);
 PercentToMutateOutput.textContent = percentToMutateInput;
 PercentToMutateInput.addEventListener("input", () => {
-    percentToMutateInput = PercentToMutateInput.value;
+    percentToMutateInput = parseInt(PercentToMutateInput.value);
     PercentToMutateOutput.textContent = percentToMutateInput;
 });
 // Percent to cross range form
 const PercentToCrossOutput = document.getElementById("PercentToCrossOutput");
 const PercentToCrossInput = document.getElementById("PercentToCrossRange");
-percentToCrossInput = PercentToCrossInput.value;
+percentToCrossInput = parseInt(PercentToCrossInput.value);
 PercentToCrossOutput.textContent = percentToCrossInput;
 PercentToCrossInput.addEventListener("input", () => {
-    percentToCrossInput = PercentToCrossInput.value;
+    percentToCrossInput = parseInt(PercentToCrossInput.value);
     PercentToCrossOutput.textContent = percentToCrossInput;
 });
 // Generations without changes range form
 const MaxGenerationsWithoutChangesOutput = document.getElementById("MaxGenerationsWithoutChangesOutput");
 const MaxGenerationsWithoutChangesInput = document.getElementById("MaxGenerationsWithoutChangesRange");
-maxGenerationsWithoutChangesInput = MaxGenerationsWithoutChangesInput.value;
+maxGenerationsWithoutChangesInput = parseInt(MaxGenerationsWithoutChangesInput.value);
 MaxGenerationsWithoutChangesOutput.textContent = maxGenerationsWithoutChangesInput;
 MaxGenerationsWithoutChangesInput.addEventListener("input", () => {
-    maxGenerationsWithoutChangesInput = MaxGenerationsWithoutChangesInput.value;
+    maxGenerationsWithoutChangesInput = parseInt(MaxGenerationsWithoutChangesInput.value);
     MaxGenerationsWithoutChangesOutput.textContent = maxGenerationsWithoutChangesInput;
 });
 //# sourceMappingURL=bindings.js.map

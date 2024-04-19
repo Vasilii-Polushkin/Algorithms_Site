@@ -1,4 +1,4 @@
-let isAnimating = true;
+import { abortPathFinding } from "./genetic.js";
 window.requestAnimationFrame = (function () {
     return window.requestAnimationFrame ||
         window.webkitRequestAnimationFrame ||
@@ -10,12 +10,12 @@ window.requestAnimationFrame = (function () {
         };
 })();
 class Vector {
+    x;
+    y;
     constructor(x, y) {
         this.x = x || 0;
         this.y = y || 0;
     }
-    x;
-    y;
     set(x, y) {
         if (typeof x === 'object') {
             y = x.y;
@@ -44,7 +44,8 @@ class Vector {
         return Math.sqrt(this.x * this.x + this.y * this.y);
     }
     distanceTo(other) {
-        let diffX = other.x - this.x, diffY = other.y - this.y;
+        const diffX = other.x - this.x;
+        const diffY = other.y - this.y;
         return Math.sqrt(diffX * diffX + diffY * diffY);
     }
     toString() {
@@ -56,7 +57,6 @@ function substractVectors(a, b) {
     return new Vector(a.x - b.x, a.y - b.y);
 }
 ;
-const RADIUS_LIMIT = 65;
 class City {
     x;
     y;
@@ -76,7 +76,8 @@ class City {
         this._targets = { cities: targets.cities || [] };
     }
     distanceTo(other) {
-        let diffX = other.x - this.x, diffY = other.y - this.y;
+        const diffX = other.x - this.x;
+        const diffY = other.y - this.y;
         return Math.sqrt(diffX * diffX + diffY * diffY);
     }
     hitTest(vector) {
@@ -101,7 +102,6 @@ class City {
     render(context) {
         if (this.destroyed)
             return;
-        let i, length;
         this._easeRadius = (this._easeRadius + (this.radius - this.currentRadius) * 0.07) * 0.95;
         this.currentRadius += this._easeRadius;
         if (this.currentRadius < 0)
@@ -110,11 +110,11 @@ class City {
             this.radius *= 0.75;
             if (this.currentRadius < 1)
                 this.destroyed = true;
-            this._draw(context);
+            this.draw(context);
             return;
         }
         let cities = this._targets.cities, city, area = this.radius * this.radius * Math.PI, garea;
-        for (i = 0, length = cities.length; i < length; i++) {
+        for (let i = 0, length = cities.length; i < length; i++) {
             city = cities[i];
             if (city === this || city.destroyed)
                 continue;
@@ -128,9 +128,9 @@ class City {
         }
         if (this.currentRadius > RADIUS_LIMIT)
             this.collapse();
-        this._draw(context);
+        this.draw(context);
     }
-    _draw(context, cityColor = "#ffffff") {
+    draw(context, cityColor = "#ffffff") {
         context.save();
         context.beginPath();
         context.arc(this.x, this.y, this.currentRadius, 0, Math.PI * 2, false);
@@ -150,29 +150,24 @@ export function setRandomSities(amount = 10) {
 export function clearSities() {
     cities.length = 0;
 }
-// Initialize
-// Configs
-const BACKGROUND_COLOR = 'rgba(11, 51, 56, 1)', CITY_RADIUS = 10;
-// lets
-let canvas, context, bufferCanvas, screenWidth, screenHeight, mouse = new Vector(), gradient;
+//const BACKGROUND_COLOR = 'rgba(11, 51, 56, 1)';
+let isAnimating = true;
+const RADIUS_LIMIT = 65;
+const CITY_RADIUS = 10;
+let canvas, context;
+let screenWidth, screenHeight;
+let mouse = new Vector();
 export let cities = [];
-// Event Listeners
+/* -------------------------- EVENT LISTENERS -------------------------- */
 function resize() {
     screenWidth = canvas.width = window.innerWidth;
     screenHeight = canvas.height = window.innerHeight;
-    bufferCanvas.width = screenWidth;
-    bufferCanvas.height = screenHeight;
     context = canvas.getContext('2d');
-    //let cx = canvas.width * 0.5,
-    //    cy = canvas.height * 0.5;
-    //gradient = context.createRadialGradient(cx, cy, 0, cx, cy, Math.sqrt(cx * cx + cy * cy));
-    //gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
-    //gradient.addColorStop(1, 'rgba(0, 0, 0, 0.35)');
 }
 function mouseMove(e) {
     mouse.set(e.clientX, e.clientY);
-    let i, city, hit = false;
-    for (i = cities.length - 1; i >= 0; i--) {
+    let city, hit = false;
+    for (let i = cities.length - 1; i >= 0; i--) {
         city = cities[i];
         if ((!hit && city.hitTest(mouse)) || city.dragging)
             city.isMouseOver = hit = true;
@@ -188,9 +183,7 @@ function mouseDown(e) {
             return;
         }
     }
-    cities.push(new City(e.clientX, e.clientY, CITY_RADIUS, {
-        cities: cities
-    }));
+    cities.push(new City(e.clientX, e.clientY, CITY_RADIUS, { cities: cities }));
 }
 function mouseUp() {
     for (let i = 0, length = cities.length; i < length; i++) {
@@ -208,15 +201,7 @@ function doubleClick() {
         }
     }
 }
-// Init
-canvas = document.getElementById('c');
-bufferCanvas = document.createElement('canvas');
-window.addEventListener('resize', resize, false);
-resize(null);
-canvas.addEventListener('mousemove', mouseMove, false);
-canvas.addEventListener('mousedown', mouseDown, false);
-canvas.addEventListener('mouseup', mouseUp, false);
-canvas.addEventListener('dblclick', doubleClick, false);
+/* ------------------------------- INIT ------------------------------- */
 export function stopAnimating() {
     isAnimating = false;
     window.removeEventListener('resize', resize, false);
@@ -229,6 +214,7 @@ export function stopAnimating() {
 export function startAnimating() {
     if (isAnimating)
         return;
+    abortPathFinding();
     isAnimating = true;
     window.addEventListener('resize', resize, false);
     resize(null);
@@ -256,7 +242,6 @@ export function drawLines(nodesOrder, strokeColor = "rgb(205, 198, 195)") {
     drawCities();
     context.restore();
 }
-// Start Update
 let loop = function (shouldCheck = false) {
     if (shouldCheck && !isAnimating)
         return;
@@ -265,7 +250,8 @@ let loop = function (shouldCheck = false) {
     context.fillStyle = BACKGROUND_COLOR;
     context.fillRect(0, 0, screenWidth, screenHeight);
     context.fillStyle = gradient;
-    context.fillRect(0, 0, screenWidth, screenHeight);*/
+    context.fillRect(0, 0, screenWidth, screenHeight);
+    */
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.restore();
     drawCities();
@@ -285,5 +271,12 @@ function drawCities() {
         }
     }
 }
+canvas = document.getElementById('c');
+window.addEventListener('resize', resize, false);
+resize();
+canvas.addEventListener('mousemove', mouseMove, false);
+canvas.addEventListener('mousedown', mouseDown, false);
+canvas.addEventListener('mouseup', mouseUp, false);
+canvas.addEventListener('dblclick', doubleClick, false);
 loop();
 //# sourceMappingURL=visualisation.js.map
