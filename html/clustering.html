@@ -23,10 +23,12 @@
     <script src="../js/common.js" defer></script>
 
     <script src="../libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <link rel="stylesheet" href="../node_modules/bootstrap-icons/font/bootstrap-icons.min.css">
     <!-- default -->
 
-    <script type = "module" src="../js/clustering/control.js" defer></script>
-    <script type = "module" src="../js/clustering/algorithms.js" defer></script>
+    <script type="module" src="../js/clustering/control.js" defer></script>
+    <script type="module" src="../js/clustering/algorithms.js" defer></script>
     <link rel="stylesheet" href="../css/clustering.css">
 
 </head>
@@ -86,15 +88,66 @@
 
 
     <div id="menu">
+
+        <div class="mb-3 btn btn-secondary" id="minPtsTooltip" type="button" data-bs-toggle="tooltip"
+             data-bs-placement="top"
+             data-bs-title="The minimum number of points that forms a cluster; DBSCAN parameter">
+            <label for="minPts" class="form-label"></label>
+            <input type="number" class="form-control" id="minPts" placeholder="Enter minPts" step="1" min="1">
+        </div>
+
+        <div class="mb-3 btn btn-secondary" id="epsilonTooltip" type="button" data-bs-toggle="tooltip"
+             data-bs-placement="top"
+             data-bs-title="Radius of point's neighborhood; DBSCAN parameter">
+            <label for="epsilon" class="form-label"></label>
+            <input type="number" class="form-control" id="epsilon" placeholder="Enter epsilon" step="0.1" min="0.1">
+        </div>
+
         <div class="mb-3">
             <label for="numberOfClusters" class="form-label"></label>
-            <input type="number" class="form-control" id="numberOfClusters" placeholder="Enter the number of clusters" step="1" min="1">
+            <input type="number" class="form-control" id="numberOfClusters" placeholder="Enter the number of clusters"
+                   step="1" min="1">
         </div>
         <button id="run" class="btn btn-outline-light w-100" type="button">Cluster</button>
         <button id="clear" class="btn btn-outline-light w-100" type="button">Restart</button>
 
-        <!-- alert -->
-        <div id="alert"></div>
+
+        <!-- toasts -->
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <!-- number of clusters -->
+            <div id="validNumberOfClusters" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <i class="bi-exclamation-triangle"></i>
+                    <strong class="me-auto whitespaces-pre">   Invalid number of clusters!</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    The number of clusters must be a natural number
+                </div>
+            </div>
+            <!-- DBSCAN parameters -->
+            <div id="validMinPts" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <i class="bi-exclamation-triangle"></i>
+                    <strong class="me-auto whitespaces-pre">   Invalid minPts!</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    The number of min points must be a natural number
+                </div>
+            </div>
+            <div id="validEpsilon" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <i class="bi-exclamation-triangle"></i>
+                    <strong class="me-auto whitespaces-pre">   Invalid epsilon!</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    The min distance between points must be positive
+                </div>
+            </div>
+
+        </div>
     </div>
 
 </section>

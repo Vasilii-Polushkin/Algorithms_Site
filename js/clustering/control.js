@@ -21,6 +21,12 @@ let DBSCAN_caption = document.getElementById('DBSCAN_caption');
 
 let color = document.getElementById('K-means_caption').style.color;
 
+const minPtsTooltip = document.getElementById('minPtsTooltip')
+const ptsTooltip = bootstrap.Tooltip.getOrCreateInstance(minPtsTooltip);
+
+const epsilonTooltip = document.getElementById('epsilonTooltip')
+const epsTooltip = bootstrap.Tooltip.getOrCreateInstance(epsilonTooltip);
+
 
 class Control {
     constructor() {

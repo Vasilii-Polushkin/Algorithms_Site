@@ -1,11 +1,23 @@
-import {control, ctx_C_means, ctx_Hierarchical, ctx_K_means} from "./control.js";
+import {control, ctx_C_means, ctx_DBSCAN, ctx_Hierarchical, ctx_K_means} from "./control.js";
 
 const MAX = 10000;
 const fuzzinessParam = 2;
 const toleranceValue = 0.01;
 let inputNumberOfClusters = document.getElementById('numberOfClusters');
 let numberOfClusters;
+let minPtsInput = document.getElementById('minPts');
+let minPts;
+let epsilonInput = document.getElementById('epsilon');
+let epsilon;
 
+const validNumberOfClusters = document.getElementById('validNumberOfClusters');
+const notValidNumberToast = bootstrap.Toast.getOrCreateInstance(validNumberOfClusters);
+
+const validMinPts = document.getElementById('validMinPts');
+const notValidMinPts = bootstrap.Toast.getOrCreateInstance(validMinPts);
+
+const validEpsilon = document.getElementById('validEpsilon');
+const notValidEpsilon = bootstrap.Toast.getOrCreateInstance(validEpsilon);
 
 function getRandomColor() {
     let letters = '0123456789ABCDEF';
@@ -331,13 +343,75 @@ function AgglomerativeHierarchicalClustering() {
 }
 
 function DBSCAN() {
+    let nearestPoints = new Array(control.points.length);
+    let statuses = new Array(control.points.length);
+    let clusters = [];
 
+    for(let i = 0; i < nearestPoints.length; i++)
+        nearestPoints[i] = [];
+
+    for(let i = 0; i < control.points.length; i++) {
+        for(let j = 0; j < control.points.length; j++) {
+            if (i !== j) {
+                let distance = Math.sqrt((control.points[i].x - control.points[j].x) ** 2 + (control.points[i].y - control.points[j].y) ** 2);
+                if (distance <= epsilon) {
+                    nearestPoints[i].push(j);
+                }
+            }
+        }
+    }
+
+    for(let i = 0; i < nearestPoints.length; i++){
+        if(statuses[i] === undefined) {
+            if (nearestPoints[i].length + 1 < minPts) {
+                statuses[i] = 'noise';
+            } else {
+                statuses[i] = 'core';
+                let cluster = new Cluster(control.points[i]);
+                for (let j = 0; j < nearestPoints[i].length; j++) {
+                    if(statuses[nearestPoints[i][j]] === undefined) statusDetermination(nearestPoints[i][j], nearestPoints, statuses, cluster);
+                }
+                clusters.push(cluster);
+            }
+        }
+    }
+
+    for(let i = 0; i < nearestPoints.length; i++){
+        if(statuses[i] === 'noise') {
+            let cluster = new Cluster(control.points[i]);
+            cluster.color = '#fff';
+            clusters.push(cluster);
+        }
+    }
+
+    control.draw(clusters, ctx_DBSCAN);
+}
+
+function statusDetermination (index, nearestPoints, statuses, cluster) {
+    if(nearestPoints[index].length + 1 >= minPts) {
+        statuses[index] = 'core';
+        for(let i = 0; i < nearestPoints[index].length; i++)
+            if (statuses[nearestPoints[index][i]] === undefined) statusDetermination(nearestPoints[index][i], nearestPoints, statuses, cluster);
+    } else {
+        statuses[index] = 'border';
+    }
+    cluster.points.push(control.points[index]);
 }
 
 export function runAlgorithm() {
     numberOfClusters = parseInt(inputNumberOfClusters.value);
     if (numberOfClusters < 1 || inputNumberOfClusters.valueAsNumber !== Math.floor(numberOfClusters) || numberOfClusters > control.points.length) {
-        control.appendAlert('Invalid number of clusters');
+        notValidNumberToast.show();
+        return;
+    }
+    minPts = parseInt(minPtsInput.value);
+    if (minPts < 1 || minPtsInput.valueAsNumber !== Math.floor(minPts) || minPts > control.points.length) {
+        notValidMinPts.show();
+        return;
+    }
+    epsilon = parseInt(epsilonInput.value);
+    if (epsilon < 0) {
+        notValidEpsilon.show();
         return;
     }
 
