@@ -12,6 +12,7 @@ let epsilon;
 
 const validNumberOfClusters = document.getElementById('validNumberOfClusters');
 const notValidNumberToast = bootstrap.Toast.getOrCreateInstance(validNumberOfClusters);
+let numberOfClustersId = document.getElementById('numberOfClustersId');
 
 const validMinPts = document.getElementById('validMinPts');
 const notValidMinPts = bootstrap.Toast.getOrCreateInstance(validMinPts);
@@ -400,7 +401,13 @@ function statusDetermination (index, nearestPoints, statuses, cluster) {
 
 export function runAlgorithm() {
     numberOfClusters = parseInt(inputNumberOfClusters.value);
-    if (numberOfClusters < 1 || inputNumberOfClusters.valueAsNumber !== Math.floor(numberOfClusters) || numberOfClusters > control.points.length) {
+    if (numberOfClusters < 1 || inputNumberOfClusters.valueAsNumber !== Math.floor(numberOfClusters)) {
+        numberOfClustersId.value = 'The number of clusters must be a natural number';
+        notValidNumberToast.show();
+        return;
+    }
+    if(numberOfClusters > control.points.length) {
+        numberOfClustersId.value = 'The number of clusters cannot exceed the number of points';
         notValidNumberToast.show();
         return;
     }

@@ -172,8 +172,8 @@ export class Control {
     }
 
     getPosition = (e) => {
-        this.x = e.clientX - view.layer1.offsetLeft;
-        this.y = e.clientY - view.layer1.offsetTop;
+        this.x = e.pageX - view.layer1.getBoundingClientRect().left;
+        this.y = e.pageY - view.layer1.getBoundingClientRect().top;
     }
 
     colonyBtnFunc = () => {

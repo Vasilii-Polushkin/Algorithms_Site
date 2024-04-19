@@ -1,4 +1,4 @@
-import {cols, control, getNearFields, isFieldValid, rows, view} from "./control.js";
+import {cols, control, getNearFields, isFieldValid, rows} from "./control.js";
 import {Ant, Cell, Colony} from "./objects.js";
 
 export let currFPS;
