@@ -150,9 +150,6 @@ function resize() {
     screenWidth = canvas.width = window.innerWidth;
     screenHeight = canvas.height = window.innerHeight;
     context = canvas.getContext('2d');
-    context.lineJoin = 'round';
-    context.lineCap = 'round';
-    context.lineWidth = 2;
 }
 function mouseMove(event) {
     mouse.set(event.clientX, event.clientY);

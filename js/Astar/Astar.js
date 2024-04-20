@@ -184,7 +184,7 @@ function updateCellVisuals(event)
         break;
       case cellsTypes.START:
         event.target.style.backgroundColor = cellsTypesColours.START_COLOUR;
-        if (startCell != null)
+        if (startCell !== null)
         {
           resetCellClasses(document.getElementById(startCell));
           document.getElementById(startCell).style.backgroundColor = cellsTypesColours.BLANK_COLOUR;
@@ -194,7 +194,7 @@ function updateCellVisuals(event)
         break;
       case cellsTypes.END:
         event.target.style.backgroundColor = cellsTypesColours.END_COLOUR;
-        if (endCell != null)
+        if (endCell !== null)
         {
           resetCellClasses(document.getElementById(endCell));
           document.getElementById(endCell).style.backgroundColor = cellsTypesColours.BLANK_COLOUR;
@@ -354,10 +354,10 @@ function getRandomInt(max) {
 }
 
 function getLeftAdjustCell(cellId){
-  return (cellId % cellsWidth != 0)? cellId - 1: null;
+  return (cellId % cellsWidth !== 0)? cellId - 1: null;
 }
 function getRightAdjustCell(cellId){
-  return (cellId % cellsWidth != cellsWidth - 1)? cellId + 1: null;
+  return (cellId % cellsWidth !== cellsWidth - 1)? cellId + 1: null;
 }
 function getTopAdjustCell(cellId){
   return (cellId - cellsWidth >= 0)? cellId - cellsWidth: null;
@@ -372,8 +372,8 @@ function getAdjustCells(cellId)
 
   if (cellId - cellsWidth >= 0) res.push(cellId - cellsWidth);
   if (cellId + cellsWidth < cellsWidth * cellsHeight) res.push(cellId + cellsWidth);
-  if (cellId % cellsWidth != 0) res.push(cellId - 1);
-  if (cellId % cellsWidth != cellsWidth - 1) res.push(cellId + 1);
+  if (cellId % cellsWidth !== 0) res.push(cellId - 1);
+  if (cellId % cellsWidth !== cellsWidth - 1) res.push(cellId + 1);
 
   return res;
 }
@@ -393,7 +393,7 @@ let labyrinthStack = [];
 
 function clearLabyrinthStack()
 {
-  while (labyrinthStack.length != 0)
+  while (labyrinthStack.length !== 0)
     labyrinthStack.pop().isGenerating = false;
 }
 
@@ -447,7 +447,7 @@ async createLabyrinth()
     let left = getLeftAdjustCell(randomWallId);
     let right = getRightAdjustCell(randomWallId);
 
-    if (bottom != null && top != null)
+    if (bottom !== null && top !== null)
     {
       if (visited[bottom] && !visited[top])
       {
@@ -484,7 +484,7 @@ async createLabyrinth()
         });
       }
     }
-    if (left != null && right != null)
+    if (left !== null && right !== null)
     {
       if (visited[left] && !visited[right])
       {
@@ -529,7 +529,7 @@ async createLabyrinth()
     if (cell.style.backgroundColor === cellsTypesColours.BLANK_COLOUR)
     {
       cell.style.backgroundColor = cellsTypesColours.START_COLOUR;
-        if (startCell != null)
+        if (startCell !== null)
         {
           resetCellClasses(cell);
           cell.style.backgroundColor = cellsTypesColours.BLANK_COLOUR;
@@ -544,7 +544,7 @@ async createLabyrinth()
     if (cell.style.backgroundColor === cellsTypesColours.BLANK_COLOUR)
     {
       cell.style.backgroundColor = cellsTypesColours.END_COLOUR;
-        if (endCell != null)
+        if (endCell !== null)
         {
           resetCellClasses(cell);
           cell.style.backgroundColor = cellsTypesColours.BLANK_COLOUR;
@@ -574,7 +574,7 @@ let AstarStack = [];
 
 function clearAstarStack()
 {
-  while (AstarStack.length != 0)
+  while (AstarStack.length !== 0)
   {
     AstarStack[AstarStack.length - 1].clearGarbage();
     AstarStack.pop().isRunning = false;
@@ -614,7 +614,7 @@ class AstarAlgorithm
     if (elem < cellsHeight * cellsWidth)
     {
       const cell = document.getElementById(elem);
-      if (cell != null)
+      if (cell !== null)
       {
         cell.textContent = "";
         cell.classList.remove("closed-list");
@@ -629,7 +629,7 @@ class AstarAlgorithm
     if (this.openList.peek()[1] < cellsHeight * cellsWidth)
     {
       const cell = document.getElementById(this.openList.pop()[1]);
-      if (cell != null)
+      if (cell !== null)
       {
         cell.classList.remove("open-list");
         cell.textContent = "";
@@ -642,7 +642,7 @@ class AstarAlgorithm
     if (elem < cellsHeight * cellsWidth)
     {
       const cell = document.getElementById(elem);
-      if (cell != null)
+      if (cell !== null)
       {
         cell.textContent = "";
         cell.classList.remove("final-path");
